@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="apocalypsheep"
+run/main_scene="uid://chwr4tmpuf5bm"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -19,6 +20,7 @@ config/icon="res://icon.svg"
 Constants="*uid://cautn8wl3isvm"
 GameManager="*uid://mupgdiw4mghm"
 SceneManager="*uid://dgby6h86usrbb"
+SaveManager="*uid://de5q0ts77t7u5"
 
 [display]
 

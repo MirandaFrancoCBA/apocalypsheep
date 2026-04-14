@@ -1,5 +1,5 @@
 # scripts/utils/constants.gd
-
+extends Node
 # ─────────────────────────────────────────
 # SCENES — rutas a cada escena del juego
 # ─────────────────────────────────────────
