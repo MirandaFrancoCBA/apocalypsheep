@@ -60,7 +60,10 @@ El proyecto está estructurado en capas para facilitar escalabilidad:
 ## 📁 Estructura del proyecto
 
 
-/project
+## 📁 Estructura del proyecto
+
+
+apocalypsheep/
 │
 ├── scenes/
 ├── scripts/
@@ -71,10 +74,15 @@ El proyecto está estructurado en capas para facilitar escalabilidad:
 │
 ├── data/
 ├── assets/
+│ ├── sprites/
+│ ├── ui/
+│ └── fx/
+│
 ├── save/
-
-
----
+│
+├── README.md
+├── .gitignore
+└── project.godot
 
 ## 🛠️ Tecnologías
 
