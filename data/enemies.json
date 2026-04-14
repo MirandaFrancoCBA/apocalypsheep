@@ -1,0 +1,14 @@
+[
+    {
+      "id": "raider",
+      "name": "Raider",
+      "hp": 50,
+      "damage": 8
+    },
+    {
+      "id": "mutant_rat",
+      "name": "Rata mutante",
+      "hp": 30,
+      "damage": 5
+    }
+  ]
