@@ -76,6 +76,7 @@ apocalypsheep/
 ├── README.md
 ├── .gitignore
 └── project.godot       # Configuración principal de Godot
+```
 
 ## 🛠️ Tecnologías
 
