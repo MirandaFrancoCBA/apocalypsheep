@@ -14,6 +14,12 @@ config/name="apocalypsheep"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Constants="*uid://cautn8wl3isvm"
+GameManager="*uid://mupgdiw4mghm"
+SceneManager="*uid://dgby6h86usrbb"
+
 [display]
 
 window/size/viewport_width=1080
