@@ -1,0 +1,14 @@
+[
+    {
+      "id": "zone_1",
+      "name": "Ciudad destruida",
+      "level_range": [1, 3],
+      "enemies": ["raider", "mutant_rat"]
+    },
+    {
+      "id": "zone_2",
+      "name": "Laboratorio abandonado",
+      "level_range": [2, 5],
+      "enemies": ["robot", "infected_scientist"]
+    }
+  ]

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://cdsiijhsvt4lg"]
+
+[ext_resource type="Script" uid="uid://dqpyduhr8k5cp" path="res://scripts/ui/zone_select.gd" id="1_i4lb5"]
+
+[node name="ZoneSelect" type="Control" unique_id=2138411376]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_i4lb5")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2139926215]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1564190964]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="LabelTitle" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1622635230]
+layout_mode = 2
+text = "Seleccionar Zona"
+horizontal_alignment = 1
+
+[node name="VBoxZones" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1621934966]
+layout_mode = 2

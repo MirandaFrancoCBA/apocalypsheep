@@ -13,33 +13,35 @@ extends Control
 # _ready() se ejecuta cuando la escena carga
 # ─────────────────────────────────────────
 func _ready() -> void:
-    print("[MainMenu] Escena cargada")
-    _check_existing_save()
+	print("[MainMenu] Escena cargada")
+	_check_existing_save()
 
 # ─────────────────────────────────────────
 # Si ya hay una partida guardada, el botón
 # dice "CONTINUAR" en lugar de "JUGAR"
 # ─────────────────────────────────────────
 func _check_existing_save() -> void:
-    if SaveManager.has_save():
-        button_play.text = "CONTINUAR"
-    else:
-        button_play.text = "JUGAR"
+	if SaveManager.has_save():
+		button_play.text = "CONTINUAR"
+	else:
+		button_play.text = "JUGAR"
 
 # ─────────────────────────────────────────
 # Esta función la conectaste desde el editor
 # Se ejecuta cuando el jugador toca "JUGAR"
 # ─────────────────────────────────────────
 func _on_button_play_pressed() -> void:
-    print("[MainMenu] Botón presionado")
-    
-    if SaveManager.has_save():
-        # Carga la partida existente en GameManager
-        SaveManager.load_game()
-    else:
-        # Resetea el estado para una partida nueva
-        GameManager.reset_game()
-        GameManager.game_started = true
-    
-    # Navega a la selección de zona
-    SceneManager.go_to_zone_select()
+	print("[MainMenu] Botón presionado")
+	
+	if SaveManager.has_save():
+		# Carga la partida existente en GameManager
+		SaveManager.load_game()
+	else:
+		# Resetea el estado para una partida nueva
+		GameManager.reset_game()
+		GameManager.game_started = true
+	
+	# Navega a la selección de zona
+	SceneManager.go_to_zone_select()
+
+	
