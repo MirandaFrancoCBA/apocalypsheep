@@ -59,30 +59,23 @@ El proyecto está estructurado en capas para facilitar escalabilidad:
 
 ## 📁 Estructura del proyecto
 
-
-## 📁 Estructura del proyecto
-
-
+```text
 apocalypsheep/
-│
-├── scenes/
-├── scripts/
-│ ├── core/
-│ ├── managers/
-│ ├── ui/
-│ └── utils/
-│
-├── data/
-├── assets/
-│ ├── sprites/
-│ ├── ui/
-│ └── fx/
-│
-├── save/
-│
+├── scenes/             # Escenas de Godot (.tscn)
+├── scripts/            # Lógica del juego (GDScript)
+│   ├── core/           # Clases base y lógica fundamental
+│   ├── managers/       # Singletons (Autoloads) para música, inventario, etc.
+│   ├── ui/             # Scripts de la interfaz de usuario
+│   └── utils/          # Funciones de ayuda y constantes
+├── data/               # Recursos (.tres) para ítems, armas y enemigos
+├── assets/             # Archivos binarios
+│   ├── sprites/        # Pixel art de ovejas y enemigos
+│   ├── ui/             # Texturas de menús y botones
+│   └── fx/             # Partículas y efectos visuales
+├── save/               # Carpeta para archivos de guardado local
 ├── README.md
 ├── .gitignore
-└── project.godot
+└── project.godot       # Configuración principal de Godot
 
 ## 🛠️ Tecnologías
 
