@@ -1,0 +1,85 @@
+# =========================================
+# Godot Engine
+# =========================================
+
+# Archivos de compilación / exportación
+.export/
+.export_presets.cfg
+
+# Cache interna del editor
+.import/
+
+# Archivos generados automáticamente
+*.import
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Archivos de sistema (Windows)
+Thumbs.db
+desktop.ini
+
+# Archivos de sistema (Mac)
+.DS_Store
+
+# Archivos de VS Code (opcional)
+.vscode/
+
+# Archivos de backup
+*.bak
+
+# Archivos de debug
+*.debug
+
+# =========================================
+# Save files (opcional)
+# =========================================
+
+# Ignorar saves locales
+save/
+
+# (Opcional: si querés versionar estructura pero no contenido)
+# save/*
+# !save/.gitkeep
+
+# =========================================
+# Build / Export
+# =========================================
+
+# APK / builds Android
+*.apk
+*.aab
+
+# Exportaciones
+/build/
+dist/
+
+# =========================================
+# Logs y basura
+# =========================================
+
+logs/
+*.log
+
+# =========================================
+# Archivos de usuario local
+# =========================================
+
+*.local
+*.env
+
+# =========================================
+# Otros
+# =========================================
+
+# Archivos de compresión
+*.zip
+*.rar
+*.7z
+
+# Archivos binarios innecesarios
+*.exe
+*.dll
+
+.godot/
