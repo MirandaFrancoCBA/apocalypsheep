@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://doo631d6pjvil"]
+
+[ext_resource type="Script" uid="uid://dchsng412lxan" path="res://scripts/ui/result_screen.gd" id="1_aqgun"]
+
+[node name="ResultScreen" type="Control" unique_id=1727427734]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_aqgun")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=16671477]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=703081789]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LabelTitle" type="Label" parent="CenterContainer/VBoxContainer" unique_id=6197300]
+layout_mode = 2
+text = "Resultado del combate"
+horizontal_alignment = 1
+
+[node name="LabelResult" type="Label" parent="CenterContainer/VBoxContainer" unique_id=64009753]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="ButtonContinue" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1003990004]
+layout_mode = 2
+text = "Continuar"
+
+[connection signal="pressed" from="CenterContainer/VBoxContainer/ButtonContinue" to="." method="_on_button_continue_pressed"]

@@ -76,3 +76,6 @@ func _end_combat(result: String) -> void:
     button_attack.disabled = true
 
     print("[Combat] Resultado:", result)
+
+    await get_tree().create_timer(1.5).timeout
+    SceneManager.go_to_result()

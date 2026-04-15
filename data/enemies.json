@@ -10,5 +10,17 @@
       "name": "Rata mutante",
       "hp": 30,
       "damage": 5
+    },
+    {
+      "id": "infected_scientist",
+      "name": "Infected Scientist",
+      "hp": 50,
+      "damage": 8
+    },
+    {
+      "id": "robot",
+      "name": "Robot mutante",
+      "hp": 300,
+      "damage": 5
     }
   ]
