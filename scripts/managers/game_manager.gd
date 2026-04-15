@@ -6,6 +6,7 @@ extends Node
 # ─────────────────────────────────────────
 signal player_data_changed   # Se dispara cuando cambian los stats del jugador
 signal zone_selected(zone)   # Se dispara cuando el jugador elige una zona
+signal level_up(new_level)
 
 # ─────────────────────────────────────────
 # ESTADO DEL JUGADOR
@@ -91,6 +92,7 @@ func _check_level_up() -> void:
         player_data["hp"]        = player_data["max_hp"]  # cura al subir de nivel
         player_data["damage"]   += 2
         player_data["xp_to_next"] = int(player_data["xp_to_next"] * 1.5)
+        emit_signal("level_up", player_data["level"])
         print("[GameManager] ¡LEVEL UP! Nivel: ", player_data["level"])
 
 # ─────────────────────────────────────────

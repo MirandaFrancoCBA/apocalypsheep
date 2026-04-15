@@ -73,6 +73,11 @@ func _end_combat(result: String) -> void:
 
     if result == "victory":
         var loot = _generate_loot()
+
+        var xp_gained = 20
+        GameManager.add_xp(xp_gained)
+
+        print("[XP] Ganaste:", xp_gained)
         
         if loot != null:
             GameManager.add_item_to_inventory({
