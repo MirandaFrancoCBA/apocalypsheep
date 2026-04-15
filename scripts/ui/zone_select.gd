@@ -3,6 +3,7 @@ extends Control
 
 # Referencia al contenedor donde vamos a crear botones
 @onready var zones_container = $MarginContainer/VBoxContainer/VBoxZones
+@onready var button_back = $MarginContainer/VBoxContainer/ButtonBack
 
 
 func _ready() -> void:
@@ -46,3 +47,7 @@ func _on_zone_selected(zone: Dictionary) -> void:
 
 	# Ir a combate (aunque no exista aún)
 	SceneManager.go_to_combat()
+
+func _on_button_back_pressed() -> void:
+	print("[ZoneSelect] Volviendo al menú")
+	SceneManager.go_to_main_menu()

@@ -43,3 +43,6 @@ func go_to_combat() -> void:
 
 func go_to_result() -> void:
     go_to(Constants.SCENE_RESULT)
+
+func go_to_inventory():
+    go_to(Constants.SCENE_INVENTORY)

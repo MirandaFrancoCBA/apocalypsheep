@@ -45,3 +45,5 @@ func _on_button_play_pressed() -> void:
 	SceneManager.go_to_zone_select()
 
 	
+func _on_button_inventory_pressed():
+	SceneManager.go_to_inventory()

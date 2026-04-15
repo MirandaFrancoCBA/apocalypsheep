@@ -7,6 +7,7 @@ const SCENE_MAIN_MENU   = "res://scenes/main_menu.tscn"
 const SCENE_ZONE_SELECT = "res://scenes/zone_select.tscn"
 const SCENE_COMBAT      = "res://scenes/combat_screen.tscn"
 const SCENE_RESULT      = "res://scenes/result.tscn"
+const SCENE_INVENTORY   = "res://scenes/inventory.tscn"
 
 # ─────────────────────────────────────────
 # GAME CONFIG

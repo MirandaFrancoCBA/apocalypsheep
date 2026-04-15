@@ -34,3 +34,9 @@ horizontal_alignment = 1
 
 [node name="VBoxZones" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1621934966]
 layout_mode = 2
+
+[node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1315409959]
+layout_mode = 2
+text = "Volver al Menu"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonBack" to="." method="_on_button_back_pressed"]
