@@ -6,7 +6,7 @@ class_name Player
 var hp: int
 var damage: int
 
-func from_game_manager() -> Player:
+static func from_game_manager() -> Player:
     var data = GameManager.get_player_data()
     
     var p = Player.new()
