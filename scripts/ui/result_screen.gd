@@ -10,6 +10,11 @@ func _ready() -> void:
 
 func _show_result() -> void:
     var result = GameManager.get_combat_result()
+    var inventory = GameManager.get_player_data()["inventory"]
+
+    if inventory.size() > 0:
+        var last_item = inventory[inventory.size() - 1]
+        label_result.text += "\nLoot: " + last_item["name"]
 
     if result == "victory":
         label_result.text = "¡VICTORIA!"

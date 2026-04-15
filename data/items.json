@@ -1,0 +1,23 @@
+[
+    {
+      "id": "pistol_01",
+      "name": "Pistola oxidada",
+      "type": "weapon",
+      "damage": 5,
+      "rarity": "common"
+    },
+    {
+      "id": "rifle_01",
+      "name": "Rifle viejo",
+      "type": "weapon",
+      "damage": 10,
+      "rarity": "rare"
+    },
+    {
+      "id": "medkit_01",
+      "name": "Botiquín",
+      "type": "consumable",
+      "heal": 20,
+      "rarity": "common"
+    }
+  ]

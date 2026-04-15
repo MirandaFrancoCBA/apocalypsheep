@@ -71,6 +71,18 @@ func _end_combat(result: String) -> void:
 
     GameManager.set_combat_result(result)
 
+    if result == "victory":
+        var loot = _generate_loot()
+        
+        if loot != null:
+            GameManager.add_item_to_inventory({
+                "id": loot.id,
+                "name": loot.name,
+                "type": loot.type
+            })
+
+            print("[Loot] Ganaste:", loot.name)
+
     label_result.text = "Resultado: " + result
 
     button_attack.disabled = true
@@ -79,3 +91,22 @@ func _end_combat(result: String) -> void:
 
     await get_tree().create_timer(1.5).timeout
     SceneManager.go_to_result()
+
+func _generate_loot():
+    var file = FileAccess.open("res://data/items.json", FileAccess.READ)
+
+    if file == null:
+        push_error("No se pudo abrir items.json")
+        return null
+
+    var data = JSON.parse_string(file.get_as_text())
+
+    if data == null or data.is_empty():
+        push_error("Items vacíos")
+        return null
+
+    var random_item_data = data.pick_random()
+
+    var item = Item.from_dict(random_item_data)
+
+    return item
