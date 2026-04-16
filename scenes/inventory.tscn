@@ -38,10 +38,15 @@ layout_mode = 2
 [node name="LabelDetail" type="Label" parent="MarginContainer/VBoxContainer" unique_id=727969253]
 layout_mode = 2
 text = "Selecciona un item"
-autowrap_mode = 1
+autowrap_mode = 2
+
+[node name="ButtonEquip" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1069234930]
+layout_mode = 2
+text = "Equipar"
 
 [node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=293995187]
 layout_mode = 2
 text = "<- Volver"
 
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonEquip" to="." method="_on_button_equip_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonBack" to="." method="_on_button_back_pressed"]
