@@ -35,6 +35,11 @@ horizontal_alignment = 1
 [node name="VBoxItems" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1535806740]
 layout_mode = 2
 
+[node name="LabelDetail" type="Label" parent="MarginContainer/VBoxContainer" unique_id=727969253]
+layout_mode = 2
+text = "Selecciona un item"
+autowrap_mode = 1
+
 [node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=293995187]
 layout_mode = 2
 text = "<- Volver"

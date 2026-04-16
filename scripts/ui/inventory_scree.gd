@@ -4,6 +4,7 @@ extends Control
 
 @onready var items_container = $MarginContainer/VBoxContainer/VBoxItems
 @onready var button_back = $MarginContainer/VBoxContainer/ButtonBack
+@onready var label_detail = $MarginContainer/VBoxContainer/LabelDetail
 
 func _ready() -> void:
 	print("[Inventory] Cargando inventario")
@@ -60,6 +61,8 @@ func _show_item_detail(item: Dictionary) -> void:
 
 	if item.has("rarity"):
 		text += "Rareza: " + item["rarity"] + "\n"
+
+	label_detail.text = text
 
 	print(text)
 

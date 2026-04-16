@@ -7,6 +7,13 @@
       "rarity": "common"
     },
     {
+      "id": "rifle_00",
+      "name": "Rifle Antiguo del Sol",
+      "type": "weapon",
+      "damage": 100,
+      "rarity": "Epic"
+    },
+    {
       "id": "rifle_01",
       "name": "Rifle viejo",
       "type": "weapon",

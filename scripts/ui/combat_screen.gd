@@ -81,9 +81,12 @@ func _end_combat(result: String) -> void:
         
         if loot != null:
             GameManager.add_item_to_inventory({
-                "id": loot.id,
-                "name": loot.name,
-                "type": loot.type
+            "id": loot.id,
+            "name": loot.name,
+            "type": loot.type,
+            "damage": loot.damage,
+            "heal": loot.heal,
+            "rarity": loot.rarity
             })
 
             print("[Loot] Ganaste:", loot.name)
