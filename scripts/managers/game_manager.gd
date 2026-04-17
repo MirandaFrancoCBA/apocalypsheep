@@ -78,7 +78,7 @@ func unequip_item() -> void:
 	print("[Inventory] Arma desequipada:", player_data["equipped_weapon"]["name"])
 
 	player_data["equipped_weapon"] = null
-	
+
 func get_equipped_weapon():
 	return player_data["equipped_weapon"]
 
@@ -116,6 +116,21 @@ func _check_level_up() -> void:
 		player_data["xp_to_next"] = int(player_data["xp_to_next"] * 1.5)
 		emit_signal("level_up", player_data["level"])
 		print("[GameManager] ¡LEVEL UP! Nivel: ", player_data["level"])
+
+func remove_item(item: Dictionary) -> void:
+	var inventory = player_data["inventory"]
+
+	if item in inventory:
+		inventory.erase(item)
+
+		# si estaba equipado → desequipar
+		if player_data.get("equipped_weapon") == item:
+			player_data["equipped_weapon"] = null
+			print("[Inventory] Item equipado eliminado → desequipado automático")
+
+		print("[Inventory] Item eliminado:", item.get("name", ""))
+	else:
+		print("[Inventory] Item no encontrado")
 
 # ─────────────────────────────────────────
 # RESET (nueva partida)

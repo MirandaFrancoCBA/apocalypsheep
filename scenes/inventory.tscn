@@ -44,6 +44,10 @@ layout_mode = 2
 text = "Selecciona un item"
 autowrap_mode = 2
 
+[node name="ButtonDelete" type="Button" parent="MarginContainer/VBoxContainer" unique_id=166275754]
+layout_mode = 2
+text = "Eliminar"
+
 [node name="ButtonEquip" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1069234930]
 layout_mode = 2
 text = "Equipar"
@@ -56,6 +60,12 @@ text = "Desequipar"
 layout_mode = 2
 text = "<- Volver"
 
+[node name="ConfirmDeleteDialog" type="ConfirmationDialog" parent="." unique_id=394682685]
+ok_button_text = "Eliminar"
+dialog_text = "Eliminar item?"
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonDelete" to="." method="_on_button_delete_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonEquip" to="." method="_on_button_equip_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonUnequip" to="." method="_on_button_unequip_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonBack" to="." method="_on_button_back_pressed"]
+[connection signal="confirmed" from="ConfirmDeleteDialog" to="." method="_on_confirm_delete_dialog_confirmed"]

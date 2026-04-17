@@ -8,6 +8,8 @@ extends Control
 @onready var button_equip = $MarginContainer/VBoxContainer/ButtonEquip
 @onready var label_equipped = $MarginContainer/VBoxContainer/LabelEquipped
 @onready var button_unequip = $MarginContainer/VBoxContainer/ButtonUnequip
+@onready var button_delete = $MarginContainer/VBoxContainer/ButtonDelete
+@onready var confirm_delete_dialog = $ConfirmDeleteDialog
 
 var selected_item: Dictionary = {}
 
@@ -41,7 +43,7 @@ func _create_items(items: Array) -> void:
 		var text = item.get("name", "Item") + " (" + item.get("type", "") + ")"
 
 		if item == GameManager.get_equipped_weapon():
-			text += " (EQUIPADO)"
+			text += " ✔"
 
 		button.text = text
 
@@ -90,10 +92,22 @@ func _on_button_equip_pressed() -> void:
 	GameManager.equip_item(selected_item)
 	_update_equipped_label()
 	_update_unequip_button()
+	_refresh_inventory()
+
 func _on_button_unequip_pressed() -> void:
 	GameManager.unequip_item()
 	_update_equipped_label()
 	_update_unequip_button()
+	_refresh_inventory()
+
+func _clear_items() -> void:
+	for child in items_container.get_children():
+		child.queue_free()
+
+
+func _refresh_inventory() -> void:
+	_clear_items()
+	_load_inventory()
 
 func _update_unequip_button() -> void:
 	var weapon = GameManager.get_equipped_weapon()
@@ -110,3 +124,23 @@ func _update_equipped_label() -> void:
 	
 
 
+
+
+func _on_button_delete_pressed() -> void:
+	if selected_item.is_empty():
+		print("[Inventory] Ningún item seleccionado")
+		return
+
+	confirm_delete_dialog.popup_centered()
+
+
+func _on_confirm_delete_dialog_confirmed() -> void:
+	GameManager.remove_item(selected_item)
+
+	selected_item = {}
+
+	_refresh_inventory()
+	_update_equipped_label()
+	_update_unequip_button()
+
+	label_detail.text = "Item eliminado"

@@ -32,16 +32,17 @@ func _check_existing_save() -> void:
 # ─────────────────────────────────────────
 func _on_button_play_pressed() -> void:
 	print("[MainMenu] Botón presionado")
-	
+
 	if SaveManager.has_save():
-		# Carga la partida existente en GameManager
+		# cargar partida
 		SaveManager.load_game()
 	else:
-		# Resetea el estado para una partida nueva
-		GameManager.reset_game()
-		GameManager.game_started = true
-	
-	# Navega a la selección de zona
+		# nueva partida (solo una vez)
+		if not GameManager.game_started:
+			GameManager.reset_game()
+			GameManager.game_started = true
+
+	# SIEMPRE navegar
 	SceneManager.go_to_zone_select()
 
 	
