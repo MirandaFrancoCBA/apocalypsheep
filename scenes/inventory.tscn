@@ -48,9 +48,14 @@ autowrap_mode = 2
 layout_mode = 2
 text = "Equipar"
 
+[node name="ButtonUnequip" type="Button" parent="MarginContainer/VBoxContainer" unique_id=2130716038]
+layout_mode = 2
+text = "Desequipar"
+
 [node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=293995187]
 layout_mode = 2
 text = "<- Volver"
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonEquip" to="." method="_on_button_equip_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonUnequip" to="." method="_on_button_unequip_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonBack" to="." method="_on_button_back_pressed"]

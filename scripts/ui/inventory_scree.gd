@@ -7,6 +7,7 @@ extends Control
 @onready var label_detail = $MarginContainer/VBoxContainer/LabelDetail
 @onready var button_equip = $MarginContainer/VBoxContainer/ButtonEquip
 @onready var label_equipped = $MarginContainer/VBoxContainer/LabelEquipped
+@onready var button_unequip = $MarginContainer/VBoxContainer/ButtonUnequip
 
 var selected_item: Dictionary = {}
 
@@ -14,6 +15,7 @@ func _ready() -> void:
 	print("[Inventory] Cargando inventario")
 	_load_inventory()
 	_update_equipped_label()
+	_update_unequip_button()
 
 func _load_inventory() -> void:
 	var player = GameManager.get_player_data()
@@ -87,6 +89,16 @@ func _on_button_equip_pressed() -> void:
 
 	GameManager.equip_item(selected_item)
 	_update_equipped_label()
+	_update_unequip_button()
+func _on_button_unequip_pressed() -> void:
+	GameManager.unequip_item()
+	_update_equipped_label()
+	_update_unequip_button()
+
+func _update_unequip_button() -> void:
+	var weapon = GameManager.get_equipped_weapon()
+
+	button_unequip.disabled = weapon == null
 
 func _update_equipped_label() -> void:
 	var weapon = GameManager.get_equipped_weapon()

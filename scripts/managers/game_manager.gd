@@ -70,6 +70,15 @@ func equip_item(item: Dictionary) -> void:
 
 	print("[Inventory] Arma equipada:", item["name"])
 
+func unequip_item() -> void:
+	if player_data.get("equipped_weapon") == null:
+		print("[Inventory] No hay arma equipada")
+		return
+
+	print("[Inventory] Arma desequipada:", player_data["equipped_weapon"]["name"])
+
+	player_data["equipped_weapon"] = null
+	
 func get_equipped_weapon():
 	return player_data["equipped_weapon"]
 
