@@ -32,6 +32,10 @@ layout_mode = 2
 text = "INVENTARIO!"
 horizontal_alignment = 1
 
+[node name="LabelEquipped" type="Label" parent="MarginContainer/VBoxContainer" unique_id=483843494]
+layout_mode = 2
+text = "Arma equipada: Ninguna"
+
 [node name="VBoxItems" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1535806740]
 layout_mode = 2
 

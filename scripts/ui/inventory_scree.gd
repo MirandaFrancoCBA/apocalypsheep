@@ -6,11 +6,14 @@ extends Control
 @onready var button_back = $MarginContainer/VBoxContainer/ButtonBack
 @onready var label_detail = $MarginContainer/VBoxContainer/LabelDetail
 @onready var button_equip = $MarginContainer/VBoxContainer/ButtonEquip
+@onready var label_equipped = $MarginContainer/VBoxContainer/LabelEquipped
+
 var selected_item: Dictionary = {}
 
 func _ready() -> void:
 	print("[Inventory] Cargando inventario")
 	_load_inventory()
+	_update_equipped_label()
 
 func _load_inventory() -> void:
 	var player = GameManager.get_player_data()
@@ -34,11 +37,14 @@ func _create_items(items: Array) -> void:
 		var button = Button.new()
 
 		var text = item.get("name", "Item") + " (" + item.get("type", "") + ")"
+
+		if item == GameManager.get_equipped_weapon():
+			text += " (EQUIPADO)"
+
 		button.text = text
 
 		button.custom_minimum_size = Vector2(0, 50)
 
-		# conectar click
 		button.pressed.connect(func():
 			_on_item_selected(item)
 		)
@@ -80,3 +86,15 @@ func _on_button_equip_pressed() -> void:
 		return
 
 	GameManager.equip_item(selected_item)
+	_update_equipped_label()
+
+func _update_equipped_label() -> void:
+	var weapon = GameManager.get_equipped_weapon()
+
+	if weapon == null:
+		label_equipped.text = "Arma equipada: Ninguna"
+	else:
+		label_equipped.text = "Arma equipada: " + weapon.get("name", "")
+	
+
+
