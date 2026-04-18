@@ -50,25 +50,33 @@ func _on_button_attack_pressed() -> void:
 	button_attack.disabled = true
 
 	# 🗡️ jugador ataca
-	combat_system.player_attack(player, enemy)
+	var player_result = combat_system.player_attack(player, enemy)
+
+	if player_result["is_crit"]:
+		label_result.text = "💥 CRÍTICO!"
+	else:
+		label_result.text = "Golpe normal"
+
 	_update_ui()
 
 	if enemy.hp <= 0:
 		_end_combat("victory")
 		return
 
-	# ⏳ pequeña pausa
 	await get_tree().create_timer(0.6).timeout
 
 	# 👾 enemigo ataca
-	combat_system.enemy_attack(player, enemy)
+	var enemy_result = combat_system.enemy_attack(player, enemy)
+
+	if enemy_result["is_crit"]:
+		label_result.text = "⚠️ El enemigo hizo CRÍTICO!"
+
 	_update_ui()
 
 	if player.hp <= 0:
 		_end_combat("defeat")
 		return
 
-	# 🔓 reactivar botón
 	button_attack.disabled = false
 
 func _end_combat(result: String) -> void:
