@@ -50,12 +50,14 @@ func _on_button_attack_pressed() -> void:
 	button_attack.disabled = true
 
 	# 🗡️ jugador ataca
-	var player_result = combat_system.player_attack(player, enemy)
+	var result = combat_system.player_attack(player, enemy)
 
-	if player_result["is_crit"]:
-		label_result.text = "💥 CRÍTICO!"
-	else:
-		label_result.text = "Golpe normal"
+	var text = "Golpeaste por " + str(result["damage"])
+
+	if result["is_crit"]:
+		text = "💥 CRÍTICO! " + str(result["damage"])
+
+	label_result.text = text
 
 	_update_ui()
 
@@ -66,10 +68,14 @@ func _on_button_attack_pressed() -> void:
 	await get_tree().create_timer(0.6).timeout
 
 	# 👾 enemigo ataca
-	var enemy_result = combat_system.enemy_attack(player, enemy)
+	result = combat_system.enemy_attack(player, enemy)
 
-	if enemy_result["is_crit"]:
-		label_result.text = "⚠️ El enemigo hizo CRÍTICO!"
+	var enemy_text = "Enemigo golpea por " + str(result["damage"])
+
+	if result["is_crit"]:
+		enemy_text = "⚠️ CRÍTICO enemigo! " + str(result["damage"])
+
+	label_result.text += "\n" + enemy_text
 
 	_update_ui()
 
