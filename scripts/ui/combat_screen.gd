@@ -2,10 +2,12 @@
 extends Control
 
 @onready var label_enemy      = $MarginContainer/VBoxContainer/LabelEnemy
-@onready var label_enemy_hp   = $MarginContainer/VBoxContainer/LabelEnemyHP
-@onready var label_player_hp  = $MarginContainer/VBoxContainer/LabelPlayerHP
+@onready var label_enemy_hp   = $MarginContainer/VBoxContainer/EnemyContainer/LabelEnemyHP
+@onready var label_player_hp  = $MarginContainer/VBoxContainer/PlayerContainer/LabelPlayerHP
 @onready var button_attack    = $MarginContainer/VBoxContainer/ButtonAttack
 @onready var label_result     = $MarginContainer/VBoxContainer/LabelResult
+@onready var player_container = $MarginContainer/VBoxContainer/PlayerContainer
+@onready var enemy_container  = $MarginContainer/VBoxContainer/EnemyContainer
 
 var player
 var enemy
@@ -52,6 +54,12 @@ func _on_button_attack_pressed() -> void:
 	# 🗡️ jugador ataca
 	var result = combat_system.player_attack(player, enemy)
 
+	await _flash(enemy_container, Color.RED)
+	await _shake(enemy_container)
+
+	if result["is_crit"]:
+		await _flash(enemy_container, Color.YELLOW)
+
 	var text = "Golpeaste por " + str(result["damage"])
 
 	if result["is_crit"]:
@@ -69,6 +77,12 @@ func _on_button_attack_pressed() -> void:
 
 	# 👾 enemigo ataca
 	result = combat_system.enemy_attack(player, enemy)
+
+	await _flash(player_container, Color.RED)
+	await _shake(player_container)
+
+	if result["is_crit"]:
+		await _flash(player_container, Color.YELLOW)
 
 	var enemy_text = "Enemigo golpea por " + str(result["damage"])
 
@@ -134,3 +148,23 @@ func _generate_loot():
 
 	var random_item_data = data.pick_random()
 	return Item.from_dict(random_item_data)
+
+func _flash(node: Control, color: Color) -> void:
+	var original = node.modulate
+
+	node.modulate = color
+
+	await get_tree().create_timer(0.1).timeout
+
+	node.modulate = original
+
+func _shake(node: Control) -> void:
+	var original_pos = node.position
+
+	for i in range(5):
+		node.position.x += randi_range(-5, 5)
+		node.position.y += randi_range(-5, 5)
+
+		await get_tree().create_timer(0.02).timeout
+
+	node.position = original_pos

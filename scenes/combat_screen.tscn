@@ -27,14 +27,26 @@ theme_override_constants/margin_bottom = 20
 layout_mode = 2
 theme_override_constants/separation = 15
 
+[node name="PlayerContainer" type="Control" parent="MarginContainer/VBoxContainer" unique_id=1197238035]
+layout_mode = 2
+
+[node name="LabelPlayerHP" type="Label" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1411385085]
+layout_mode = 0
+offset_top = 53.0
+offset_right = 680.0
+offset_bottom = 76.0
+
 [node name="LabelEnemy" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2073394795]
 layout_mode = 2
 
-[node name="LabelEnemyHP" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1800026567]
+[node name="EnemyContainer" type="Control" parent="MarginContainer/VBoxContainer" unique_id=1831012932]
 layout_mode = 2
 
-[node name="LabelPlayerHP" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1411385085]
-layout_mode = 2
+[node name="LabelEnemyHP" type="Label" parent="MarginContainer/VBoxContainer/EnemyContainer" unique_id=1800026567]
+layout_mode = 0
+offset_top = 53.0
+offset_right = 680.0
+offset_bottom = 76.0
 
 [node name="ButtonAttack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1997688783]
 custom_minimum_size = Vector2(150, 150)
