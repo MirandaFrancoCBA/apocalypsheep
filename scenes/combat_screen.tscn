@@ -2,6 +2,16 @@
 
 [ext_resource type="Script" uid="uid://0g3li3luseua" path="res://scripts/ui/combat_screen.gd" id="1_icss1"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icss1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
+bg_color = Color(0.24662805, 0.70213753, 0.40214536, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uvqtf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42k13"]
+bg_color = Color(0.95323414, 0.39075476, 0.38226333, 1)
+
 [node name="CombatScreen" type="Control" unique_id=844330171]
 layout_mode = 3
 anchors_preset = 15
@@ -36,6 +46,23 @@ offset_top = 53.0
 offset_right = 680.0
 offset_bottom = 76.0
 
+[node name="PlayerHPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1577161083]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_styles/background = SubResource("StyleBoxFlat_icss1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_032jr")
+step = 1.0
+show_percentage = false
+
 [node name="LabelEnemy" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2073394795]
 layout_mode = 2
 
@@ -47,6 +74,21 @@ layout_mode = 0
 offset_top = 53.0
 offset_right = 680.0
 offset_bottom = 76.0
+
+[node name="EnemyHPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/EnemyContainer" unique_id=1154476836]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -0.5
+offset_bottom = 3.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_uvqtf")
+theme_override_styles/fill = SubResource("StyleBoxFlat_42k13")
+step = 1.0
+show_percentage = false
 
 [node name="ButtonAttack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1997688783]
 custom_minimum_size = Vector2(150, 150)

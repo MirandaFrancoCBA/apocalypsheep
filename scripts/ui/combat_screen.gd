@@ -8,6 +8,8 @@ extends Control
 @onready var label_result     = $MarginContainer/VBoxContainer/LabelResult
 @onready var player_container = $MarginContainer/VBoxContainer/PlayerContainer
 @onready var enemy_container  = $MarginContainer/VBoxContainer/EnemyContainer
+@onready var player_hp_bar = $MarginContainer/VBoxContainer/PlayerContainer/PlayerHPBar
+@onready var enemy_hp_bar  = $MarginContainer/VBoxContainer/EnemyContainer/EnemyHPBar
 
 var player
 var enemy
@@ -22,6 +24,13 @@ func _ready() -> void:
 func _setup_combat() -> void:
 	player = Player.from_game_manager()
 	enemy = _generate_enemy()
+	player_hp_bar.min_value = 0
+	player_hp_bar.max_value = player.hp
+	player_hp_bar.value = player.hp
+
+	enemy_hp_bar.min_value = 0
+	enemy_hp_bar.max_value = enemy.hp
+	enemy_hp_bar.value = enemy.hp
 
 	label_enemy.text = "Enemigo: " + enemy.name
 	_update_ui()
@@ -44,6 +53,12 @@ func _generate_enemy():
 func _update_ui() -> void:
 	label_player_hp.text = "Jugador HP: " + str(player.hp)
 	label_enemy_hp.text  = "Enemigo HP: " + str(enemy.hp)
+
+	player.hp = max(player.hp, 0)
+	enemy.hp = max(enemy.hp, 0)
+
+	player_hp_bar.value = player.hp
+	enemy_hp_bar.value = enemy.hp
 
 func _on_button_attack_pressed() -> void:
 	if combat_finished:
