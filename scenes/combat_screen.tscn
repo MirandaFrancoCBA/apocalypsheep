@@ -2,17 +2,17 @@
 
 [ext_resource type="Script" uid="uid://0g3li3luseua" path="res://scripts/ui/combat_screen.gd" id="1_icss1"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icss1"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
-bg_color = Color(0.24662805, 0.70213753, 0.40214536, 1)
-
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uvqtf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42k13"]
 bg_color = Color(0.95323414, 0.39075476, 0.38226333, 1)
 
-[node name="CombatScreen" type="Control" unique_id=844330171]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_icss1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
+bg_color = Color(0.24662805, 0.70213753, 0.40214536, 1)
+
+[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("player_container", "enemy_container", "label_player_hp", "player_hp_bar", "label_enemy", "label_enemy_hp", "enemy_hp_bar", "button_attack", "label_result")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,6 +20,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_icss1")
+player_container = NodePath("MarginContainer/VBoxContainer/ArenaSection/HBoxContainer/PlayerContainer")
+enemy_container = NodePath("MarginContainer/VBoxContainer/ArenaSection/HBoxContainer/EnemyContainer")
+label_player_hp = NodePath("MarginContainer/VBoxContainer/PlayerSection/LabelPlayerHP")
+player_hp_bar = NodePath("MarginContainer/VBoxContainer/PlayerSection/PlayerHPBar")
+label_enemy = NodePath("MarginContainer/VBoxContainer/EnemySection/LabelEnemy")
+label_enemy_hp = NodePath("MarginContainer/VBoxContainer/EnemySection/LabelEnemyHP")
+enemy_hp_bar = NodePath("MarginContainer/VBoxContainer/EnemySection/EnemyHPBar")
+button_attack = NodePath("MarginContainer/VBoxContainer/PlayerSection/CenterContainer/ButtonAttack")
+label_result = NodePath("MarginContainer/VBoxContainer/PlayerSection/LabelResult")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1555668808]
 layout_mode = 1
@@ -35,27 +44,57 @@ theme_override_constants/margin_bottom = 20
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=840649750]
 layout_mode = 2
-theme_override_constants/separation = 15
+theme_override_constants/separation = 30
 
-[node name="PlayerContainer" type="Control" parent="MarginContainer/VBoxContainer" unique_id=1197238035]
+[node name="EnemySection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1494593958]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="LabelEnemy" type="Label" parent="MarginContainer/VBoxContainer/EnemySection" unique_id=2073394795]
 layout_mode = 2
 
-[node name="LabelPlayerHP" type="Label" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1411385085]
-layout_mode = 0
-offset_top = 53.0
-offset_right = 680.0
-offset_bottom = 76.0
+[node name="LabelEnemyHP" type="Label" parent="MarginContainer/VBoxContainer/EnemySection" unique_id=1800026567]
+layout_mode = 2
 
-[node name="PlayerHPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1577161083]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -2.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="EnemyHPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/EnemySection" unique_id=1154476836]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_uvqtf")
+theme_override_styles/fill = SubResource("StyleBoxFlat_42k13")
+step = 1.0
+show_percentage = false
+
+[node name="ArenaSection" type="Control" parent="MarginContainer/VBoxContainer" unique_id=1706300991]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ArenaSection" unique_id=1194873249]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PlayerContainer" type="Control" parent="MarginContainer/VBoxContainer/ArenaSection/HBoxContainer" unique_id=1197238035]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Spacer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ArenaSection/HBoxContainer" unique_id=228936247]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="EnemyContainer" type="Control" parent="MarginContainer/VBoxContainer/ArenaSection/HBoxContainer" unique_id=1831012932]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="PlayerSection" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1467062514]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="LabelPlayerHP" type="Label" parent="MarginContainer/VBoxContainer/PlayerSection" unique_id=1411385085]
+layout_mode = 2
+
+[node name="PlayerHPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/PlayerSection" unique_id=1577161083]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_styles/background = SubResource("StyleBoxFlat_icss1")
@@ -63,40 +102,16 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_032jr")
 step = 1.0
 show_percentage = false
 
-[node name="LabelEnemy" type="Label" parent="MarginContainer/VBoxContainer" unique_id=2073394795]
+[node name="LabelResult" type="Label" parent="MarginContainer/VBoxContainer/PlayerSection" unique_id=771717333]
 layout_mode = 2
 
-[node name="EnemyContainer" type="Control" parent="MarginContainer/VBoxContainer" unique_id=1831012932]
+[node name="CenterContainer" type="CenterContainer" parent="MarginContainer/VBoxContainer/PlayerSection" unique_id=1536895560]
 layout_mode = 2
 
-[node name="LabelEnemyHP" type="Label" parent="MarginContainer/VBoxContainer/EnemyContainer" unique_id=1800026567]
-layout_mode = 0
-offset_top = 53.0
-offset_right = 680.0
-offset_bottom = 76.0
-
-[node name="EnemyHPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer/EnemyContainer" unique_id=1154476836]
-layout_mode = 1
-anchors_preset = 14
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -0.5
-offset_bottom = 3.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_styles/background = SubResource("StyleBoxFlat_uvqtf")
-theme_override_styles/fill = SubResource("StyleBoxFlat_42k13")
-step = 1.0
-show_percentage = false
-
-[node name="ButtonAttack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1997688783]
+[node name="ButtonAttack" type="Button" parent="MarginContainer/VBoxContainer/PlayerSection/CenterContainer" unique_id=1997688783]
 custom_minimum_size = Vector2(150, 150)
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Atacar"
 
-[node name="LabelResult" type="Label" parent="MarginContainer/VBoxContainer" unique_id=771717333]
-layout_mode = 2
-
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonAttack" to="." method="_on_button_attack_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/PlayerSection/CenterContainer/ButtonAttack" to="." method="_on_button_attack_pressed"]
