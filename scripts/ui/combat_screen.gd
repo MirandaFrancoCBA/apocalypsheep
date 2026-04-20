@@ -18,6 +18,11 @@ extends Control
 @export var button_attack: Button
 
 # ─────────────────────────────────────────
+# CONFIG
+# ─────────────────────────────────────────
+const MAX_LOG_LINES := 8
+
+# ─────────────────────────────────────────
 # DATA
 # ─────────────────────────────────────────
 var player: Player
@@ -34,7 +39,7 @@ func _ready() -> void:
 	_setup_combat()
 
 # ─────────────────────────────────────────
-# VALIDACIÓN (te salva la vida)
+# VALIDACIÓN
 # ─────────────────────────────────────────
 func _validate_nodes() -> void:
 	var nodes = [
@@ -55,7 +60,6 @@ func _setup_combat() -> void:
 	player = Player.from_game_manager()
 	enemy = _generate_enemy()
 
-	# HP BARS
 	player_hp_bar.min_value = 0
 	player_hp_bar.max_value = player.max_hp
 	player_hp_bar.value = player.hp
@@ -66,8 +70,10 @@ func _setup_combat() -> void:
 
 	label_enemy.text = "Enemigo: " + enemy.name
 
-	_update_ui()
 	label_result.text = ""
+	add_log("⚔️ Combate contra " + enemy.name)
+
+	_update_ui()
 
 # ─────────────────────────────────────────
 # UI UPDATE
@@ -91,6 +97,7 @@ func _on_button_attack_pressed() -> void:
 
 	button_attack.disabled = true
 
+	# ATAQUE JUGADOR
 	var result = combat_system.player_attack(player, enemy)
 
 	await _flash(enemy_container, Color.RED)
@@ -98,10 +105,9 @@ func _on_button_attack_pressed() -> void:
 
 	if result["is_crit"]:
 		await _flash(enemy_container, Color.YELLOW)
-
-	_add_log("💥 CRÍTICO! " + str(result["damage"]))
-	if not result["is_crit"]:
-		_add_log("Golpeaste por " + str(result["damage"]))
+		add_log("💥 CRÍTICO! " + str(result["damage"]))
+	else:
+		add_log("Golpeaste por " + str(result["damage"]))
 
 	_update_ui()
 
@@ -111,7 +117,7 @@ func _on_button_attack_pressed() -> void:
 
 	await get_tree().create_timer(0.6).timeout
 
-	# ENEMIGO
+	# ATAQUE ENEMIGO
 	result = combat_system.enemy_attack(player, enemy)
 
 	await _flash(player_container, Color.RED)
@@ -119,11 +125,9 @@ func _on_button_attack_pressed() -> void:
 
 	if result["is_crit"]:
 		await _flash(player_container, Color.YELLOW)
-
-	if result["is_crit"]:
-		_add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
+		add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
 	else:
-		_add_log("Enemigo golpea por " + str(result["damage"]))
+		add_log("Enemigo golpea por " + str(result["damage"]))
 
 	_update_ui()
 
@@ -134,12 +138,23 @@ func _on_button_attack_pressed() -> void:
 	button_attack.disabled = false
 
 # ─────────────────────────────────────────
-# LOG (AUTO SCROLL)
+# LOG (PRO + AUTO SCROLL + LIMIT)
 # ─────────────────────────────────────────
-func _add_log(text: String) -> void:
-	label_result.text += text + "\n"
+func add_log(text: String) -> void:
+	var lines := []
+
+	if label_result.text != "":
+		lines = label_result.text.split("\n")
+
+	lines.append(text)
+
+	if lines.size() > MAX_LOG_LINES:
+		lines.remove_at(0)
+
+	label_result.text = "\n".join(lines)
 
 	await get_tree().process_frame
+
 	log_container.scroll_vertical = log_container.get_v_scroll_bar().max_value
 
 # ─────────────────────────────────────────
@@ -160,8 +175,7 @@ func _generate_enemy() -> Enemy:
 
 	for e in data:
 		if e["id"] == random_id:
-			return Enemy.new().from_dict(e)
-
+			return Enemy.from_dict(e)
 	return Enemy.new()
 
 func _end_combat(result: String) -> void:
@@ -172,9 +186,9 @@ func _end_combat(result: String) -> void:
 	if result == "victory":
 		var xp_gained = 20
 		GameManager.add_xp(xp_gained)
-		_add_log("Ganaste " + str(xp_gained) + " XP")
+		add_log("✨ Ganaste " + str(xp_gained) + " XP")
 
-	label_result.text += "\nResultado: " + result
+	add_log("🏁 Resultado: " + result)
 
 	button_attack.disabled = true
 
@@ -194,8 +208,8 @@ func _shake(node: Control) -> void:
 	var original_pos = node.position
 
 	for i in range(5):
-		node.position.x += randi_range(-5, 5)
-		node.position.y += randi_range(-5, 5)
+		node.position.x += float(randi_range(-5, 5))
+		node.position.y += float(randi_range(-5, 5))
 		await get_tree().create_timer(0.02).timeout
 
 	node.position = original_pos
