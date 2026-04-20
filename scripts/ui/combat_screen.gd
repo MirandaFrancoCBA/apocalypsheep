@@ -1,23 +1,24 @@
 extends Control
 
 # ─────────────────────────────────────────
-# EXPORTS (asignás desde el editor)
+# EXPORTS (asignados desde el editor)
 # ─────────────────────────────────────────
-@export var player_container: Control
+@export var label_enemy: Label
+@export var label_enemy_hp: Label
+@export var enemy_hp_bar: ProgressBar
 @export var enemy_container: Control
 
 @export var label_player_hp: Label
 @export var player_hp_bar: ProgressBar
+@export var player_container: Control
 
-@export var label_enemy: Label
-@export var label_enemy_hp: Label
-@export var enemy_hp_bar: ProgressBar
+@export var label_result: Label
+@export var log_container: ScrollContainer
 
 @export var button_attack: Button
-@export var label_result: Label
 
 # ─────────────────────────────────────────
-# ESTADO
+# DATA
 # ─────────────────────────────────────────
 var player: Player
 var enemy: Enemy
@@ -29,25 +30,23 @@ var combat_system := CombatSystem.new()
 # READY
 # ─────────────────────────────────────────
 func _ready() -> void:
-	print("[Combat] Iniciado")
-
 	_validate_nodes()
 	_setup_combat()
 
 # ─────────────────────────────────────────
-# VALIDACIÓN (anti errores silenciosos)
+# VALIDACIÓN (te salva la vida)
 # ─────────────────────────────────────────
 func _validate_nodes() -> void:
 	var nodes = [
-		player_container, enemy_container,
-		label_player_hp, player_hp_bar,
-		label_enemy, label_enemy_hp, enemy_hp_bar,
-		button_attack, label_result
+		label_enemy, label_enemy_hp, enemy_hp_bar, enemy_container,
+		label_player_hp, player_hp_bar, player_container,
+		label_result, log_container, button_attack
 	]
 
 	for n in nodes:
 		if n == null:
 			push_error("[CombatScreen] Nodo no asignado en inspector")
+			return
 
 # ─────────────────────────────────────────
 # SETUP
@@ -56,21 +55,22 @@ func _setup_combat() -> void:
 	player = Player.from_game_manager()
 	enemy = _generate_enemy()
 
-	# HP Bars
+	# HP BARS
 	player_hp_bar.min_value = 0
 	player_hp_bar.max_value = player.max_hp
 	player_hp_bar.value = player.hp
 
 	enemy_hp_bar.min_value = 0
-	enemy_hp_bar.max_value = enemy.hp
+	enemy_hp_bar.max_value = enemy.max_hp
 	enemy_hp_bar.value = enemy.hp
 
 	label_enemy.text = "Enemigo: " + enemy.name
 
 	_update_ui()
+	label_result.text = ""
 
 # ─────────────────────────────────────────
-# UI
+# UI UPDATE
 # ─────────────────────────────────────────
 func _update_ui() -> void:
 	player.hp = max(player.hp, 0)
@@ -80,10 +80,10 @@ func _update_ui() -> void:
 	label_enemy_hp.text  = "HP: " + str(enemy.hp)
 
 	player_hp_bar.value = player.hp
-	enemy_hp_bar.value  = enemy.hp
+	enemy_hp_bar.value = enemy.hp
 
 # ─────────────────────────────────────────
-# INPUT
+# BOTÓN
 # ─────────────────────────────────────────
 func _on_button_attack_pressed() -> void:
 	if combat_finished:
@@ -91,26 +91,6 @@ func _on_button_attack_pressed() -> void:
 
 	button_attack.disabled = true
 
-	await _player_turn()
-
-	if not enemy.is_alive():
-		_end_combat("victory")
-		return
-
-	await get_tree().create_timer(0.6).timeout
-
-	await _enemy_turn()
-
-	if player.hp <= 0:
-		_end_combat("defeat")
-		return
-
-	button_attack.disabled = false
-
-# ─────────────────────────────────────────
-# TURNOS (Clean separation)
-# ─────────────────────────────────────────
-func _player_turn() -> void:
 	var result = combat_system.player_attack(player, enemy)
 
 	await _flash(enemy_container, Color.RED)
@@ -119,12 +99,20 @@ func _player_turn() -> void:
 	if result["is_crit"]:
 		await _flash(enemy_container, Color.YELLOW)
 
-	_set_result_text(result, true)
+	_add_log("💥 CRÍTICO! " + str(result["damage"]))
+	if not result["is_crit"]:
+		_add_log("Golpeaste por " + str(result["damage"]))
 
 	_update_ui()
 
-func _enemy_turn() -> void:
-	var result = combat_system.enemy_attack(player, enemy)
+	if enemy.hp <= 0:
+		_end_combat("victory")
+		return
+
+	await get_tree().create_timer(0.6).timeout
+
+	# ENEMIGO
+	result = combat_system.enemy_attack(player, enemy)
 
 	await _flash(player_container, Color.RED)
 	await _shake(player_container)
@@ -132,70 +120,30 @@ func _enemy_turn() -> void:
 	if result["is_crit"]:
 		await _flash(player_container, Color.YELLOW)
 
-	_set_result_text(result, false)
+	if result["is_crit"]:
+		_add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
+	else:
+		_add_log("Enemigo golpea por " + str(result["damage"]))
 
 	_update_ui()
 
-# ─────────────────────────────────────────
-# TEXTO RESULTADO
-# ─────────────────────────────────────────
-func _set_result_text(result: Dictionary, is_player: bool) -> void:
-	var text := ""
+	if player.hp <= 0:
+		_end_combat("defeat")
+		return
 
-	if is_player:
-		text = "Golpeaste por " + str(result["damage"])
-		if result["is_crit"]:
-			text = "💥 CRÍTICO! " + str(result["damage"])
-	else:
-		text = "Enemigo golpea por " + str(result["damage"])
-		if result["is_crit"]:
-			text = "⚠️ CRÍTICO enemigo! " + str(result["damage"])
-
-	label_result.text += "\n" + text
+	button_attack.disabled = false
 
 # ─────────────────────────────────────────
-# FIN DE COMBATE
+# LOG (AUTO SCROLL)
 # ─────────────────────────────────────────
-func _end_combat(result: String) -> void:
-	combat_finished = true
-	button_attack.disabled = true
+func _add_log(text: String) -> void:
+	label_result.text += text + "\n"
 
-	GameManager.set_combat_result(result)
-
-	if result == "victory":
-		_handle_victory()
-
-	label_result.text += "\nResultado: " + result
-
-	print("[Combat] Resultado:", result)
-
-	await get_tree().create_timer(1.5).timeout
-	SceneManager.go_to_result()
+	await get_tree().process_frame
+	log_container.scroll_vertical = log_container.get_v_scroll_bar().max_value
 
 # ─────────────────────────────────────────
-# VICTORIA
-# ─────────────────────────────────────────
-func _handle_victory() -> void:
-	var xp_gained = 20
-	GameManager.add_xp(xp_gained)
-	print("[XP] Ganaste:", xp_gained)
-
-	var loot = _generate_loot()
-
-	if loot != null:
-		GameManager.add_item_to_inventory({
-			"id": loot.id,
-			"name": loot.name,
-			"type": loot.type,
-			"damage": loot.damage,
-			"heal": loot.heal,
-			"rarity": loot.rarity
-		})
-
-		print("[Loot] Ganaste:", loot.name)
-
-# ─────────────────────────────────────────
-# DATA
+# COMBATE
 # ─────────────────────────────────────────
 func _generate_enemy() -> Enemy:
 	var zone = GameManager.get_selected_zone()
@@ -216,20 +164,22 @@ func _generate_enemy() -> Enemy:
 
 	return Enemy.new()
 
-func _generate_loot():
-	var file = FileAccess.open("res://data/items.json", FileAccess.READ)
+func _end_combat(result: String) -> void:
+	combat_finished = true
 
-	if file == null:
-		push_error("No se pudo abrir items.json")
-		return null
+	GameManager.set_combat_result(result)
 
-	var data = JSON.parse_string(file.get_as_text())
+	if result == "victory":
+		var xp_gained = 20
+		GameManager.add_xp(xp_gained)
+		_add_log("Ganaste " + str(xp_gained) + " XP")
 
-	if data == null or data.is_empty():
-		push_error("Items vacíos")
-		return null
+	label_result.text += "\nResultado: " + result
 
-	return Item.from_dict(data.pick_random())
+	button_attack.disabled = true
+
+	await get_tree().create_timer(1.5).timeout
+	SceneManager.go_to_result()
 
 # ─────────────────────────────────────────
 # FX
