@@ -141,21 +141,23 @@ func _on_button_attack_pressed() -> void:
 # LOG (PRO + AUTO SCROLL + LIMIT)
 # ─────────────────────────────────────────
 func add_log(text: String) -> void:
-	var lines := []
-
-	if label_result.text != "":
+	var lines = []
+	if not label_result.text.is_empty():
 		lines = label_result.text.split("\n")
-
+	
 	lines.append(text)
-
+	
 	if lines.size() > MAX_LOG_LINES:
 		lines.remove_at(0)
-
+		
 	label_result.text = "\n".join(lines)
-
+	
+	# Esperamos a que la UI se redibuje completamente
 	await get_tree().process_frame
-
-	log_container.scroll_vertical = log_container.get_v_scroll_bar().max_value
+	
+	# Ajustamos el scroll al máximo posible
+	var scroll_bar = log_container.get_v_scroll_bar()
+	log_container.scroll_vertical = int(scroll_bar.max_value)
 
 # ─────────────────────────────────────────
 # COMBATE
