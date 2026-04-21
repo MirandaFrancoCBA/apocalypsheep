@@ -1,4 +1,3 @@
-# scripts/core/combat_system.gd
 extends Node
 class_name CombatSystem
 
@@ -11,7 +10,30 @@ func _init():
 	rng.randomize()
 
 # ─────────────────────────────────────────
-# PLAYER ATTACK
+# 🆕 EFECTOS
+# ─────────────────────────────────────────
+func apply_effects(target) -> Array[String]:
+	var logs: Array[String] = []
+	var remaining_effects: Array[Dictionary] = []
+
+	for effect in target.effects:
+		match effect["type"]:
+			"bleed":
+				target.take_damage(effect["value"])
+				logs.append("🩸 Sangrado: -" + str(effect["value"]))
+
+		effect["turns"] -= 1
+
+		if effect["turns"] > 0:
+			remaining_effects.append(effect)
+
+	target.effects = remaining_effects
+
+	return logs
+
+
+# ─────────────────────────────────────────
+# ATAQUES
 # ─────────────────────────────────────────
 func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 	var variation = int(player.damage * 0.2)
@@ -25,6 +47,14 @@ func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 
 	enemy.take_damage(damage)
 
+	# 🆕 шанс de aplicar bleed
+	if rng.randi_range(1, 100) <= 30:
+		enemy.effects.append({
+			"type": "bleed",
+			"value": 3,
+			"turns": 2
+		})
+
 	if is_crit:
 		print("Jugador pega:", damage, "💥 CRIT!")
 	else:
@@ -35,9 +65,7 @@ func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 		"is_crit": is_crit
 	}
 
-# ─────────────────────────────────────────
-# ENEMY ATTACK
-# ─────────────────────────────────────────
+
 func enemy_attack(player: Player, enemy: Enemy) -> Dictionary:
 	var variation = int(enemy.damage * 0.2)
 	var damage = enemy.damage + rng.randi_range(-variation, variation)
@@ -60,8 +88,6 @@ func enemy_attack(player: Player, enemy: Enemy) -> Dictionary:
 		"is_crit": is_crit
 	}
 
-# ─────────────────────────────────────────
-# CRÍTICO
-# ─────────────────────────────────────────
+
 func _is_critical() -> bool:
 	return rng.randi_range(1, 100) <= CRIT_CHANCE
