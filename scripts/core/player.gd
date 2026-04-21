@@ -2,64 +2,44 @@
 extends Resource
 class_name Player
 
-# ─────────────────────────────────────────
-# STATS BASE
-# ─────────────────────────────────────────
-var hp: int = 1
-var max_hp: int = 1
-var damage: int = 1
+var hp: int
+var max_hp: int
+var damage: int
 
-# ─────────────────────────────────────────
-# META
-# ─────────────────────────────────────────
-var level: int = 1
-var xp: int = 0
+var level: int
+var xp: int
 
-# ─────────────────────────────────────────
-# EQUIPO
-# ─────────────────────────────────────────
-var equipped_weapon: Dictionary = {}  # ⚠️ nunca null
+var equipped_weapon: Dictionary
 
-# ─────────────────────────────────────────
-# FACTORY
-# ─────────────────────────────────────────
+# 🆕 EFECTOS
+var effects: Array[Dictionary] = []
+
 static func from_game_manager() -> Player:
 	var data = GameManager.get_player_data()
 
 	var p = Player.new()
 
-	# 🧠 stats base
-	p.hp     = data.get("hp", 1)
-	p.max_hp = data.get("max_hp", p.hp)
-	p.damage = data.get("damage", 1)
+	p.hp      = data.get("hp", 1)
+	p.max_hp  = data.get("max_hp", p.hp)
+	p.damage  = data.get("damage", 1)
 
-	# 📈 meta
-	p.level  = data.get("level", 1)
-	p.xp     = data.get("xp", 0)
+	p.level   = data.get("level", 1)
+	p.xp      = data.get("xp", 0)
 
-	# 🗡️ equipo (evita null)
-	var weapon = data.get("equipped_weapon")
-	if weapon != null:
-		p.equipped_weapon = weapon
-		p.damage += weapon.get("damage", 0)
-	else:
-		p.equipped_weapon = {}
+	p.equipped_weapon = data.get("equipped_weapon")
+
+	if p.equipped_weapon != null:
+		p.damage += p.equipped_weapon.get("damage", 0)
 
 	return p
 
-# ─────────────────────────────────────────
-# UTILIDADES
-# ─────────────────────────────────────────
 func take_damage(amount: int) -> void:
-	hp = max(hp - amount, 0)
+	hp -= amount
+	hp = max(hp, 0)
 
 func heal(amount: int) -> void:
-	hp = min(hp + amount, max_hp)
+	hp += amount
+	hp = min(hp, max_hp)
 
 func is_alive() -> bool:
 	return hp > 0
-
-func debug_string() -> String:
-	return "[Player] HP: %s/%s | DMG: %s | LVL: %s" % [
-		hp, max_hp, damage, level
-	]
