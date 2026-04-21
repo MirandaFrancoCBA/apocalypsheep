@@ -96,7 +96,16 @@ func _on_button_attack_pressed() -> void:
 		return
 
 	button_attack.disabled = true
+	# aplicar efectos antes del turno
+	var logs = combat_system.apply_effects(player)
+	for l in logs:
+		add_log(l)
 
+	logs = combat_system.apply_effects(enemy)
+	for l in logs:
+		add_log(l)
+
+	_update_ui()
 	# ATAQUE JUGADOR
 	var result = combat_system.player_attack(player, enemy)
 
