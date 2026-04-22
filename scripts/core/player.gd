@@ -9,7 +9,8 @@ var damage: int
 var level: int
 var xp: int
 
-var equipped_weapon: Dictionary
+# 🔥 IMPORTANTE → valor por defecto
+var equipped_weapon: Dictionary = {}
 
 # 🆕 EFECTOS
 var effects: Array[Dictionary] = []
@@ -26,10 +27,14 @@ static func from_game_manager() -> Player:
 	p.level   = data.get("level", 1)
 	p.xp      = data.get("xp", 0)
 
-	p.equipped_weapon = data.get("equipped_weapon")
+	# 🔥 FIX REAL
+	var weapon = data.get("equipped_weapon", {})
 
-	if p.equipped_weapon != null:
-		p.damage += p.equipped_weapon.get("damage", 0)
+	if weapon != null and not weapon.is_empty():
+		p.equipped_weapon = weapon
+		p.damage += weapon.get("damage", 0)
+	else:
+		p.equipped_weapon = {}
 
 	return p
 

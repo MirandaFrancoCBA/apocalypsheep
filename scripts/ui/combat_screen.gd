@@ -161,12 +161,15 @@ func add_log(text: String) -> void:
 		
 	label_result.text = "\n".join(lines)
 	
-	# Esperamos a que la UI se redibuje completamente
+	# FORZAMOS la actualización del layout
+	label_result.custom_minimum_size.y = 0 # Reseteamos para que recalcule
+	
+	# Esperamos dos frames para asegurar que el ScrollContainer vea el nuevo tamaño
+	await get_tree().process_frame
 	await get_tree().process_frame
 	
-	# Ajustamos el scroll al máximo posible
-	var scroll_bar = log_container.get_v_scroll_bar()
-	log_container.scroll_vertical = int(scroll_bar.max_value)
+	# Ajustamos el scroll al final
+	log_container.scroll_vertical = int(log_container.get_v_scroll_bar().max_value)
 
 # ─────────────────────────────────────────
 # COMBATE

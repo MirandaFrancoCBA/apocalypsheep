@@ -88,6 +88,7 @@ step = 1.0
 show_percentage = false
 
 [node name="CombatLogContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=1739706393]
+clip_contents = false
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_vertical = 0
@@ -105,8 +106,8 @@ theme_override_constants/margin_bottom = 20
 [node name="LabelResult" type="Label" parent="MarginContainer/VBoxContainer/CombatLogContainer/MarginContainer" unique_id=771717333]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-size_flags_vertical = 1
-autowrap_mode = 2
+size_flags_vertical = 8
+autowrap_mode = 3
 clip_text = true
 
 [node name="ButtonAttack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1997688783]
