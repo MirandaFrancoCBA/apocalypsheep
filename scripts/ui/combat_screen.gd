@@ -198,9 +198,17 @@ func _end_combat(result: String) -> void:
 	GameManager.set_combat_result(result)
 
 	if result == "victory":
-		var xp_gained = 20
+		# XP
+		var xp_gained := 20
 		GameManager.add_xp(xp_gained)
 		add_log("✨ Ganaste " + str(xp_gained) + " XP")
+
+		# 🆕 LOOT
+		var loot = _generate_loot()
+
+		if loot.size() > 0:
+			GameManager.add_item_to_inventory(loot)
+			add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
 
 	add_log("🏁 Resultado: " + result)
 
@@ -227,3 +235,18 @@ func _shake(node: Control) -> void:
 		await get_tree().create_timer(0.02).timeout
 
 	node.position = original_pos
+
+func _generate_loot() -> Dictionary:
+	var file = FileAccess.open("res://data/items.json", FileAccess.READ)
+
+	if file == null:
+		push_error("No se pudo abrir items.json")
+		return {}
+
+	var data = JSON.parse_string(file.get_as_text())
+
+	if data == null or data.is_empty():
+		push_error("Items vacíos")
+		return {}
+
+	return data.pick_random()
