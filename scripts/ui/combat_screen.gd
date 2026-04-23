@@ -150,26 +150,25 @@ func _on_button_attack_pressed() -> void:
 # LOG (PRO + AUTO SCROLL + LIMIT)
 # ─────────────────────────────────────────
 func add_log(text: String) -> void:
-	var lines = []
+	var lines: Array = []
+
 	if not label_result.text.is_empty():
 		lines = label_result.text.split("\n")
-	
+
 	lines.append(text)
-	
+
 	if lines.size() > MAX_LOG_LINES:
 		lines.remove_at(0)
-		
+
 	label_result.text = "\n".join(lines)
-	
-	# FORZAMOS la actualización del layout
-	label_result.custom_minimum_size.y = 0 # Reseteamos para que recalcule
-	
-	# Esperamos dos frames para asegurar que el ScrollContainer vea el nuevo tamaño
+
+	# Esperar UN frame (suficiente)
 	await get_tree().process_frame
-	await get_tree().process_frame
-	
-	# Ajustamos el scroll al final
-	log_container.scroll_vertical = int(log_container.get_v_scroll_bar().max_value)
+
+	# Scroll automático
+	var scrollbar = log_container.get_v_scroll_bar()
+	if scrollbar:
+		log_container.scroll_vertical = int(scrollbar.max_value)
 
 # ─────────────────────────────────────────
 # COMBATE
