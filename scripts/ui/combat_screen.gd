@@ -28,6 +28,7 @@ const MAX_LOG_LINES := 8
 var player: Player
 var enemy: Enemy
 var combat_finished := false
+var waiting_for_input := false
 
 var combat_system := CombatSystem.new()
 
@@ -96,7 +97,8 @@ func _on_button_attack_pressed() -> void:
 		return
 
 	button_attack.disabled = true
-	# aplicar efectos antes del turno
+
+	# 🧪 EFECTOS (inicio de turno)
 	var logs = combat_system.apply_effects(player)
 	for l in logs:
 		add_log(l)
@@ -106,7 +108,8 @@ func _on_button_attack_pressed() -> void:
 		add_log(l)
 
 	_update_ui()
-	# ATAQUE JUGADOR
+
+	# 🗡️ ATAQUE JUGADOR
 	var result = combat_system.player_attack(player, enemy)
 
 	await _flash(enemy_container, Color.RED)
@@ -126,7 +129,7 @@ func _on_button_attack_pressed() -> void:
 
 	await get_tree().create_timer(0.6).timeout
 
-	# ATAQUE ENEMIGO
+	# 👾 ATAQUE ENEMIGO
 	result = combat_system.enemy_attack(player, enemy)
 
 	await _flash(player_container, Color.RED)
@@ -147,7 +150,7 @@ func _on_button_attack_pressed() -> void:
 	button_attack.disabled = false
 
 # ─────────────────────────────────────────
-# LOG (PRO + AUTO SCROLL + LIMIT)
+# LOG (ESTABLE + LIMITADO + AUTOSCROLL)
 # ─────────────────────────────────────────
 func add_log(text: String) -> void:
 	var lines: Array = []
@@ -157,15 +160,14 @@ func add_log(text: String) -> void:
 
 	lines.append(text)
 
-	if lines.size() > MAX_LOG_LINES:
+	# limitar tamaño
+	while lines.size() > MAX_LOG_LINES:
 		lines.remove_at(0)
 
 	label_result.text = "\n".join(lines)
 
-	# Esperar UN frame (suficiente)
 	await get_tree().process_frame
 
-	# Scroll automático
 	var scrollbar = log_container.get_v_scroll_bar()
 	if scrollbar:
 		log_container.scroll_vertical = int(scrollbar.max_value)
@@ -189,20 +191,20 @@ func _generate_enemy() -> Enemy:
 	for e in data:
 		if e["id"] == random_id:
 			return Enemy.from_dict(e)
+
 	return Enemy.new()
 
 func _end_combat(result: String) -> void:
 	combat_finished = true
+	waiting_for_input = true
 
 	GameManager.set_combat_result(result)
 
 	if result == "victory":
-		# XP
 		var xp_gained := 20
 		GameManager.add_xp(xp_gained)
 		add_log("✨ Ganaste " + str(xp_gained) + " XP")
 
-		# 🆕 LOOT
 		var loot = _generate_loot()
 
 		if loot.size() > 0:
@@ -210,11 +212,17 @@ func _end_combat(result: String) -> void:
 			add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
 
 	add_log("🏁 Resultado: " + result)
+	add_log("👉 Tocar para continuar")
 
 	button_attack.disabled = true
 
-	await get_tree().create_timer(1.5).timeout
-	SceneManager.go_to_result()
+# ─────────────────────────────────────────
+# INPUT FINAL (NO MÁS AUTO EXIT)
+# ─────────────────────────────────────────
+func _input(event):
+	if waiting_for_input and event.is_pressed():
+		waiting_for_input = false
+		SceneManager.go_to_result()
 
 # ─────────────────────────────────────────
 # FX
@@ -235,6 +243,9 @@ func _shake(node: Control) -> void:
 
 	node.position = original_pos
 
+# ─────────────────────────────────────────
+# LOOT
+# ─────────────────────────────────────────
 func _generate_loot() -> Dictionary:
 	var file = FileAccess.open("res://data/items.json", FileAccess.READ)
 
