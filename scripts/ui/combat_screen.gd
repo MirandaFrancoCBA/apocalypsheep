@@ -293,3 +293,4 @@ func _on_button_defend_pressed() -> void:
 
 	button_attack.disabled = false
 	button_defend.disabled = false
+

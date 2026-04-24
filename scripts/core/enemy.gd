@@ -10,7 +10,7 @@ var damage: int
 
 # 🆕 EFECTOS
 var effects: Array[Dictionary] = []
-
+var is_defending: bool = false
 static func from_dict(data: Dictionary) -> Enemy:
 	var e = Enemy.new()
 	e.id = data.get("id", "")
