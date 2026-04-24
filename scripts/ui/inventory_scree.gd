@@ -1,5 +1,3 @@
-# scripts/ui/inventory_screen.gd
-
 extends Control
 
 @onready var items_container = $MarginContainer/VBoxContainer/VBoxItems
@@ -19,6 +17,9 @@ func _ready() -> void:
 	_update_equipped_label()
 	_update_unequip_button()
 
+# ─────────────────────────────────────────
+# LOAD
+# ─────────────────────────────────────────
 func _load_inventory() -> void:
 	var player = GameManager.get_player_data()
 	var inventory = player["inventory"]
@@ -33,20 +34,21 @@ func _show_empty() -> void:
 	var label = Label.new()
 	label.text = "Inventario vacío"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-
 	items_container.add_child(label)
 
+# ─────────────────────────────────────────
+# LISTA DE ITEMS
+# ─────────────────────────────────────────
 func _create_items(items: Array) -> void:
 	for item in items:
 		var button = Button.new()
 
-		var text = item.get("name", "Item") + " (" + item.get("type", "") + ")"
+		var text = _format_item(item)
 
 		if item == GameManager.get_equipped_weapon():
 			text += " ✔"
 
 		button.text = text
-
 		button.custom_minimum_size = Vector2(0, 50)
 
 		button.pressed.connect(func():
@@ -55,13 +57,36 @@ func _create_items(items: Array) -> void:
 
 		items_container.add_child(button)
 
+# 🔥 FORMATO PRO
+func _format_item(item: Dictionary) -> String:
+	var text = item.get("name", "Item")
+
+	if item.get("type") == "weapon":
+		text += " | DMG: " + str(item.get("damage", 0))
+
+		var effect = item.get("effect", "")
+		if effect != "":
+			text += " | " + _effect_to_text(effect)
+
+	return text
+
+func _effect_to_text(effect: String) -> String:
+	match effect:
+		"bleed": return "🩸 Sangrado"
+		"poison": return "☠️ Veneno"
+		"burn": return "🔥 Fuego"
+		"stun": return "💫 Aturde"
+		_: return effect
+
+# ─────────────────────────────────────────
+# SELECCIÓN
+# ─────────────────────────────────────────
 func _on_item_selected(item: Dictionary) -> void:
 	selected_item = item
-
 	print("[Inventory] Item seleccionado:", item)
-
 	_show_item_detail(item)
 
+# 🔍 DETALLE COMPLETO
 func _show_item_detail(item: Dictionary) -> void:
 	var text = ""
 
@@ -71,6 +96,9 @@ func _show_item_detail(item: Dictionary) -> void:
 	if item.has("damage"):
 		text += "Daño: " + str(item["damage"]) + "\n"
 
+	if item.has("effect"):
+		text += "Efecto: " + _effect_to_text(item["effect"]) + "\n"
+
 	if item.has("heal"):
 		text += "Curación: " + str(item["heal"]) + "\n"
 
@@ -79,8 +107,9 @@ func _show_item_detail(item: Dictionary) -> void:
 
 	label_detail.text = text
 
-	print(text)
-
+# ─────────────────────────────────────────
+# BOTONES
+# ─────────────────────────────────────────
 func _on_button_back_pressed() -> void:
 	SceneManager.go_to_zone_select()
 
@@ -100,39 +129,12 @@ func _on_button_unequip_pressed() -> void:
 	_update_unequip_button()
 	_refresh_inventory()
 
-func _clear_items() -> void:
-	for child in items_container.get_children():
-		child.queue_free()
-
-
-func _refresh_inventory() -> void:
-	_clear_items()
-	_load_inventory()
-
-func _update_unequip_button() -> void:
-	var weapon = GameManager.get_equipped_weapon()
-
-	button_unequip.disabled = weapon == null
-
-func _update_equipped_label() -> void:
-	var weapon = GameManager.get_equipped_weapon()
-
-	if weapon == null:
-		label_equipped.text = "Arma equipada: Ninguna"
-	else:
-		label_equipped.text = "Arma equipada: " + weapon.get("name", "")
-	
-
-
-
-
 func _on_button_delete_pressed() -> void:
 	if selected_item.is_empty():
 		print("[Inventory] Ningún item seleccionado")
 		return
 
 	confirm_delete_dialog.popup_centered()
-
 
 func _on_confirm_delete_dialog_confirmed() -> void:
 	GameManager.remove_item(selected_item)
@@ -144,3 +146,26 @@ func _on_confirm_delete_dialog_confirmed() -> void:
 	_update_unequip_button()
 
 	label_detail.text = "Item eliminado"
+
+# ─────────────────────────────────────────
+# HELPERS
+# ─────────────────────────────────────────
+func _clear_items() -> void:
+	for child in items_container.get_children():
+		child.queue_free()
+
+func _refresh_inventory() -> void:
+	_clear_items()
+	_load_inventory()
+
+func _update_unequip_button() -> void:
+	var weapon = GameManager.get_equipped_weapon()
+	button_unequip.disabled = weapon == null
+
+func _update_equipped_label() -> void:
+	var weapon = GameManager.get_equipped_weapon()
+
+	if weapon == null:
+		label_equipped.text = "Arma equipada: Ninguna"
+	else:
+		label_equipped.text = "Arma equipada: " + weapon.get("name", "")
