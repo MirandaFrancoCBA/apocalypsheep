@@ -115,4 +115,12 @@ size_flags_horizontal = 4
 size_flags_vertical = 0
 text = "Atacar"
 
+[node name="ButtonDefend" type="Button" parent="MarginContainer/VBoxContainer" unique_id=626622388]
+custom_minimum_size = Vector2(200, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Defender
+"
+
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonAttack" to="." method="_on_button_attack_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonDefend" to="." method="_on_button_defend_pressed"]

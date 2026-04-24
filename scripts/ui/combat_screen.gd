@@ -16,6 +16,7 @@ extends Control
 @export var log_container: ScrollContainer
 
 @export var button_attack: Button
+@export var button_defend: Button
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -260,3 +261,35 @@ func _generate_loot() -> Dictionary:
 		return {}
 
 	return data.pick_random()
+
+func _on_button_defend_pressed() -> void:
+	if combat_finished:
+		return
+
+	button_attack.disabled = true
+	button_defend.disabled = true
+
+	player.start_defense()
+	add_log("🛡️ Te preparás para defender")
+
+	await get_tree().create_timer(0.5).timeout
+
+	# turno enemigo
+	var result = combat_system.enemy_attack(player, enemy)
+
+	await _flash(player_container, Color.BLUE)
+	await _shake(player_container)
+
+	if result["is_crit"]:
+		add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
+	else:
+		add_log("Enemigo golpea por " + str(result["damage"]))
+
+	_update_ui()
+
+	if player.hp <= 0:
+		_end_combat("defeat")
+		return
+
+	button_attack.disabled = false
+	button_defend.disabled = false

@@ -48,3 +48,13 @@ func heal(amount: int) -> void:
 
 func is_alive() -> bool:
 	return hp > 0
+
+# 🆕 DEFENSA
+var is_defending: bool = false
+var defense_multiplier: float = 0.5  # 50% daño
+
+func start_defense():
+	is_defending = true
+
+func stop_defense():
+	is_defending = false
