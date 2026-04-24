@@ -26,5 +26,38 @@
       "type": "consumable",
       "heal": 20,
       "rarity": "common"
+    },
+    {
+        "id": "rusty_pistol",
+        "name": "Pistola Oxidada",
+        "type": "weapon",
+        "damage": 3,
+        "effect": "bleed",
+        "rarity": "common"
+    },
+    {
+        "id": "toxic_rifle",
+        "name": "Rifle Tóxico",
+        "type": "weapon",
+        "damage": 2,
+        "effect": "poison",
+        "rarity": "rare"
+    },
+    {
+        "id": "flamethrower",
+        "name": "Lanzallamas",
+        "type": "weapon",
+        "damage": 4,
+        "effect": "burn",
+        "rarity": "epic"
+    },
+    {
+        "id": "shock_gun",
+        "name": "Arma de Descarga",
+        "type": "weapon",
+        "damage": 2,
+        "effect": "stun",
+        "rarity": "rare"
     }
+    
   ]
