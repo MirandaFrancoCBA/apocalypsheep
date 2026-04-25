@@ -12,7 +12,7 @@ bg_color = Color(0.9904657, 0.18689609, 0.7883756, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
 bg_color = Color(0.20565334, 0.68708014, 0.6062001, 1)
 
-[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container")]
+[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container", "label_weapon")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -33,6 +33,7 @@ button_attack = NodePath("MarginContainer/VBoxContainer/ButtonAttack")
 button_defend = NodePath("MarginContainer/VBoxContainer/ButtonDefend")
 player_effects_container = NodePath("MarginContainer/VBoxContainer/PlayerContainer/PlayerEffects")
 enemy_effects_container = NodePath("MarginContainer/VBoxContainer/EnemyContainer/EnemyEffects")
+label_weapon = NodePath("MarginContainer/VBoxContainer/PlayerContainer/LabelWeapon")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1555668808]
 layout_mode = 1
@@ -92,6 +93,9 @@ theme_override_styles/background = SubResource("StyleBoxFlat_icss1")
 theme_override_styles/fill = SubResource("StyleBoxFlat_032jr")
 step = 1.0
 show_percentage = false
+
+[node name="LabelWeapon" type="Label" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1383726120]
+layout_mode = 2
 
 [node name="PlayerEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1244911006]
 layout_mode = 2

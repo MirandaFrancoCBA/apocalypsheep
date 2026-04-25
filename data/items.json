@@ -29,7 +29,7 @@
     },
     {
         "id": "rusty_pistol",
-        "name": "Pistola Oxidada",
+        "name": "Pistola Oxidada Agujereadora",
         "type": "weapon",
         "damage": 3,
         "effect": "bleed",
