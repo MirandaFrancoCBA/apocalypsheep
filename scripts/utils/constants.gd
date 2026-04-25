@@ -21,3 +21,12 @@ const PLAYER_DEFAULT_HP      = 100
 const PLAYER_DEFAULT_DAMAGE  = 10
 const PLAYER_DEFAULT_LEVEL   = 1
 const PLAYER_DEFAULT_XP      = 0
+
+# ─────────────────────────────────────────
+# LOOT — rarezas
+# ─────────────────────────────────────────
+const RARITY_WEIGHTS = {
+	"common": 70,
+	"rare": 25,
+	"epic": 5
+}

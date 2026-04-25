@@ -313,7 +313,40 @@ func _generate_loot() -> Dictionary:
 		push_error("Items vacíos")
 		return {}
 
-	return data.pick_random()
+	# 🎲 elegir rareza
+	var rarity = _roll_rarity()
+
+	print("[LOOT] Rareza:", rarity) # debug
+
+	# 📦 filtrar items
+	var filtered_items: Array = []
+
+	for item in data:
+		if item.get("rarity", "common") == rarity:
+			filtered_items.append(item)
+
+	# fallback si no hay items de esa rareza
+	if filtered_items.is_empty():
+		filtered_items = data
+
+	return filtered_items.pick_random()
+
+func _roll_rarity() -> String:
+	var total_weight := 0
+
+	for w in Constants.RARITY_WEIGHTS.values():
+		total_weight += w
+
+	var roll = randi_range(1, total_weight)
+	var cumulative = 0
+
+	for rarity in Constants.RARITY_WEIGHTS.keys():
+		cumulative += Constants.RARITY_WEIGHTS[rarity]
+
+		if roll <= cumulative:
+			return rarity
+
+	return "common"
 
 func _on_button_defend_pressed() -> void:
 	if combat_finished:
