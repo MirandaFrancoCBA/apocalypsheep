@@ -18,6 +18,9 @@ extends Control
 @export var button_attack: Button
 @export var button_defend: Button
 
+@export var player_effects_container: HBoxContainer
+@export var enemy_effects_container: HBoxContainer
+
 # ─────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────
@@ -89,6 +92,7 @@ func _update_ui() -> void:
 
 	player_hp_bar.value = player.hp
 	enemy_hp_bar.value = enemy.hp
+	_update_effects_ui()
 
 # ─────────────────────────────────────────
 # BOTÓN
@@ -217,6 +221,39 @@ func _end_combat(result: String) -> void:
 
 	button_attack.disabled = true
 
+func _update_effects_ui() -> void:
+	_draw_effects(player.effects, player_effects_container)
+	_draw_effects(enemy.effects, enemy_effects_container)
+
+func _draw_effects(effects: Array, container: HBoxContainer) -> void:
+	# limpiar
+	for child in container.get_children():
+		child.queue_free()
+
+	for effect in effects:
+		var label = Label.new()
+
+		var icon = _effect_icon(effect["type"])
+		var duration = effect["duration"]
+
+		# stun no necesita número
+		if effect["type"] == "stun":
+			label.text = icon
+		else:
+			label.text = icon + " x" + str(duration)
+
+		label.add_theme_font_size_override("font_size", 16)
+
+		container.add_child(label)
+
+func _effect_icon(type: String) -> String:
+	match type:
+		"bleed": return "🩸"
+		"poison": return "☠️"
+		"burn": return "🔥"
+		"stun": return "💫"
+		_: return "❓"
+
 # ─────────────────────────────────────────
 # INPUT FINAL (NO MÁS AUTO EXIT)
 # ─────────────────────────────────────────
@@ -293,4 +330,3 @@ func _on_button_defend_pressed() -> void:
 
 	button_attack.disabled = false
 	button_defend.disabled = false
-

@@ -12,7 +12,7 @@ bg_color = Color(0.9904657, 0.18689609, 0.7883756, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
 bg_color = Color(0.20565334, 0.68708014, 0.6062001, 1)
 
-[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend")]
+[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -31,6 +31,8 @@ label_result = NodePath("MarginContainer/VBoxContainer/CombatLogContainer/Margin
 log_container = NodePath("MarginContainer/VBoxContainer/CombatLogContainer")
 button_attack = NodePath("MarginContainer/VBoxContainer/ButtonAttack")
 button_defend = NodePath("MarginContainer/VBoxContainer/ButtonDefend")
+player_effects_container = NodePath("MarginContainer/VBoxContainer/PlayerContainer/PlayerEffects")
+enemy_effects_container = NodePath("MarginContainer/VBoxContainer/EnemyContainer/EnemyEffects")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1555668808]
 layout_mode = 1
@@ -69,6 +71,9 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_42k13")
 step = 1.0
 show_percentage = false
 
+[node name="EnemyEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer/EnemyContainer" unique_id=421896757]
+layout_mode = 2
+
 [node name="CenterSpace" type="Control" parent="MarginContainer/VBoxContainer" unique_id=524512282]
 layout_mode = 2
 size_flags_vertical = 2
@@ -87,6 +92,9 @@ theme_override_styles/background = SubResource("StyleBoxFlat_icss1")
 theme_override_styles/fill = SubResource("StyleBoxFlat_032jr")
 step = 1.0
 show_percentage = false
+
+[node name="PlayerEffects" type="HBoxContainer" parent="MarginContainer/VBoxContainer/PlayerContainer" unique_id=1244911006]
+layout_mode = 2
 
 [node name="CombatLogContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=1739706393]
 clip_contents = false
