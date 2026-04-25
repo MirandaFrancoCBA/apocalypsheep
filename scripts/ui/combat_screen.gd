@@ -20,6 +20,7 @@ extends Control
 
 @export var player_effects_container: HBoxContainer
 @export var enemy_effects_container: HBoxContainer
+@export var label_weapon: Label
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -79,6 +80,7 @@ func _setup_combat() -> void:
 	add_log("⚔️ Combate contra " + enemy.name)
 
 	_update_ui()
+	_update_weapon_ui()
 
 # ─────────────────────────────────────────
 # UI UPDATE
@@ -253,6 +255,20 @@ func _effect_icon(type: String) -> String:
 		"burn": return "🔥"
 		"stun": return "💫"
 		_: return "❓"
+
+func _update_weapon_ui() -> void:
+	var weapon = player.equipped_weapon
+
+	if weapon == null:
+		label_weapon.text = "Arma: Sin arma"
+	else:
+		label_weapon.text = "Arma: " + weapon.get("name", "???")
+	
+	if weapon != null:
+		var effect = weapon.get("effect", "")
+		if effect != "":
+			label_weapon.text += " (" + _effect_icon(effect) + ")"
+
 
 # ─────────────────────────────────────────
 # INPUT FINAL (NO MÁS AUTO EXIT)
