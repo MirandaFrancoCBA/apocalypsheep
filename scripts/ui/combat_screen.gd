@@ -212,11 +212,15 @@ func _end_combat(result: String) -> void:
 		GameManager.add_xp(xp_gained)
 		add_log("✨ Ganaste " + str(xp_gained) + " XP")
 
-		var loot = _generate_loot()
+	# 🎲 DROP CHANCE
+		if _roll_drop():
+			var loot = _generate_loot()
 
-		if loot.size() > 0:
-			GameManager.add_item_to_inventory(loot)
-			add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
+			if loot.size() > 0:
+				GameManager.add_item_to_inventory(loot)
+				add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
+	else:
+		add_log("❌ No obtuviste nada...")
 
 	add_log("🏁 Resultado: " + result)
 	add_log("👉 Tocar para continuar")
@@ -379,3 +383,7 @@ func _on_button_defend_pressed() -> void:
 
 	button_attack.disabled = false
 	button_defend.disabled = false
+
+func _roll_drop() -> bool:
+	var roll = randi_range(1, 100)
+	return roll <= Constants.LOOT_DROP_CHANCE

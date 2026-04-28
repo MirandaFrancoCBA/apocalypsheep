@@ -30,3 +30,8 @@ const RARITY_WEIGHTS = {
 	"rare": 25,
 	"epic": 5
 }
+
+# ─────────────────────────────────────────
+# LOOT — drop chance
+# ─────────────────────────────────────────
+const LOOT_DROP_CHANCE = 60 # %
