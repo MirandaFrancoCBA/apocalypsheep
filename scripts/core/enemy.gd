@@ -12,13 +12,16 @@ var damage: int
 var effects: Array[Dictionary] = []
 var is_defending: bool = false
 static func from_dict(data: Dictionary) -> Enemy:
-	var e = Enemy.new()
-	e.id = data.get("id", "")
-	e.name = data.get("name", "Enemy")
-	e.hp = data.get("hp", 10)
-	e.max_hp = e.hp
-	e.damage = data.get("damage", 1)
-	return e
+	var new_enemy = Enemy.new()
+
+	new_enemy.id = data.get("id", "")
+	new_enemy.name = data.get("name", "Enemigo")
+
+	new_enemy.hp = data.get("hp", 10)
+	new_enemy.max_hp = data.get("max_hp", new_enemy.hp)
+	new_enemy.damage = data.get("damage", 2)
+
+	return new_enemy
 
 func take_damage(amount: int) -> void:
 	hp -= amount

@@ -1,26 +1,13 @@
 [
-    {
-      "id": "raider",
-      "name": "Raider",
-      "hp": 50,
-      "damage": 8
-    },
-    {
-      "id": "mutant_rat",
-      "name": "Rata mutante",
-      "hp": 30,
-      "damage": 5
-    },
-    {
-      "id": "infected_scientist",
-      "name": "Infected Scientist",
-      "hp": 50,
-      "damage": 8
-    },
-    {
-      "id": "robot",
-      "name": "Robot mutante",
-      "hp": 300,
-      "damage": 5
-    }
-  ]
+  { "id": "raider", "name": "Saqueador", "hp": 20, "damage": 5 },
+  { "id": "mutant_rat", "name": "Rata mutante", "hp": 15, "damage": 4 },
+
+  { "id": "robot", "name": "Robot defectuoso", "hp": 30, "damage": 6 },
+  { "id": "infected_scientist", "name": "Científico infectado", "hp": 25, "damage": 5 },
+
+  { "id": "toxic_slug", "name": "Babosa tóxica", "hp": 35, "damage": 6 },
+  { "id": "swamp_beast", "name": "Bestia del pantano", "hp": 40, "damage": 8 },
+
+  { "id": "elite_soldier", "name": "Soldado élite", "hp": 50, "damage": 10 },
+  { "id": "turret", "name": "Torreta automática", "hp": 45, "damage": 9 }
+]
