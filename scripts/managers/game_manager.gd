@@ -103,10 +103,19 @@ func add_xp(amount: int) -> void:
 	_check_level_up()
 	emit_signal("player_data_changed")
 
-func add_item_to_inventory(item: Dictionary) -> void:
-	player_data["inventory"].append(item)
+func add_item_to_inventory(item: Dictionary) -> bool:
+	var inventory = player_data["inventory"]
+
+	if inventory.size() >= Constants.INVENTORY_MAX_SIZE:
+		print("[Inventory] Inventario lleno")
+		return false
+
+	inventory.append(item)
+
 	emit_signal("player_data_changed")
-	print("[GameManager] Item agregado:", item.get("name", ""))
+	print("[GameManager] Item agregado:", item.get("name", "desconocido"))
+
+	return true
 
 # ─────────────────────────────────────────
 # NIVEL

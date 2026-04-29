@@ -35,3 +35,4 @@ const RARITY_WEIGHTS = {
 # LOOT — drop chance
 # ─────────────────────────────────────────
 const LOOT_DROP_CHANCE = 60 # %
+const INVENTORY_MAX_SIZE = 10

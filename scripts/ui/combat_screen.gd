@@ -265,8 +265,13 @@ func _end_combat(result: String) -> void:
 			var loot = _generate_loot()
 
 			if loot.size() > 0:
-				GameManager.add_item_to_inventory(loot)
-				add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
+				var added = GameManager.add_item_to_inventory(loot)
+				if added:
+					add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
+				else:
+					add_log("🎒 Inventario lleno (no se pudo recoger)")
+
+
 		else:
 			add_log("❌ No obtuviste nada...")
 

@@ -12,6 +12,12 @@ extends Control
 var selected_item: Dictionary = {}
 
 func _ready() -> void:
+	var player = GameManager.get_player_data()
+	var inventory = player["inventory"]
+	label_equipped.text += "\nEspacio: %d/%d" % [
+	inventory.size(),
+	Constants.INVENTORY_MAX_SIZE
+]
 	print("[Inventory] Cargando inventario")
 	_load_inventory()
 	_update_equipped_label()
