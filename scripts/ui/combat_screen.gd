@@ -229,14 +229,25 @@ func _generate_enemy() -> Enemy:
 	var random_id = enemies_ids.pick_random()
 
 	var file = FileAccess.open("res://data/enemies.json", FileAccess.READ)
+	if file == null:
+		push_error("No se pudo abrir enemies.json")
+		return Enemy.new()
+
 	var data = JSON.parse_string(file.get_as_text())
 
 	for e in data:
-		if e["id"] == random_id:
-			var enemy = Enemy.from_dict(e)
-			_apply_enemy_scaling(enemy)
-			return enemy
+		if e.get("id", "") == random_id:
+			var new_enemy = Enemy.from_dict(e)
 
+			if new_enemy == null:
+				push_error("Enemy.from_dict devolvió null")
+				return Enemy.new()
+
+			_apply_enemy_scaling(new_enemy)
+
+			return new_enemy
+
+	push_error("Enemy ID no encontrado: " + str(random_id))
 	return Enemy.new()
 
 func _end_combat(result: String) -> void:
@@ -396,4 +407,4 @@ func _apply_enemy_scaling(target_enemy: Enemy) -> void:
 	target_enemy.hp = target_enemy.max_hp
 	target_enemy.damage += final_level * 2
 
-	print("[ENEMY] Nivel:", final_level, "HP:", enemy.hp, "DMG:", enemy.damage)
+	print("[ENEMY] Nivel:", final_level, "HP:", target_enemy.hp, "DMG:", target_enemy.damage)

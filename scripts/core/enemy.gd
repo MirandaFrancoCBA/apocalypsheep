@@ -8,6 +8,7 @@ var hp: int
 var max_hp: int
 var damage: int
 
+
 # 🆕 EFECTOS
 var effects: Array[Dictionary] = []
 var is_defending: bool = false
@@ -20,6 +21,7 @@ static func from_dict(data: Dictionary) -> Enemy:
 	new_enemy.hp = data.get("hp", 10)
 	new_enemy.max_hp = data.get("max_hp", new_enemy.hp)
 	new_enemy.damage = data.get("damage", 2)
+
 
 	return new_enemy
 

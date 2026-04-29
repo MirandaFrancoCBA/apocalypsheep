@@ -32,11 +32,11 @@ func create_zone_buttons(zones: Array) -> void:
 	for zone in zones:
 		var button = Button.new()
 		
-		var range = zone.get("level_range", [1, 1])
+		var level_range = zone.get("level_range", [1, 1])
 		var text = "%s (Lv %d-%d)" % [
 			zone.get("name", "Zona"),
-			range[0],
-			range[1]
+			level_range[0],
+			level_range[1]
 		]
 
 		button.text = text
