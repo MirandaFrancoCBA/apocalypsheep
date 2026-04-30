@@ -8,6 +8,7 @@ extends Control
 @onready var button_unequip = $MarginContainer/VBoxContainer/ButtonUnequip
 @onready var button_delete = $MarginContainer/VBoxContainer/ButtonDelete
 @onready var confirm_delete_dialog = $ConfirmDeleteDialog
+@onready var label_stats = $MarginContainer/VBoxContainer/LabelStats
 
 var selected_item: Dictionary = {}
 
@@ -18,10 +19,12 @@ func _ready() -> void:
 	inventory.size(),
 	Constants.INVENTORY_MAX_SIZE
 ]
+	GameManager.player_data_changed.connect(_update_stats)
 	print("[Inventory] Cargando inventario")
 	_load_inventory()
 	_update_equipped_label()
 	_update_unequip_button()
+	_update_stats()
 
 # ─────────────────────────────────────────
 # LOAD
@@ -175,3 +178,24 @@ func _update_equipped_label() -> void:
 		label_equipped.text = "Arma equipada: Ninguna"
 	else:
 		label_equipped.text = "Arma equipada: " + weapon.get("name", "")
+
+func _update_stats() -> void:
+	var player = GameManager.get_player_data()
+
+	var text = ""
+
+	text += "❤️ HP: %d / %d\n" % [player["hp"], player["max_hp"]]
+
+	# 🔥 DAÑO REAL (con arma)
+	var weapon = GameManager.get_equipped_weapon()
+	var total_damage = player["damage"]
+
+	if weapon != null:
+		total_damage += weapon.get("damage", 0)
+
+	text += "⚔️ Daño: %d\n" % total_damage
+
+	text += "🎖️ Nivel: %d\n" % player["level"]
+	text += "✨ XP: %d / %d" % [player["xp"], player["xp_to_next"]]
+
+	label_stats.text = text
