@@ -6,7 +6,7 @@ func show_level_up(level: int) -> void:
 	label.text = "🔥 LEVEL UP!\nNivel " + str(level)
 
 	modulate.a = 0
-	scale = Vector2(0.5, 0.5)
+	scale = Vector2(2.0, 2.0)
 
 	# fade + zoom
 	var tween = create_tween()
@@ -19,6 +19,6 @@ func show_level_up(level: int) -> void:
 	var tween2 = create_tween()
 	tween2.tween_property(self, "scale", Vector2(1, 1), 0.2)
 
-	await get_tree().create_timer(1.2).timeout
+	await get_tree().create_timer(3.0).timeout
 
 	queue_free()

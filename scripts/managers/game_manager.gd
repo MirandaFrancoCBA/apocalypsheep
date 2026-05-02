@@ -35,6 +35,7 @@ var game_started: bool = false
 
 func _ready() -> void:
 	print("[GameManager] Iniciado correctamente")
+	_load_game()
 
 # ─────────────────────────────────────────
 # ZONA
@@ -66,6 +67,8 @@ func equip_item(item: Dictionary) -> void:
 
 	player_data["equipped_weapon"] = item
 	print("[Inventory] Arma equipada:", item.get("name", ""))
+	emit_signal("player_data_changed")
+	_save_game()
 
 func unequip_item() -> void:
 	var weapon = player_data.get("equipped_weapon", {})
@@ -75,9 +78,11 @@ func unequip_item() -> void:
 		return
 
 	print("[Inventory] Arma desequipada:", weapon.get("name", ""))
+	emit_signal("player_data_changed")
 
 	# 🔥 nunca null
 	player_data["equipped_weapon"] = {}
+	_save_game()
 
 func get_equipped_weapon() -> Dictionary:
 	var weapon = player_data.get("equipped_weapon", {})
@@ -105,6 +110,7 @@ func add_xp(amount: int) -> void:
 		_level_up()
 
 	emit_signal("player_data_changed")
+	_save_game()
 
 func add_item_to_inventory(item: Dictionary) -> bool:
 	var inventory = player_data["inventory"]
@@ -114,6 +120,7 @@ func add_item_to_inventory(item: Dictionary) -> bool:
 		return false
 
 	inventory.append(item)
+	_save_game()
 
 	emit_signal("player_data_changed")
 	print("[GameManager] Item agregado:", item.get("name", "desconocido"))
@@ -137,6 +144,9 @@ func remove_item(item: Dictionary) -> void:
 		print("[Inventory] Item eliminado:", item.get("name", ""))
 	else:
 		print("[Inventory] Item no encontrado")
+
+	emit_signal("player_data_changed")
+	_save_game() # 🔥
 
 # ─────────────────────────────────────────
 # RESET
@@ -163,6 +173,7 @@ func reset_game() -> void:
 
 	emit_signal("player_data_changed")
 	print("[GameManager] Partida reseteada")
+	_save_game()
 # ─────────────────────────────────────────
 # NIVEL
 # ─────────────────────────────────────────
@@ -180,7 +191,27 @@ func _level_up() -> void:
 
 	# 🔁 recalcular XP necesaria
 	player_data["xp_to_next"] = calculate_xp_to_next(player_data["level"])
-	
+
 	emit_signal("level_up", player_data["level"])
 
 	print("[LEVEL UP] Nivel:", player_data["level"])
+
+func _load_game() -> void:
+	var data = SaveSystem.load_game()
+
+	if data.is_empty():
+		print("[GameManager] Nueva partida")
+		return
+
+	player_data = data.get("player_data", player_data)
+
+	print("[GameManager] Datos cargados:", player_data)
+
+	emit_signal("player_data_changed")
+
+func _save_game() -> void:
+	var data = {
+		"player_data": player_data
+	}
+
+	SaveSystem.save_game(data)

@@ -20,7 +20,7 @@ config/icon="res://icon.svg"
 Constants="*uid://cautn8wl3isvm"
 GameManager="*uid://mupgdiw4mghm"
 SceneManager="*uid://dgby6h86usrbb"
-SaveManager="*uid://de5q0ts77t7u5"
+SaveSystem="*uid://d1h5l3iwn5dsy"
 
 [display]
 
