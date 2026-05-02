@@ -2,6 +2,14 @@
 
 [ext_resource type="Script" uid="uid://cenvib3bj3etw" path="res://scripts/ui/inventory_scree.gd" id="1_qw0r6"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qw0r6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hj2ta"]
+bg_color = Color(0.71732026, 0.5809547, 0.25360864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ty45s"]
+bg_color = Color(0.3401623, 0.70169216, 0.1041007, 1)
+
 [node name="InventoryScreen" type="Control" unique_id=44979725]
 layout_mode = 3
 anchors_preset = 15
@@ -34,7 +42,15 @@ horizontal_alignment = 1
 
 [node name="LabelStats" type="Label" parent="MarginContainer/VBoxContainer" unique_id=1079375024]
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_qw0r6")
 text = "Estadisticas"
+horizontal_alignment = 2
+clip_text = true
+
+[node name="XPBar" type="ProgressBar" parent="MarginContainer/VBoxContainer" unique_id=2109927368]
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_hj2ta")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ty45s")
 
 [node name="LabelEquipped" type="Label" parent="MarginContainer/VBoxContainer" unique_id=483843494]
 layout_mode = 2

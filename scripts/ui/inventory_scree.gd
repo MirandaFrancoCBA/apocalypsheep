@@ -9,6 +9,7 @@ extends Control
 @onready var button_delete = $MarginContainer/VBoxContainer/ButtonDelete
 @onready var confirm_delete_dialog = $ConfirmDeleteDialog
 @onready var label_stats = $MarginContainer/VBoxContainer/LabelStats
+@onready var xp_bar = $MarginContainer/VBoxContainer/XPBar
 
 var selected_item: Dictionary = {}
 
@@ -199,3 +200,5 @@ func _update_stats() -> void:
 	text += "✨ XP: %d / %d" % [player["xp"], player["xp_to_next"]]
 
 	label_stats.text = text
+	xp_bar.max_value = player["xp_to_next"]
+	xp_bar.value = player["xp"]

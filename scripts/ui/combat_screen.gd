@@ -21,6 +21,9 @@ extends Control
 @export var player_effects_container: HBoxContainer
 @export var enemy_effects_container: HBoxContainer
 @export var label_weapon: Label
+const LevelUpPopup = preload("res://scenes/level_up_popup.tscn")
+@export var xp_bar: ProgressBar
+@export var label_xp: Label
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -43,6 +46,18 @@ var combat_system := CombatSystem.new()
 func _ready() -> void:
 	_validate_nodes()
 	_setup_combat()
+
+	GameManager.level_up.connect(_on_level_up)
+	GameManager.player_data_changed.connect(_update_xp_ui)
+
+func _on_level_up(new_level: int) -> void:
+	add_log("🎉 LEVEL UP! Nivel " + str(new_level))
+
+	var popup = LevelUpPopup.instantiate()
+	add_child(popup)
+
+	popup.show_level_up(new_level)
+
 
 # ─────────────────────────────────────────
 # VALIDACIÓN
@@ -81,7 +96,7 @@ func _setup_combat() -> void:
 
 	_update_ui()
 	_update_weapon_ui()
-
+	_update_xp_ui()
 # ─────────────────────────────────────────
 # UI UPDATE
 # ─────────────────────────────────────────
@@ -96,6 +111,16 @@ func _update_ui() -> void:
 	enemy_hp_bar.value = enemy.hp
 
 	_update_effects_ui()
+	_update_xp_ui()
+
+func _update_xp_ui():
+	var data = GameManager.get_player_data()
+
+	xp_bar.max_value = data["xp_to_next"]
+	xp_bar.value = data["xp"]
+
+	label_xp.text = "XP: %d / %d" % [data["xp"], data["xp_to_next"]]
+
 
 # ─────────────────────────────────────────
 # ATAQUE
@@ -259,21 +284,20 @@ func _end_combat(result: String) -> void:
 	if result == "victory":
 		var xp_gained := 20
 		GameManager.add_xp(xp_gained)
+
 		add_log("✨ Ganaste " + str(xp_gained) + " XP")
+
+		# 💥 feedback visible
+		label_result.text += "\n⭐ +" + str(xp_gained) + " XP"
 
 		if _roll_drop():
 			var loot = _generate_loot()
 
 			if loot.size() > 0:
-				var added = GameManager.add_item_to_inventory(loot)
-				if added:
-					add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
-				else:
-					add_log("🎒 Inventario lleno (no se pudo recoger)")
-
-
-		else:
-			add_log("❌ No obtuviste nada...")
+				GameManager.add_item_to_inventory(loot)
+				add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
+			else:
+				add_log("❌ No obtuviste nada...")
 
 	add_log("🏁 Resultado: " + result)
 	add_log("👉 Tocar para continuar")
