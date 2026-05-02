@@ -22,7 +22,7 @@ var player_data: Dictionary = {
 	# 🔥 CAMBIO CLAVE → nunca null
 	"equipped_weapon": {},
 
-	"xp_to_next": 100,
+	"xp_to_next": calculate_xp_to_next(Constants.PLAYER_DEFAULT_LEVEL),
 	"inventory": []
 }
 
@@ -99,8 +99,11 @@ func update_player_hp(new_hp: int) -> void:
 
 func add_xp(amount: int) -> void:
 	player_data["xp"] += amount
-	print("[GameManager] XP ganada:", amount, "| Total:", player_data["xp"])
-	_check_level_up()
+
+	while player_data["xp"] >= player_data["xp_to_next"]:
+		player_data["xp"] -= player_data["xp_to_next"]
+		_level_up()
+
 	emit_signal("player_data_changed")
 
 func add_item_to_inventory(item: Dictionary) -> bool:
@@ -117,20 +120,6 @@ func add_item_to_inventory(item: Dictionary) -> bool:
 
 	return true
 
-# ─────────────────────────────────────────
-# NIVEL
-# ─────────────────────────────────────────
-func _check_level_up() -> void:
-	while player_data["xp"] >= player_data["xp_to_next"]:
-		player_data["xp"] -= player_data["xp_to_next"]
-		player_data["level"] += 1
-		player_data["max_hp"] += 20
-		player_data["hp"] = player_data["max_hp"]
-		player_data["damage"] += 2
-		player_data["xp_to_next"] = int(player_data["xp_to_next"] * 1.5)
-
-		emit_signal("level_up", player_data["level"])
-		print("[GameManager] ¡LEVEL UP! Nivel:", player_data["level"])
 
 # ─────────────────────────────────────────
 # INVENTARIO
@@ -164,7 +153,7 @@ func reset_game() -> void:
 		# 🔥 consistente
 		"equipped_weapon": {},
 
-		"xp_to_next": 100,
+		"xp_to_next": calculate_xp_to_next(player_data["level"]),
 		"inventory":  []
 	}
 
@@ -174,3 +163,24 @@ func reset_game() -> void:
 
 	emit_signal("player_data_changed")
 	print("[GameManager] Partida reseteada")
+# ─────────────────────────────────────────
+# NIVEL
+# ─────────────────────────────────────────
+func calculate_xp_to_next(level: int) -> int:
+	return int(50 * pow(level, 1.5))
+
+func _level_up() -> void:
+	player_data["level"] += 1
+
+	# 📈 scaling básico
+	player_data["max_hp"] += 10
+	player_data["damage"] += 2
+
+	player_data["hp"] = player_data["max_hp"]
+
+	# 🔁 recalcular XP necesaria
+	player_data["xp_to_next"] = calculate_xp_to_next(player_data["level"])
+	
+	emit_signal("level_up", player_data["level"])
+
+	print("[LEVEL UP] Nivel:", player_data["level"])
