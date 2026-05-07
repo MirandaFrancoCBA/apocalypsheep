@@ -46,5 +46,10 @@ text = "Jugar"
 layout_mode = 2
 text = "Ver Inventario"
 
+[node name="ButtonNewGame" type="Button" parent="VBoxContainer" unique_id=759112886]
+layout_mode = 2
+text = "Nueva Partida"
+
 [connection signal="pressed" from="VBoxContainer/ButtonPlay" to="." method="_on_button_play_pressed"]
 [connection signal="pressed" from="VBoxContainer/ButtonInventory" to="." method="_on_button_inventory_pressed"]
+[connection signal="pressed" from="VBoxContainer/ButtonNewGame" to="." method="_on_button_new_game_pressed"]
