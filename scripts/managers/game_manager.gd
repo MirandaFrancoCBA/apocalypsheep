@@ -153,18 +153,24 @@ func remove_item(item: Dictionary) -> void:
 # ─────────────────────────────────────────
 func reset_game() -> void:
 	player_data = {
-		"name":       "Oveja",
-		"hp":         Constants.PLAYER_DEFAULT_HP,
-		"max_hp":     Constants.PLAYER_DEFAULT_HP,
-		"damage":     Constants.PLAYER_DEFAULT_DAMAGE,
-		"level":      Constants.PLAYER_DEFAULT_LEVEL,
-		"xp":         Constants.PLAYER_DEFAULT_XP,
+		"name": "Oveja",
 
-		# 🔥 consistente
+		"hp": Constants.PLAYER_DEFAULT_HP,
+		"max_hp": Constants.PLAYER_DEFAULT_HP,
+
+		"damage": Constants.PLAYER_DEFAULT_DAMAGE,
+
+		"level": Constants.PLAYER_DEFAULT_LEVEL,
+		"xp": Constants.PLAYER_DEFAULT_XP,
+
 		"equipped_weapon": {},
 
-		"xp_to_next": calculate_xp_to_next(player_data["level"]),
-		"inventory":  []
+		# 🔥 usar default level directamente
+		"xp_to_next": calculate_xp_to_next(
+			Constants.PLAYER_DEFAULT_LEVEL
+		),
+
+		"inventory": []
 	}
 
 	selected_zone = {}
@@ -172,7 +178,9 @@ func reset_game() -> void:
 	game_started = false
 
 	emit_signal("player_data_changed")
+
 	print("[GameManager] Partida reseteada")
+
 	_save_game()
 # ─────────────────────────────────────────
 # NIVEL
