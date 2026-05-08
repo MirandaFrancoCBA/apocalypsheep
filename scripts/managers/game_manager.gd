@@ -6,7 +6,7 @@ extends Node
 # ─────────────────────────────────────────
 signal player_data_changed
 signal zone_selected(zone)
-signal level_up(new_level)
+signal level_up(new_level, hp_gain, damage_gain)
 signal game_saved
 
 # ─────────────────────────────────────────
@@ -193,6 +193,10 @@ func calculate_xp_to_next(level: int) -> int:
 	return int(50 * pow(level, 1.5))
 
 func _level_up() -> void:
+
+	var old_max_hp = player_data["max_hp"]
+	var old_damage = player_data["damage"]
+
 	player_data["level"] += 1
 
 	# 📈 scaling básico
@@ -201,10 +205,21 @@ func _level_up() -> void:
 
 	player_data["hp"] = player_data["max_hp"]
 
-	# 🔁 recalcular XP necesaria
-	player_data["xp_to_next"] = calculate_xp_to_next(player_data["level"])
+	# 📊 calcular gains
+	var hp_gain = player_data["max_hp"] - old_max_hp
+	var damage_gain = player_data["damage"] - old_damage
 
-	emit_signal("level_up", player_data["level"])
+	# 🔁 recalcular XP necesaria
+	player_data["xp_to_next"] = calculate_xp_to_next(
+		player_data["level"]
+	)
+
+	emit_signal(
+		"level_up",
+		player_data["level"],
+		hp_gain,
+		damage_gain
+	)
 
 	print("[LEVEL UP] Nivel:", player_data["level"])
 

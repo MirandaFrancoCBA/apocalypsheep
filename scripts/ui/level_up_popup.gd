@@ -2,8 +2,17 @@ extends Control
 
 @onready var label = $CenterContainer/Panel/Label
 
-func show_level_up(level: int) -> void:
-	label.text = "🔥 LEVEL UP!\nNivel " + str(level)
+func show_level_up(
+	level: int,
+	hp_gain: int,
+	damage_gain: int
+):
+	label.text = (
+	"🎉 LEVEL UP!\n\n" +
+	"Nivel " + str(level) + "\n" +
+	"+%d HP\n" % hp_gain +
+	"+%d Daño" % damage_gain
+)
 
 	modulate.a = 0
 	scale = Vector2(2.0, 2.0)

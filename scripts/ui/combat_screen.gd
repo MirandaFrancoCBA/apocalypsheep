@@ -25,6 +25,9 @@ const LevelUpPopup = preload("res://scenes/level_up_popup.tscn")
 @export var xp_bar: ProgressBar
 @export var label_xp: Label
 @export var label_saving: Label
+const DamageNumberScene = preload(
+	"res://scenes/ui/damage_number.tscn"
+)
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -52,13 +55,22 @@ func _ready() -> void:
 	GameManager.player_data_changed.connect(_update_xp_ui)
 	GameManager.game_saved.connect(show_save_feedback)
 
-func _on_level_up(new_level: int) -> void:
+func _on_level_up(
+	new_level: int,
+	hp_gain: int,
+	damage_gain: int
+) -> void:
+
 	add_log("🎉 LEVEL UP! Nivel " + str(new_level))
 
 	var popup = LevelUpPopup.instantiate()
 	add_child(popup)
 
-	popup.show_level_up(new_level)
+	popup.show_level_up(
+		new_level,
+		hp_gain,
+		damage_gain
+	)
 
 
 # ─────────────────────────────────────────
@@ -147,6 +159,11 @@ func _on_button_attack_pressed() -> void:
 
 	# ataque jugador
 	var result = combat_system.player_attack(player, enemy)
+	_show_damage_number(
+	enemy_container,
+	result["damage"],
+	result["is_crit"]
+)
 
 	await _flash(enemy_container, Color.RED)
 	await _shake(enemy_container)
@@ -202,6 +219,11 @@ func _on_button_defend_pressed() -> void:
 	await get_tree().create_timer(0.5).timeout
 
 	var result = combat_system.enemy_attack(player, enemy)
+	_show_damage_number(
+	player_container,
+	result["damage"],
+	result["is_crit"]
+)
 
 	await _flash(player_container, Color.BLUE)
 	await _shake(player_container)
@@ -284,7 +306,7 @@ func _end_combat(result: String) -> void:
 	GameManager.set_combat_result(result)
 
 	if result == "victory":
-		var xp_gained := 20
+		var xp_gained := 40
 		GameManager.add_xp(xp_gained)
 
 		add_log("✨ Ganaste " + str(xp_gained) + " XP")
@@ -471,3 +493,65 @@ func show_save_feedback() -> void:
 	await tween.finished
 
 	label_saving.visible = false
+
+func _show_damage_number(
+	target_node: Control,
+	damage: int,
+	is_crit: bool
+) -> void:
+
+	var label := Label.new()
+
+	label.text = str(damage)
+
+	# 🔥 estilo crítico
+	if is_crit:
+		label.text = "💥 " + label.text
+		label.add_theme_font_size_override("font_size", 32)
+		label.scale = Vector2(1.2, 1.2)
+	else:
+		label.add_theme_font_size_override("font_size", 24)
+
+	# 📍 esperar frame para que size exista
+	target_node.add_child(label)
+
+	await get_tree().process_frame
+
+	# 🎯 centro del container
+	label.position = Vector2(
+		(target_node.size.x / 2) - (label.size.x / 2),
+		(target_node.size.y / 2) - (label.size.y / 2)
+	)
+
+	# ✨ animación más lenta y visible
+	var tween = create_tween()
+
+	tween.set_parallel(true)
+
+	# subir
+	tween.tween_property(
+		label,
+		"position:y",
+		label.position.y - 80,
+		1.2
+	)
+
+	# fade out
+	tween.tween_property(
+		label,
+		"modulate:a",
+		0.0,
+		1.2
+	)
+
+	# pequeño zoom
+	tween.tween_property(
+		label,
+		"scale",
+		Vector2(1.5, 1.5),
+		1.2
+	)
+
+	await tween.finished
+
+	label.queue_free()
