@@ -304,6 +304,7 @@ func _end_combat(result: String) -> void:
 
 	button_attack.disabled = true
 	button_defend.disabled = true
+	GameManager._save_game()
 
 # ─────────────────────────────────────────
 # UI EFECTOS

@@ -78,12 +78,13 @@ func unequip_item() -> void:
 		return
 
 	print("[Inventory] Arma desequipada:", weapon.get("name", ""))
-	emit_signal("player_data_changed")
+	
 
 	# 🔥 nunca null
 	player_data["equipped_weapon"] = {}
 	_save_game()
-
+	emit_signal("player_data_changed")
+	
 func get_equipped_weapon() -> Dictionary:
 	var weapon = player_data.get("equipped_weapon", {})
 
@@ -109,8 +110,9 @@ func add_xp(amount: int) -> void:
 		player_data["xp"] -= player_data["xp_to_next"]
 		_level_up()
 
-	emit_signal("player_data_changed")
 	_save_game()
+	emit_signal("player_data_changed")
+	
 
 func add_item_to_inventory(item: Dictionary) -> bool:
 	var inventory = player_data["inventory"]
@@ -145,8 +147,9 @@ func remove_item(item: Dictionary) -> void:
 	else:
 		print("[Inventory] Item no encontrado")
 
-	emit_signal("player_data_changed")
 	_save_game() # 🔥
+	emit_signal("player_data_changed")
+	
 
 # ─────────────────────────────────────────
 # RESET

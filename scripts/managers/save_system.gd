@@ -22,23 +22,53 @@ func save_game(data: Dictionary) -> void:
 # ─────────────────────────────────────────
 func load_game() -> Dictionary:
 	if not FileAccess.file_exists(SAVE_PATH):
-		print("[SaveSystem] No existe save → nueva partida")
+		push_warning("[SaveSystem] No existe save")
+
+		GameManager.reset_game()
+
 		return {}
 
 	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
 
 	if file == null:
-		push_error("[SaveSystem] Error abriendo archivo de carga")
+		push_error("[SaveSystem] No se pudo abrir save")
+
+		GameManager.reset_game()
+
 		return {}
 
 	var content = file.get_as_text()
-	var data = JSON.parse_string(content)
 
-	if data == null:
-		push_error("[SaveSystem] Error parseando JSON")
+	# save vacío
+	if content.strip_edges().is_empty():
+		push_error("[SaveSystem] Save vacío")
+
+		GameManager.reset_game()
+
 		return {}
 
-	print("[SaveSystem] Juego cargado correctamente")
+	var data = JSON.parse_string(content)
+
+	# json corrupto
+	if typeof(data) != TYPE_DICTIONARY:
+		push_error("[SaveSystem] JSON corrupto")
+
+		GameManager.reset_game()
+
+		return {}
+
+	# defaults seguros
+	if not data.has("player_data"):
+		data["player_data"] = {}
+
+	if not data.has("selected_zone"):
+		data["selected_zone"] = {}
+
+	GameManager.player_data = data.get("player_data", {})
+	GameManager.selected_zone = data.get("selected_zone", {})
+
+	print("[SaveSystem] Juego cargado")
+
 	return data
 
 # ─────────────────────────────────────────
