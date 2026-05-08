@@ -12,7 +12,7 @@ bg_color = Color(0.9904657, 0.18689609, 0.7883756, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
 bg_color = Color(0.20565334, 0.68708014, 0.6062001, 1)
 
-[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container", "label_weapon", "xp_bar", "label_xp")]
+[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container", "label_weapon", "xp_bar", "label_xp", "label_saving")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -36,6 +36,7 @@ enemy_effects_container = NodePath("MarginContainer/VBoxContainer/EnemyContainer
 label_weapon = NodePath("MarginContainer/VBoxContainer/PlayerContainer/LabelWeapon")
 xp_bar = NodePath("MarginContainer/VBoxContainer/PlayerContainer/xp_bar")
 label_xp = NodePath("MarginContainer/VBoxContainer/PlayerContainer/label_xp")
+label_saving = NodePath("MarginContainer/VBoxContainer/LabelSaving")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1555668808]
 layout_mode = 1
@@ -56,6 +57,12 @@ theme_override_constants/margin_bottom = 16
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=840649750]
 layout_mode = 2
 theme_override_constants/separation = 12
+
+[node name="LabelSaving" type="Label" parent="MarginContainer/VBoxContainer" unique_id=652259007]
+visible = false
+modulate = Color(0, 0, 0, 1)
+layout_mode = 2
+text = "💾 Guardando..."
 
 [node name="EnemyContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1103525368]
 layout_mode = 2

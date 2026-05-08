@@ -7,6 +7,7 @@ extends Node
 signal player_data_changed
 signal zone_selected(zone)
 signal level_up(new_level)
+signal game_saved
 
 # ─────────────────────────────────────────
 # ESTADO DEL JUGADOR
@@ -84,7 +85,7 @@ func unequip_item() -> void:
 	player_data["equipped_weapon"] = {}
 	_save_game()
 	emit_signal("player_data_changed")
-	
+
 func get_equipped_weapon() -> Dictionary:
 	var weapon = player_data.get("equipped_weapon", {})
 
@@ -214,7 +215,12 @@ func _load_game() -> void:
 		print("[GameManager] Nueva partida")
 		return
 
-	player_data = data.get("player_data", player_data)
+	var loaded_player = data.get("player_data", {})
+
+# merge seguro
+	for key in player_data.keys():
+		if loaded_player.has(key):
+			player_data[key] = loaded_player[key]
 
 	print("[GameManager] Datos cargados:", player_data)
 
@@ -226,3 +232,4 @@ func _save_game() -> void:
 	}
 
 	SaveSystem.save_game(data)
+	emit_signal("game_saved")

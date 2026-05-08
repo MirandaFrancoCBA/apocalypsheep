@@ -24,6 +24,7 @@ extends Control
 const LevelUpPopup = preload("res://scenes/level_up_popup.tscn")
 @export var xp_bar: ProgressBar
 @export var label_xp: Label
+@export var label_saving: Label
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -49,6 +50,7 @@ func _ready() -> void:
 
 	GameManager.level_up.connect(_on_level_up)
 	GameManager.player_data_changed.connect(_update_xp_ui)
+	GameManager.game_saved.connect(show_save_feedback)
 
 func _on_level_up(new_level: int) -> void:
 	add_log("🎉 LEVEL UP! Nivel " + str(new_level))
@@ -438,3 +440,34 @@ func _apply_enemy_scaling(target_enemy: Enemy) -> void:
 	target_enemy.damage += final_level * 2
 
 	print("[ENEMY] Nivel:", final_level, "HP:", target_enemy.hp, "DMG:", target_enemy.damage)
+
+
+func show_save_feedback() -> void:
+	if label_saving == null:
+		return
+
+	label_saving.visible = true
+
+	var tween = create_tween()
+
+	label_saving.modulate.a = 0
+
+	tween.tween_property(
+		label_saving,
+		"modulate:a",
+		1.0,
+		0.2
+	)
+
+	tween.tween_interval(0.8)
+
+	tween.tween_property(
+		label_saving,
+		"modulate:a",
+		0.0,
+		0.4
+	)
+
+	await tween.finished
+
+	label_saving.visible = false
