@@ -21,6 +21,7 @@ Constants="*uid://cautn8wl3isvm"
 GameManager="*uid://mupgdiw4mghm"
 SceneManager="*uid://dgby6h86usrbb"
 SaveSystem="*uid://d1h5l3iwn5dsy"
+SceneTransition="*uid://ckhhon2ek5k3o"
 
 [display]
 
