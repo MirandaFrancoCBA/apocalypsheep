@@ -53,6 +53,13 @@ func _create_items(items: Array) -> void:
 	for item in items:
 		var button = Button.new()
 
+		var rarity = item.get("rarity", "common")
+
+		button.modulate = Constants.RARITY_COLORS.get(
+		rarity,
+		Color.WHITE
+)
+
 		var text = _format_item(item)
 
 		if item == GameManager.get_equipped_weapon():
@@ -170,12 +177,12 @@ func _refresh_inventory() -> void:
 
 func _update_unequip_button() -> void:
 	var weapon = GameManager.get_equipped_weapon()
-	button_unequip.disabled = weapon == null
+	button_unequip.disabled = weapon.is_empty()
 
 func _update_equipped_label() -> void:
 	var weapon = GameManager.get_equipped_weapon()
 
-	if weapon == null:
+	if weapon.is_empty():
 		label_equipped.text = "Arma equipada: Ninguna"
 	else:
 		label_equipped.text = "Arma equipada: " + weapon.get("name", "")

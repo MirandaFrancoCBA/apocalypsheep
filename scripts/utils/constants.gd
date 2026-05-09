@@ -30,7 +30,16 @@ const RARITY_WEIGHTS = {
 	"rare": 25,
 	"epic": 5
 }
-
+const RARITY_COLORS := {
+	"common": Color.WHITE,
+	"rare": Color(0.4, 0.6, 1.0),
+	"epic": Color(0.7, 0.4, 1.0)
+}
+const RARITY_ICONS := {
+	"common": "⚪",
+	"rare": "🔵",
+	"epic": "🟣"
+}
 # ─────────────────────────────────────────
 # LOOT — drop chance
 # ─────────────────────────────────────────
