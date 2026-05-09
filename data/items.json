@@ -21,11 +21,20 @@
       "rarity": "rare"
     },
     {
-      "id": "medkit_01",
-      "name": "Botiquín",
+      "id": "small_potion",
+      "name": "Poción pequeña",
       "type": "consumable",
-      "heal": 20,
-      "rarity": "common"
+      "heal": 25,
+      "rarity": "common",
+      "description": "Recupera una pequeña cantidad de HP."
+    },
+    {
+      "id": "large_potion",
+      "name": "Poción grande",
+      "type": "consumable",
+      "heal": 75,
+      "rarity": "rare",
+      "description": "Recupera gran cantidad de HP."
     },
     {
         "id": "rusty_pistol",

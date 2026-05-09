@@ -27,6 +27,7 @@ func _ready() -> void:
 	_update_equipped_label()
 	_update_unequip_button()
 	_update_stats()
+	_update_use_button()
 
 # ─────────────────────────────────────────
 # LOAD
@@ -85,6 +86,8 @@ func _format_item(item: Dictionary) -> String:
 		var effect = item.get("effect", "")
 		if effect != "":
 			text += " | " + _effect_to_text(effect)
+	if item.has("heal"):
+		text += " | ❤️ +" + str(item["heal"])
 
 	return text
 
@@ -103,6 +106,7 @@ func _on_item_selected(item: Dictionary) -> void:
 	selected_item = item
 	print("[Inventory] Item seleccionado:", item)
 	_show_item_detail(item)
+	_update_use_button()
 
 # 🔍 DETALLE COMPLETO
 func _show_item_detail(item: Dictionary) -> void:
@@ -122,6 +126,9 @@ func _show_item_detail(item: Dictionary) -> void:
 
 	if item.has("rarity"):
 		text += "Rareza: " + item["rarity"] + "\n"
+	
+	if item.has("description"):
+		text += "Descripción: " + item["description"] + "\n"
 
 	label_detail.text = text
 
@@ -246,5 +253,12 @@ func _on_button_use_pressed() -> void:
 
 	_refresh_inventory()
 	_update_stats()
+	_update_use_button()
 
 	GameManager._save_game()
+
+func _update_use_button() -> void:
+	button_use.visible = (
+		not selected_item.is_empty()
+		and selected_item.has("heal")
+	)
