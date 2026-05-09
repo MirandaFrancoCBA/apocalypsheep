@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://dilm5y432bhba"]
+
+[ext_resource type="Script" uid="uid://c8wf81wo5pgrt" path="res://scripts/ui/combat_result_popup.gd" id="1_f5ltw"]
+
+[node name="CombatResultPopup" type="Control" unique_id=1442774500]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_f5ltw")
+
+[node name="Panel" type="Panel" parent="." unique_id=2088814185]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=2102876238]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LabelTitle" type="Label" parent="Panel/VBoxContainer" unique_id=1808427225]
+layout_mode = 2
+
+[node name="LabelXP" type="Label" parent="Panel/VBoxContainer" unique_id=135300782]
+layout_mode = 2
+
+[node name="LabelLoot" type="Label" parent="Panel/VBoxContainer" unique_id=789265155]
+layout_mode = 2
+
+[node name="LabelContinue" type="Label" parent="Panel/VBoxContainer" unique_id=2070686402]
+layout_mode = 2

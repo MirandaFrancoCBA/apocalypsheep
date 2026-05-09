@@ -28,7 +28,9 @@ const LevelUpPopup = preload("res://scenes/level_up_popup.tscn")
 const DamageNumberScene = preload(
 	"res://scenes/ui/damage_number.tscn"
 )
-
+const CombatResultPopupScene = preload(
+	"res://scenes/ui/combat_result_popup.tscn"
+)
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -306,31 +308,55 @@ func _end_combat(result: String) -> void:
 
 	GameManager.set_combat_result(result)
 
+	var xp_gained := 0
+	var loot := {}
+
 	if result == "victory":
-		var xp_gained := 40
+
+		# ─────────────────────────
+		# XP
+		# ─────────────────────────
+		xp_gained = 40
 		GameManager.add_xp(xp_gained)
 
-		add_log("✨ Ganaste " + str(xp_gained) + " XP")
-
-		# 💥 feedback visible
-		label_result.text += "\n⭐ +" + str(xp_gained) + " XP"
-
+		# ─────────────────────────
+		# LOOT
+		# ─────────────────────────
 		if _roll_drop():
-			var loot = _generate_loot()
+			loot = _generate_loot()
+
 			if loot.size() > 0:
 				GameManager.add_item_to_inventory(loot)
-				add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
-				_show_loot_popup(loot)       # ✅ con loot
-			else:
-				_show_loot_popup({})         # ✅ sin loot
-		else:
-			_show_loot_popup({})             # ✅ drop falló
 
-	add_log("🏁 Resultado: " + result)
+	# ─────────────────────────
+	# POPUP RESULTADO
+	# ─────────────────────────
+	_show_combat_result_popup(
+		result,
+		xp_gained,
+		loot
+	)
+
+	# ─────────────────────────
+	# LOG MINIMALISTA
+	# (solo info importante realtime)
+	# ─────────────────────────
+	if result == "victory":
+		add_log("🏆 Victoria")
+	else:
+		add_log("💀 Derrota")
+
 	add_log("👉 Tocar para continuar")
 
+	# ─────────────────────────
+	# UI
+	# ─────────────────────────
 	button_attack.disabled = true
 	button_defend.disabled = true
+
+	# ─────────────────────────
+	# SAVE
+	# ─────────────────────────
 	GameManager._save_game()
 
 # ─────────────────────────────────────────
@@ -561,3 +587,19 @@ func _show_loot_popup(item: Dictionary) -> void:
 	else:
 		print("[LootPopup] ❌ show_loot no existe en este nodo")
 		print("[LootPopup] Métodos disponibles: ", popup.get_method_list().map(func(m): return m["name"]))
+
+func _show_combat_result_popup(
+	result: String,
+	xp: int,
+	loot: Dictionary
+) -> void:
+
+	var popup = CombatResultPopupScene.instantiate()
+
+	get_tree().current_scene.add_child(popup)
+
+	popup.show_result(
+		result,
+		xp,
+		loot
+	)
