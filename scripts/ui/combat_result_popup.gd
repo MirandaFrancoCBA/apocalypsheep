@@ -71,6 +71,9 @@ func show_result(
 		0.25
 	)
 
+	label_continue.text = "Continuar"
+	label_continue.modulate = Color.GOLD
+	
 func _rarity_icon(rarity: String) -> String:
 	match rarity:
 		"common":
@@ -84,3 +87,5 @@ func _rarity_icon(rarity: String) -> String:
 
 		_:
 			return "❓"
+
+
