@@ -10,6 +10,7 @@ extends Control
 @onready var confirm_delete_dialog = $ConfirmDeleteDialog
 @onready var label_stats = $MarginContainer/VBoxContainer/LabelStats
 @onready var xp_bar = $MarginContainer/VBoxContainer/XPBar
+@onready var button_use = $MarginContainer/VBoxContainer/ButtonUse
 
 var selected_item: Dictionary = {}
 
@@ -209,3 +210,41 @@ func _update_stats() -> void:
 	label_stats.text = text
 	xp_bar.max_value = player["xp_to_next"]
 	xp_bar.value = player["xp"]
+
+
+func _on_button_use_pressed() -> void:
+
+	if selected_item.is_empty():
+		return
+
+	if not selected_item.has("heal"):
+		print("[Inventory] Item no consumible")
+		return
+
+	var player = GameManager.get_player_data()
+
+	# ❤️ HP llena
+	if player["hp"] >= player["max_hp"]:
+		label_detail.text = "HP ya está al máximo"
+		return
+
+	var heal_amount = selected_item.get("heal", 0)
+
+	player["hp"] = min(
+		player["hp"] + heal_amount,
+		player["max_hp"]
+	)
+
+	GameManager.remove_item(selected_item)
+
+	label_detail.text = (
+		"❤️ Recuperaste %d HP"
+		% heal_amount
+	)
+
+	selected_item = {}
+
+	_refresh_inventory()
+	_update_stats()
+
+	GameManager._save_game()

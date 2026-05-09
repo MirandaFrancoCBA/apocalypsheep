@@ -60,8 +60,11 @@ text = "Arma equipada: Ninguna"
 layout_mode = 2
 
 [node name="LabelDetail" type="Label" parent="MarginContainer/VBoxContainer" unique_id=727969253]
+clip_contents = true
+custom_minimum_size = Vector2(50, 30)
 layout_mode = 2
 text = "Selecciona un item"
+horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="ButtonDelete" type="Button" parent="MarginContainer/VBoxContainer" unique_id=166275754]
@@ -76,6 +79,11 @@ text = "Equipar"
 layout_mode = 2
 text = "Desequipar"
 
+[node name="ButtonUse" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1873895744]
+layout_mode = 2
+text = "Usar
+"
+
 [node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=293995187]
 layout_mode = 2
 text = "<- Volver"
@@ -87,5 +95,6 @@ dialog_text = "Eliminar item?"
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonDelete" to="." method="_on_button_delete_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonEquip" to="." method="_on_button_equip_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonUnequip" to="." method="_on_button_unequip_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonUse" to="." method="_on_button_use_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonBack" to="." method="_on_button_back_pressed"]
 [connection signal="confirmed" from="ConfirmDeleteDialog" to="." method="_on_confirm_delete_dialog_confirmed"]

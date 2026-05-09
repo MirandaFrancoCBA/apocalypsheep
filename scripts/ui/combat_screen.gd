@@ -121,6 +121,8 @@ func _update_ui() -> void:
 	player.hp = max(player.hp, 0)
 	enemy.hp = max(enemy.hp, 0)
 
+	GameManager.update_player_hp(player.hp)
+	
 	label_player_hp.text = "HP: " + str(player.hp)
 	label_enemy_hp.text  = "HP: " + str(enemy.hp)
 
