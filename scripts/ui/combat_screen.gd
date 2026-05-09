@@ -317,13 +317,14 @@ func _end_combat(result: String) -> void:
 
 		if _roll_drop():
 			var loot = _generate_loot()
-
 			if loot.size() > 0:
 				GameManager.add_item_to_inventory(loot)
 				add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
-				_show_loot_popup(loot)
+				_show_loot_popup(loot)       # ✅ con loot
 			else:
-				add_log("❌ No obtuviste nada...")
+				_show_loot_popup({})         # ✅ sin loot
+		else:
+			_show_loot_popup({})             # ✅ drop falló
 
 	add_log("🏁 Resultado: " + result)
 	add_log("👉 Tocar para continuar")
@@ -545,10 +546,18 @@ func _show_damage_number(
 	label.queue_free()
 
 func _show_loot_popup(item: Dictionary) -> void:
-	var popup = load("res://scenes/ui/loot_popup.tscn").instantiate()
 	
-	# ✅ Agregar al root de la escena, no al VBox/Margin
+	var scene = load("res://scenes/ui/loot_popup.tscn")
+
+	var popup = scene.instantiate()
+
 	get_tree().current_scene.add_child(popup)
 	
+	
 	popup.z_index = 10
-	popup.show_loot(item)
+	
+	if popup.has_method("show_loot"):
+		popup.show_loot(item)
+	else:
+		print("[LootPopup] ❌ show_loot no existe en este nodo")
+		print("[LootPopup] Métodos disponibles: ", popup.get_method_list().map(func(m): return m["name"]))

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://djrl72x2d4ns5"]
 
-[ext_resource type="Script" uid="uid://b5ueht61xwu6c" path="res://scenes/ui/loot_popup.gd" id="1_x5r40"]
+[ext_resource type="Script" uid="uid://qd2cwb0t70wb" path="res://scripts/ui/loot_popup.gd" id="1_x5r40"]
 
 [node name="LootPopup" type="Control" unique_id=1048732134]
 custom_minimum_size = Vector2(400, 200)
@@ -53,4 +53,3 @@ text = "🎁 Loot obtenido"
 [node name="LabelItem" type="Label" parent="Panel/VBoxContainer" unique_id=1983101633]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Espada Rota"
