@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://djrl72x2d4ns5"]
+
+[ext_resource type="Script" uid="uid://b5ueht61xwu6c" path="res://scenes/ui/loot_popup.gd" id="1_x5r40"]
+
+[node name="LootPopup" type="Control" unique_id=1048732134]
+custom_minimum_size = Vector2(400, 200)
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_x5r40")
+
+[node name="Panel" type="Panel" parent="." unique_id=606578056]
+custom_minimum_size = Vector2(320, 140)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel" unique_id=1478680933]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -29.0
+offset_right = 20.0
+offset_bottom = 29.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="LabelTitle" type="Label" parent="Panel/VBoxContainer" unique_id=151331036]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "🎁 Loot obtenido"
+
+[node name="LabelItem" type="Label" parent="Panel/VBoxContainer" unique_id=1983101633]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Espada Rota"

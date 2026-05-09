@@ -29,6 +29,7 @@ const DamageNumberScene = preload(
 	"res://scenes/ui/damage_number.tscn"
 )
 
+
 # ─────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────
@@ -320,6 +321,7 @@ func _end_combat(result: String) -> void:
 			if loot.size() > 0:
 				GameManager.add_item_to_inventory(loot)
 				add_log("🎁 Obtuviste: " + loot.get("name", "Item"))
+				_show_loot_popup(loot)
 			else:
 				add_log("❌ No obtuviste nada...")
 
@@ -501,57 +503,52 @@ func _show_damage_number(
 ) -> void:
 
 	var label := Label.new()
+	label.text = "💥 " + str(damage) if is_crit else str(damage)
+	
+	# ✅ Desactivar autowrap para que el tamaño sea predecible
+	label.autowrap_mode = TextServer.AUTOWRAP_OFF
+	
+	# ✅ Alineación horizontal centrada (ayuda al motor a calcular bien)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	label.text = str(damage)
-
-	# 🔥 estilo crítico
 	if is_crit:
-		label.text = "💥 " + label.text
 		label.add_theme_font_size_override("font_size", 32)
-		label.scale = Vector2(1.2, 1.2)
 	else:
 		label.add_theme_font_size_override("font_size", 24)
 
-	# 📍 esperar frame para que size exista
 	target_node.add_child(label)
 
+	# ✅ Esperar DOS frames para que el layout esté completo
+	await get_tree().process_frame
 	await get_tree().process_frame
 
-	# 🎯 centro del container
+	# ✅ Compensar la escala en el cálculo de posición
+	var scale_factor := 1.2 if is_crit else 1.0
+	var visual_width  := label.size.x * scale_factor
+	var visual_height := label.size.y * scale_factor
+
+	label.scale = Vector2(scale_factor, scale_factor)
+
 	label.position = Vector2(
-		(target_node.size.x / 2) - (label.size.x / 2),
-		(target_node.size.y / 2) - (label.size.y / 2)
+		(target_node.size.x - visual_width)  / 2.0,
+		(target_node.size.y - visual_height) / 2.0
 	)
 
-	# ✨ animación más lenta y visible
 	var tween = create_tween()
-
 	tween.set_parallel(true)
 
-	# subir
-	tween.tween_property(
-		label,
-		"position:y",
-		label.position.y - 80,
-		1.2
-	)
-
-	# fade out
-	tween.tween_property(
-		label,
-		"modulate:a",
-		0.0,
-		1.2
-	)
-
-	# pequeño zoom
-	tween.tween_property(
-		label,
-		"scale",
-		Vector2(1.5, 1.5),
-		1.2
-	)
+	tween.tween_property(label, "position:y", label.position.y - 80, 1.2)
+	tween.tween_property(label, "modulate:a", 0.0, 1.2)
+	tween.tween_property(label, "scale", Vector2(scale_factor + 0.3, scale_factor + 0.3), 1.2)
 
 	await tween.finished
-
 	label.queue_free()
+
+func _show_loot_popup(item: Dictionary) -> void:
+	var popup = load("res://scenes/ui/loot_popup.tscn").instantiate()
+	
+	# ✅ Agregar al root de la escena, no al VBox/Margin
+	get_tree().current_scene.add_child(popup)
+	
+	popup.z_index = 10
+	popup.show_loot(item)
