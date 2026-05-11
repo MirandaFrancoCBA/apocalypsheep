@@ -33,7 +33,7 @@ var player_data: Dictionary = {
 var selected_zone: Dictionary = {}
 var last_combat_result: String = ""
 var game_started: bool = false
-var player_dead: bool = false
+
 
 func _ready() -> void:
 	print("[GameManager] Iniciado correctamente")
@@ -102,18 +102,23 @@ func get_player_data() -> Dictionary:
 	return player_data
 
 func is_player_dead() -> bool:
-	return player_dead
+	return player_data["hp"] <= 0
 
 func kill_player() -> void:
-	player_dead = true
 	player_data["hp"] = 0
 
 	print("[GameManager] Jugador muerto")
 
 	_save_game()
+	emit_signal("player_data_changed")
 
-func revive_player() -> void:
-	player_dead = false
+func revive_player(hp_amount: int = 1) -> void:
+	player_data["hp"] = max(hp_amount, 1)
+
+	print("[GameManager] Jugador revivido")
+
+	_save_game()
+	emit_signal("player_data_changed")
 
 
 func update_player_hp(new_hp: int) -> void:
@@ -196,7 +201,7 @@ func reset_game() -> void:
 	selected_zone = {}
 	last_combat_result = ""
 	game_started = false
-	player_dead = false
+
 
 	emit_signal("player_data_changed")
 	
@@ -248,7 +253,7 @@ func _load_game() -> void:
 		return
 
 	var loaded_player = data.get("player_data", {})
-	player_dead = player_data["hp"] <= 0
+	
 
 # merge seguro
 	for key in player_data.keys():

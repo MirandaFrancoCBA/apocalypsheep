@@ -31,6 +31,9 @@ const DamageNumberScene = preload(
 const CombatResultPopupScene = preload(
 	"res://scenes/ui/combat_result_popup.tscn"
 )
+const GameOverPopupScene = preload(
+	"res://scenes/ui/game_over_popup.tscn"
+)
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -315,7 +318,8 @@ func _end_combat(result: String) -> void:
 
 	if result == "defeat":
 		GameManager.kill_player()
-
+		_show_game_over()
+		return
 	var xp_gained := 0
 	var loot := {}
 
@@ -611,3 +615,10 @@ func _show_combat_result_popup(
 		xp,
 		loot
 	)
+
+func _show_game_over() -> void:
+	var popup = GameOverPopupScene.instantiate()
+
+	get_tree().current_scene.add_child(popup)
+
+	popup.z_index = 100
