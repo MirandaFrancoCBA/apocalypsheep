@@ -52,6 +52,9 @@ var combat_system := CombatSystem.new()
 # ─────────────────────────────────────────
 func _ready() -> void:
 	_validate_nodes()
+	if GameManager.is_player_dead():
+		SceneManager.go_to_main_menu()
+		return
 	_setup_combat()
 
 	GameManager.level_up.connect(_on_level_up)
@@ -145,7 +148,7 @@ func _update_xp_ui():
 # ATAQUE
 # ─────────────────────────────────────────
 func _on_button_attack_pressed() -> void:
-	if combat_finished:
+	if combat_finished or GameManager.is_player_dead():
 		return
 
 	button_attack.disabled = true
@@ -212,7 +215,7 @@ func _on_button_attack_pressed() -> void:
 # DEFENSA
 # ─────────────────────────────────────────
 func _on_button_defend_pressed() -> void:
-	if combat_finished:
+	if combat_finished or GameManager.is_player_dead():
 		return
 
 	button_attack.disabled = true
@@ -309,6 +312,9 @@ func _end_combat(result: String) -> void:
 	waiting_for_input = true
 
 	GameManager.set_combat_result(result)
+
+	if result == "defeat":
+		GameManager.kill_player()
 
 	var xp_gained := 0
 	var loot := {}
