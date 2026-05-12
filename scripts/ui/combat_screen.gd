@@ -344,7 +344,7 @@ func _end_combat(result: String) -> void:
 	# ─────────────────────────
 	# POPUP RESULTADO
 	# ─────────────────────────
-	func _show_combat_result_popup(
+func _show_combat_result_popup(
 	result: String,
 	xp: int,
 	loot: Dictionary
@@ -635,21 +635,6 @@ func _show_loot_popup(item: Dictionary) -> void:
 		print("[LootPopup] ❌ show_loot no existe en este nodo")
 		print("[LootPopup] Métodos disponibles: ", popup.get_method_list().map(func(m): return m["name"]))
 
-func _show_combat_result_popup(
-	result: String,
-	xp: int,
-	loot: Dictionary
-) -> void:
-
-	var popup = CombatResultPopupScene.instantiate()
-
-	get_tree().current_scene.add_child(popup)
-
-	popup.show_result(
-		result,
-		xp,
-		loot
-	)
 
 func _show_game_over() -> void:
 	var popup = GameOverPopupScene.instantiate()
