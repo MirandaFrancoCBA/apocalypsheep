@@ -28,6 +28,21 @@ func _clear_zones():
 	for child in zones_container.get_children():
 		child.queue_free()
 
+func _can_enter_combat() -> bool:
+
+	var player = GameManager.get_player_data()
+
+	if player["hp"] <= 0:
+		print("[ZoneSelect] Jugador muerto")
+		return false
+
+	if player["max_hp"] <= 0:
+		print("[ZoneSelect] Max HP inválida")
+		return false
+
+	return true
+
+
 func create_zone_buttons(zones: Array) -> void:
 	for zone in zones:
 		var button = Button.new()
@@ -49,6 +64,11 @@ func create_zone_buttons(zones: Array) -> void:
 		zones_container.add_child(button)
 
 func _on_zone_selected(zone: Dictionary) -> void:
+
+	if not _can_enter_combat():
+		print("[ZoneSelect] No se puede entrar al combate")
+		return
+
 	print("[ZoneSelect] Zona elegida:", zone.get("name", ""))
 
 	GameManager.set_selected_zone(zone)

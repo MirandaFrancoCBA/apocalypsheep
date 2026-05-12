@@ -262,6 +262,21 @@ func _load_game() -> void:
 
 	print("[GameManager] Datos cargados:", player_data)
 
+	player_data["hp"] = clamp(
+	player_data["hp"],
+	0,
+	player_data["max_hp"])
+
+	player_data["xp"] = max(player_data["xp"], 0)
+	player_data["level"] = max(player_data["level"], 1)
+
+	if typeof(player_data["inventory"]) != TYPE_ARRAY:
+		player_data["inventory"] = []
+	
+	if typeof(player_data["equipped_weapon"]) != TYPE_DICTIONARY:
+		player_data["equipped_weapon"] = {}
+	
+
 	emit_signal("player_data_changed")
 
 func _save_game() -> void:
