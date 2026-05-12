@@ -40,7 +40,12 @@ func show_loot(item: Dictionary) -> void:
 
 	var tween = create_tween()
 	tween.parallel().tween_property(self , "scale", Vector2.ONE, 0.25)
-	tween.parallel().tween_property(self , "modulate:a", 2.0, 1.25)
+	tween.parallel().tween_property(
+	self ,
+	"modulate:a",
+	1.0,
+	1.25
+)
 	tween.tween_interval(5.5)
 	tween.parallel().tween_property(self , "modulate:a", 0.0, 1.0)
 	tween.parallel().tween_property(self , "position:y", start_y - 20, 0.4)

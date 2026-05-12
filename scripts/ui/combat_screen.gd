@@ -344,9 +344,22 @@ func _end_combat(result: String) -> void:
 	# ─────────────────────────
 	# POPUP RESULTADO
 	# ─────────────────────────
-	_show_combat_result_popup(
+	func _show_combat_result_popup(
+	result: String,
+	xp: int,
+	loot: Dictionary
+) -> void:
+
+	var popup = CombatResultPopupScene.instantiate()
+
+	get_tree().current_scene.add_child(popup)
+
+	popup.top_level = true
+	popup.z_index = 100
+
+	popup.show_result(
 		result,
-		xp_gained,
+		xp,
 		loot
 	)
 
@@ -643,4 +656,6 @@ func _show_game_over() -> void:
 
 	get_tree().current_scene.add_child(popup)
 
+	popup.top_level = true
 	popup.z_index = 100
+	
