@@ -9,23 +9,15 @@ signal zone_selected(zone)
 signal level_up(new_level, hp_gain, damage_gain)
 signal game_saved
 
+const KEEP_ON_DEATH := [
+	# futuro:
+	# "gold",
+	# "perks"
+]
 # ─────────────────────────────────────────
 # ESTADO DEL JUGADOR
 # ─────────────────────────────────────────
-var player_data: Dictionary = {
-	"name":      "Oveja",
-	"hp":        Constants.PLAYER_DEFAULT_HP,
-	"max_hp":    Constants.PLAYER_DEFAULT_HP,
-	"damage":    Constants.PLAYER_DEFAULT_DAMAGE,
-	"level":     Constants.PLAYER_DEFAULT_LEVEL,
-	"xp":        Constants.PLAYER_DEFAULT_XP,
-
-	# 🔥 CAMBIO CLAVE → nunca null
-	"equipped_weapon": {},
-
-	"xp_to_next": calculate_xp_to_next(Constants.PLAYER_DEFAULT_LEVEL),
-	"inventory": []
-}
+var player_data: Dictionary = create_default_player_data()
 
 # ─────────────────────────────────────────
 # ESTADO DE PARTIDA
@@ -173,11 +165,9 @@ func remove_item(item: Dictionary) -> void:
 	emit_signal("player_data_changed")
 	
 
-# ─────────────────────────────────────────
-# RESET
-# ─────────────────────────────────────────
-func reset_game() -> void:
-	player_data = {
+
+func create_default_player_data() -> Dictionary:
+	return {
 		"name": "Oveja",
 
 		"hp": Constants.PLAYER_DEFAULT_HP,
@@ -190,13 +180,21 @@ func reset_game() -> void:
 
 		"equipped_weapon": {},
 
-		# 🔥 usar default level directamente
 		"xp_to_next": calculate_xp_to_next(
 			Constants.PLAYER_DEFAULT_LEVEL
 		),
 
 		"inventory": []
 	}
+# ─────────────────────────────────────────
+# RESET
+# ─────────────────────────────────────────
+# Reinicia la run completa.
+# Futuro:
+# algunos datos podrán persistir
+# mediante KEEP_ON_DEATH.
+func reset_game() -> void:
+	player_data = create_default_player_data()
 
 	selected_zone = {}
 	last_combat_result = ""

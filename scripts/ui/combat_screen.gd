@@ -7,7 +7,7 @@ extends Control
 @export var label_enemy_hp: Label
 @export var enemy_hp_bar: ProgressBar
 @export var enemy_container: Control
-
+@export var death_overlay: ColorRect
 @export var label_player_hp: Label
 @export var player_hp_bar: ProgressBar
 @export var player_container: Control
@@ -318,6 +318,7 @@ func _end_combat(result: String) -> void:
 
 	if result == "defeat":
 		GameManager.kill_player()
+		await _death_feedback()
 		_show_game_over()
 		return
 	var xp_gained := 0
@@ -432,6 +433,27 @@ func _flash(node: Control, color: Color) -> void:
 	node.modulate = color
 	await get_tree().create_timer(0.1).timeout
 	node.modulate = original
+
+
+func _death_feedback() -> void:
+
+	if death_overlay == null:
+		return
+
+	death_overlay.visible = true
+	death_overlay.modulate.a = 0.0
+
+	var tween = create_tween()
+
+	tween.tween_property(
+		death_overlay,
+		"modulate:a",
+		0.65,
+		0.5
+	)
+
+	await tween.finished
+
 
 func _shake(node: Control) -> void:
 	var original_pos = node.position

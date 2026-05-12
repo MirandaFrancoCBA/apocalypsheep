@@ -44,5 +44,4 @@ func _on_retry_pressed() -> void:
 	SceneManager.go_to_zone_select()
 
 func _on_menu_pressed() -> void:
-	GameManager.reset_game()
 	SceneManager.go_to_main_menu()
