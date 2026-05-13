@@ -1,16 +1,20 @@
 extends Control
 class_name CombatResultPopup
 
-@onready var label_title = $ColorRect/Panel/VBoxContainer/LabelTitle
-@onready var label_xp = $ColorRect/Panel/VBoxContainer/LabelXP
-@onready var label_loot = $ColorRect/Panel/VBoxContainer/LabelLoot
+@onready var label_title = $Panel/VBoxContainer/LabelTitle
+@onready var label_xp = $Panel/VBoxContainer/LabelXP
+@onready var label_loot = $Panel/VBoxContainer/LabelLoot
 
 func show_result(
+	result: String,
 	xp: int,
 	loot: Dictionary
 ) -> void:
 
-	label_title.text = "🏆 VICTORIA"
+	if result == "victory":
+		label_title.text = "🏆 VICTORIA"
+	else:
+		label_title.text = "💀 DERROTA"
 
 	label_xp.text = "✨ XP Ganada: +" + str(xp)
 
