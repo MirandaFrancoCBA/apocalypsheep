@@ -47,7 +47,7 @@ var player: Player
 var enemy: Enemy
 var combat_finished := false
 var waiting_for_input := false
-
+var can_continue := false
 var combat_system := CombatSystem.new()
 
 # ─────────────────────────────────────────
@@ -321,25 +321,40 @@ func _end_combat(result: String) -> void:
 		await _death_feedback()
 		_show_game_over()
 		return
+
 	var xp_gained := 0
 	var loot := {}
 
 	if result == "victory":
 
-		# ─────────────────────────
 		# XP
-		# ─────────────────────────
 		xp_gained = 40
 		GameManager.add_xp(xp_gained)
 
-		# ─────────────────────────
 		# LOOT
-		# ─────────────────────────
 		if _roll_drop():
 			loot = _generate_loot()
 
 			if loot.size() > 0:
 				GameManager.add_item_to_inventory(loot)
+
+	# ✅ MOSTRAR POPUP
+	_show_combat_result_popup(
+		result,
+		xp_gained,
+		loot
+	)
+
+	# LOG LIMPIO
+	add_log("🏆 Victoria")
+	add_log("👉 Tocar para continuar")
+
+	button_attack.disabled = true
+	button_defend.disabled = true
+
+	GameManager._save_game()
+
+
 
 	# ─────────────────────────
 	# POPUP RESULTADO
@@ -352,13 +367,12 @@ func _show_combat_result_popup(
 
 	var popup = CombatResultPopupScene.instantiate()
 
-	get_tree().current_scene.add_child(popup)
+	add_child(popup)
 
 	popup.top_level = true
 	popup.z_index = 100
 
 	popup.show_result(
-		result,
 		xp,
 		loot
 	)

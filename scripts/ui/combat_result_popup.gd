@@ -6,15 +6,11 @@ class_name CombatResultPopup
 @onready var label_loot = $Panel/VBoxContainer/LabelLoot
 
 func show_result(
-	result: String,
 	xp: int,
 	loot: Dictionary
 ) -> void:
 
-	if result == "victory":
-		label_title.text = "🏆 VICTORIA"
-	else:
-		label_title.text = "💀 DERROTA"
+	label_title.text = "🏆 VICTORIA"
 
 	label_xp.text = "✨ XP Ganada: +" + str(xp)
 
