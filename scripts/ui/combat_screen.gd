@@ -169,15 +169,17 @@ func _on_button_attack_pressed() -> void:
 	_update_ui()
 
 	# ataque jugador
+	await _combat_pause(0.15)
 	var result = combat_system.player_attack(player, enemy)
 	_show_damage_number(
 	enemy_container,
 	result["damage"],
 	result["is_crit"]
 )
-
+	await _combat_pause(0.08)
 	await _flash(enemy_container, Color.RED)
 	await _shake(enemy_container)
+	await _combat_pause(0.12)
 
 	if result["is_crit"]:
 		await _flash(enemy_container, Color.YELLOW)
@@ -194,10 +196,12 @@ func _on_button_attack_pressed() -> void:
 	await get_tree().create_timer(0.6).timeout
 
 	# ataque enemigo
+	await _combat_pause(0.25)
 	result = combat_system.enemy_attack(player, enemy)
 
 	await _flash(player_container, Color.RED)
 	await _shake(player_container)
+	await _combat_pause(0.12)
 
 	if result["is_crit"]:
 		await _flash(player_container, Color.YELLOW)
@@ -225,6 +229,8 @@ func _on_button_defend_pressed() -> void:
 	button_defend.disabled = true
 
 	player.start_defense()
+	await _flash(player_container, Color.CYAN)
+	await _combat_pause(0.15)
 	add_log("🛡️ Te preparás para defender")
 
 	await get_tree().create_timer(0.5).timeout
@@ -339,6 +345,7 @@ func _end_combat(result: String) -> void:
 				GameManager.add_item_to_inventory(loot)
 
 	# ✅ MOSTRAR POPUP
+	await _combat_pause(0.35)
 	_show_combat_result_popup(
 		result,
 		xp_gained,
@@ -491,6 +498,10 @@ func _shake(node: Control) -> void:
 		await get_tree().create_timer(0.02).timeout
 
 	node.position = original_pos
+
+func _combat_pause(duration: float) -> void:
+	await get_tree().create_timer(duration).timeout
+
 
 # ─────────────────────────────────────────
 # LOOT
