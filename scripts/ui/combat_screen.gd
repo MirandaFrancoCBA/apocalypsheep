@@ -230,7 +230,17 @@ func _on_button_defend_pressed() -> void:
 	button_defend.disabled = true
 
 	player.start_defense()
+	_show_status_text(
+	player_container,
+	"🛡️ DEFEND",
+	Color.CYAN
+	)
 	await _flash(player_container, Color.CYAN)
+	player_container.modulate = Color(0.7, 0.9, 1.0)
+
+	await get_tree().create_timer(0.15).timeout
+
+	player_container.modulate = Color.WHITE
 	await _combat_pause(0.15)
 	add_log("🛡️ Te preparás para defender")
 
@@ -250,6 +260,8 @@ func _on_button_defend_pressed() -> void:
 		add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
 	else:
 		add_log("Enemigo golpea por " + str(result["damage"]))
+		if player.is_defending:
+			add_log("🛡️ Parte del daño fue bloqueado")
 
 	_update_ui()
 
@@ -680,6 +692,53 @@ func _show_damage_number(
 
 	await tween.finished
 	label.queue_free()
+
+func _show_status_text(
+	target_node: Control,
+	text: String,
+	color: Color
+) -> void:
+
+	var label := Label.new()
+
+	label.text = text
+	label.modulate = color
+
+	label.add_theme_font_size_override(
+		"font_size",
+		20
+	)
+
+	target_node.add_child(label)
+
+	await get_tree().process_frame
+
+	label.position = Vector2(
+		(target_node.size.x - label.size.x) / 2.0,
+		target_node.size.y * 0.25
+	)
+
+	var tween = create_tween()
+	tween.set_parallel(true)
+
+	tween.tween_property(
+		label,
+		"position:y",
+		label.position.y - 40,
+		0.8
+	)
+
+	tween.tween_property(
+		label,
+		"modulate:a",
+		0.0,
+		0.8
+	)
+
+	await tween.finished
+
+	label.queue_free()
+
 
 func _show_loot_popup(item: Dictionary) -> void:
 	
