@@ -120,6 +120,7 @@ func _setup_combat() -> void:
 	_update_ui()
 	_update_weapon_ui()
 	_update_xp_ui()
+	await _enemy_intro_animation()
 # ─────────────────────────────────────────
 # UI UPDATE
 # ─────────────────────────────────────────
@@ -502,6 +503,43 @@ func _shake(node: Control) -> void:
 func _combat_pause(duration: float) -> void:
 	await get_tree().create_timer(duration).timeout
 
+func _enemy_intro_animation() -> void:
+
+	if enemy_container == null:
+		return
+
+	var original_position := enemy_container.position
+
+	enemy_container.modulate.a = 0.0
+	enemy_container.scale = Vector2(0.85, 0.85)
+
+	enemy_container.position = original_position + Vector2(0, -40)
+
+	var tween = create_tween()
+	tween.set_parallel(true)
+
+	tween.tween_property(
+		enemy_container,
+		"modulate:a",
+		1.0,
+		0.35
+	)
+
+	tween.tween_property(
+		enemy_container,
+		"scale",
+		Vector2.ONE,
+		0.35
+	)
+
+	tween.tween_property(
+		enemy_container,
+		"position",
+		original_position,
+		0.35
+	)
+
+	await tween.finished
 
 # ─────────────────────────────────────────
 # LOOT
