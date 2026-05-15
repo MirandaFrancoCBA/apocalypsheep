@@ -71,6 +71,7 @@ func _on_level_up(
 ) -> void:
 
 	add_log("🎉 LEVEL UP! Nivel " + str(new_level))
+	AudioManager.play_sfx("levelup")
 
 	var popup = LevelUpPopup.instantiate()
 	add_child(popup)
@@ -184,9 +185,11 @@ func _on_button_attack_pressed() -> void:
 
 	if result["is_crit"]:
 		await _flash(enemy_container, Color.YELLOW)
+		AudioManager.play_sfx("crit")
 		add_log("💥 CRÍTICO! " + str(result["damage"]))
 	else:
 		add_log("Golpeaste por " + str(result["damage"]))
+		AudioManager.play_sfx("hit")
 
 	_update_ui()
 
@@ -356,6 +359,7 @@ func _end_combat(result: String) -> void:
 
 			if loot.size() > 0:
 				GameManager.add_item_to_inventory(loot)
+				AudioManager.play_sfx("loot")
 
 	# ✅ MOSTRAR POPUP
 	await _combat_pause(0.35)
