@@ -353,6 +353,7 @@ func _end_combat(result: String) -> void:
 
 		# XP
 		xp_gained = enemy.xp
+		GameManager.add_xp(xp_gained)
 
 		# LOOT
 		if _roll_drop():
