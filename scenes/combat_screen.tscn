@@ -44,10 +44,6 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 0
-offset_top = 0
-offset_right = 0
-offset_bottom = 0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 24
@@ -118,7 +114,6 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="CombatLogContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=1739706393]
-clip_contents = true
 custom_minimum_size = Vector2(50, 120)
 layout_mode = 2
 size_flags_vertical = 3
@@ -135,7 +130,8 @@ theme_override_constants/margin_bottom = 20
 [node name="LabelResult" type="Label" parent="MarginContainer/VBoxContainer/CombatLogContainer/MarginContainer" unique_id=771717333]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-size_flags_vertical = Fill + Expand
+size_flags_vertical = 1
+size_flags_stretch_ratio = 4.0
 autowrap_mode = 2
 
 [node name="ButtonAttack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1997688783]
