@@ -8,19 +8,19 @@
   {
     "id": "zone_2",
     "name": "Laboratorio abandonado",
-    "level_range": [2, 5],
+    "level_range": [3, 5],
     "enemies": ["robot", "infected_scientist"]
   },
   {
     "id": "zone_3",
     "name": "Pantano tóxico",
-    "level_range": [3, 7],
+    "level_range": [5, 7],
     "enemies": ["toxic_slug", "swamp_beast"]
   },
   {
     "id": "zone_4",
     "name": "Base militar caída",
-    "level_range": [5, 10],
+    "level_range": [8, 10],
     "enemies": ["elite_soldier", "turret"]
   }
 ]

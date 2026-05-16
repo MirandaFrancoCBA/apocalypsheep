@@ -1,13 +1,58 @@
 [
-  { "id": "raider", "name": "Saqueador", "hp": 20, "damage": 5 },
-  { "id": "mutant_rat", "name": "Rata mutante", "hp": 15, "damage": 4 },
-
-  { "id": "robot", "name": "Robot defectuoso", "hp": 30, "damage": 6 },
-  { "id": "infected_scientist", "name": "Científico infectado", "hp": 25, "damage": 5 },
-
-  { "id": "toxic_slug", "name": "Babosa tóxica", "hp": 35, "damage": 6 },
-  { "id": "swamp_beast", "name": "Bestia del pantano", "hp": 40, "damage": 8 },
-
-  { "id": "elite_soldier", "name": "Soldado élite", "hp": 50, "damage": 10 },
-  { "id": "turret", "name": "Torreta automática", "hp": 45, "damage": 9 }
+  {
+    "id": "raider",
+    "name": "Saqueador",
+    "hp": 20,
+    "damage": 5,
+    "xp": 18
+  },
+  {
+    "id": "mutant_rat",
+    "name": "Rata mutante",
+    "hp": 15,
+    "damage": 4,
+    "xp": 14
+  },
+  {
+    "id": "robot",
+    "name": "Robot defectuoso",
+    "hp": 30,
+    "damage": 6,
+    "xp": 28
+  },
+  {
+    "id": "infected_scientist",
+    "name": "Científico infectado",
+    "hp": 25,
+    "damage": 5,
+    "xp": 24
+  },
+  {
+    "id": "toxic_slug",
+    "name": "Babosa tóxica",
+    "hp": 35,
+    "damage": 7,
+    "xp": 38
+  },
+  {
+    "id": "swamp_beast",
+    "name": "Bestia del pantano",
+    "hp": 42,
+    "damage": 9,
+    "xp": 46
+  },
+  {
+    "id": "elite_soldier",
+    "name": "Soldado élite",
+    "hp": 55,
+    "damage": 11,
+    "xp": 60
+  },
+  {
+    "id": "turret",
+    "name": "Torreta automática",
+    "hp": 50,
+    "damage": 10,
+    "xp": 54
+  }
 ]

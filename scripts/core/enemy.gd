@@ -7,6 +7,7 @@ var name: String
 var hp: int
 var max_hp: int
 var damage: int
+var xp: int = 10
 
 
 # 🆕 EFECTOS
@@ -21,6 +22,7 @@ static func from_dict(data: Dictionary) -> Enemy:
 	new_enemy.hp = data.get("hp", 10)
 	new_enemy.max_hp = data.get("max_hp", new_enemy.hp)
 	new_enemy.damage = data.get("damage", 2)
+	new_enemy.xp = data.get("xp", 10)
 
 
 	return new_enemy

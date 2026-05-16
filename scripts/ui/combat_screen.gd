@@ -352,8 +352,7 @@ func _end_combat(result: String) -> void:
 	if result == "victory":
 
 		# XP
-		xp_gained = 40
-		GameManager.add_xp(xp_gained)
+		xp_gained = enemy.xp
 
 		# LOOT
 		if _roll_drop():
@@ -616,10 +615,24 @@ func _apply_enemy_scaling(target_enemy: Enemy) -> void:
 
 	target_enemy.max_hp += final_level * 5
 	target_enemy.hp = target_enemy.max_hp
+
 	target_enemy.damage += final_level * 2
 
-	print("[ENEMY] Nivel:", final_level, "HP:", target_enemy.hp, "DMG:", target_enemy.damage)
+	# XP escala con dificultad
+	target_enemy.xp += final_level * 6
 
+	print(
+		"[ENEMY]",
+		target_enemy.name,
+		"LV:",
+		final_level,
+		"HP:",
+		target_enemy.hp,
+		"DMG:",
+		target_enemy.damage,
+		"XP:",
+		target_enemy.xp
+	)
 
 func show_save_feedback() -> void:
 	if label_saving == null:
