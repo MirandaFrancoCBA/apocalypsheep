@@ -184,12 +184,13 @@ func _on_button_attack_pressed() -> void:
 	await _combat_pause(0.12)
 
 	if result["is_crit"]:
-		await _flash(enemy_container, Color.YELLOW)
 		AudioManager.play_sfx("crit")
+		await _flash(enemy_container, Color.YELLOW)
 		add_log("💥 CRÍTICO! " + str(result["damage"]))
 	else:
-		add_log("Golpeaste por " + str(result["damage"]))
 		AudioManager.play_sfx("hit")
+		add_log("Golpeaste por " + str(result["damage"]))
+		
 
 	_update_ui()
 
