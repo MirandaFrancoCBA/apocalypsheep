@@ -7,16 +7,16 @@ var sfx := {
 	"levelup": preload("res://audio/sfx/levelup.wav")
 }
 
-func play_sfx(name: String) -> void:
+func play_sfx(sfx_name: String) -> void:
 
-	if not sfx.has(name):
+	if not sfx.has(sfx_name):
 		return
 
 	var player = AudioStreamPlayer.new()
 
 	add_child(player)
 
-	player.stream = sfx[name]
+	player.stream = sfx[sfx_name]
 	player.play()
 
 	player.finished.connect(
