@@ -343,6 +343,7 @@ func _end_combat(result: String) -> void:
 		GameManager.kill_player()
 		await _death_feedback()
 		_show_game_over()
+		AudioManager.play_sfx("game_over")
 		return
 
 	var xp_gained := 0
