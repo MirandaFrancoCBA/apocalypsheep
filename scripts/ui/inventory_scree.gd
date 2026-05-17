@@ -17,12 +17,16 @@ var selected_item: Dictionary = {}
 func _ready() -> void:
 	var player = GameManager.get_player_data()
 	var inventory = player["inventory"]
+
 	label_equipped.text += "\nEspacio: %d/%d" % [
-	inventory.size(),
-	Constants.INVENTORY_MAX_SIZE
-]
+		inventory.size(),
+		Constants.INVENTORY_MAX_SIZE
+	]
+
 	GameManager.player_data_changed.connect(_update_stats)
+
 	print("[Inventory] Cargando inventario")
+
 	_load_inventory()
 	_update_equipped_label()
 	_update_unequip_button()
@@ -44,8 +48,10 @@ func _load_inventory() -> void:
 
 func _show_empty() -> void:
 	var label = Label.new()
+
 	label.text = "Inventario vacío"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
 	items_container.add_child(label)
 
 # ─────────────────────────────────────────
@@ -58,9 +64,9 @@ func _create_items(items: Array) -> void:
 		var rarity = item.get("rarity", "common")
 
 		button.modulate = Constants.RARITY_COLORS.get(
-		rarity,
-		Color.WHITE
-)
+			rarity,
+			Color.WHITE
+		)
 
 		var text = _format_item(item)
 
@@ -76,7 +82,9 @@ func _create_items(items: Array) -> void:
 
 		items_container.add_child(button)
 
-# 🔥 FORMATO PRO
+# ─────────────────────────────────────────
+# FORMATO ITEMS
+# ─────────────────────────────────────────
 func _format_item(item: Dictionary) -> String:
 	var text = item.get("name", "Item")
 
@@ -84,8 +92,10 @@ func _format_item(item: Dictionary) -> String:
 		text += " | DMG: " + str(item.get("damage", 0))
 
 		var effect = item.get("effect", "")
+
 		if effect != "":
 			text += " | " + _effect_to_text(effect)
+
 	if item.has("heal"):
 		text += " | ❤️ +" + str(item["heal"])
 
@@ -93,22 +103,35 @@ func _format_item(item: Dictionary) -> String:
 
 func _effect_to_text(effect: String) -> String:
 	match effect:
-		"bleed": return "🩸 Sangrado"
-		"poison": return "☠️ Veneno"
-		"burn": return "🔥 Fuego"
-		"stun": return "💫 Aturde"
-		_: return effect
+		"bleed":
+			return "🩸 Sangrado"
+
+		"poison":
+			return "☠️ Veneno"
+
+		"burn":
+			return "🔥 Fuego"
+
+		"stun":
+			return "💫 Aturde"
+
+		_:
+			return effect
 
 # ─────────────────────────────────────────
 # SELECCIÓN
 # ─────────────────────────────────────────
 func _on_item_selected(item: Dictionary) -> void:
 	selected_item = item
+
 	print("[Inventory] Item seleccionado:", item)
+
 	_show_item_detail(item)
 	_update_use_button()
 
-# 🔍 DETALLE COMPLETO
+# ─────────────────────────────────────────
+# DETALLE ITEM
+# ─────────────────────────────────────────
 func _show_item_detail(item: Dictionary) -> void:
 	var text = ""
 
@@ -126,7 +149,7 @@ func _show_item_detail(item: Dictionary) -> void:
 
 	if item.has("rarity"):
 		text += "Rareza: " + item["rarity"] + "\n"
-	
+
 	if item.has("description"):
 		text += "Descripción: " + item["description"] + "\n"
 
@@ -144,12 +167,14 @@ func _on_button_equip_pressed() -> void:
 		return
 
 	GameManager.equip_item(selected_item)
+
 	_update_equipped_label()
 	_update_unequip_button()
 	_refresh_inventory()
 
 func _on_button_unequip_pressed() -> void:
 	GameManager.unequip_item()
+
 	_update_equipped_label()
 	_update_unequip_button()
 	_refresh_inventory()
@@ -185,6 +210,7 @@ func _refresh_inventory() -> void:
 
 func _update_unequip_button() -> void:
 	var weapon = GameManager.get_equipped_weapon()
+
 	button_unequip.disabled = weapon.is_empty()
 
 func _update_equipped_label() -> void:
@@ -193,16 +219,22 @@ func _update_equipped_label() -> void:
 	if weapon.is_empty():
 		label_equipped.text = "Arma equipada: Ninguna"
 	else:
-		label_equipped.text = "Arma equipada: " + weapon.get("name", "")
+		label_equipped.text = (
+			"Arma equipada: "
+			+ weapon.get("name", "")
+		)
 
 func _update_stats() -> void:
 	var player = GameManager.get_player_data()
 
 	var text = ""
 
-	text += "❤️ HP: %d / %d\n" % [player["hp"], player["max_hp"]]
+	text += "❤️ HP: %d / %d\n" % [
+		player["hp"],
+		player["max_hp"]
+	]
 
-	# 🔥 DAÑO REAL (con arma)
+	# daño total
 	var weapon = GameManager.get_equipped_weapon()
 	var total_damage = player["damage"]
 
@@ -210,15 +242,20 @@ func _update_stats() -> void:
 		total_damage += weapon.get("damage", 0)
 
 	text += "⚔️ Daño: %d\n" % total_damage
-
 	text += "🎖️ Nivel: %d\n" % player["level"]
-	text += "✨ XP: %d / %d" % [player["xp"], player["xp_to_next"]]
+	text += "✨ XP: %d / %d" % [
+		player["xp"],
+		player["xp_to_next"]
+	]
 
 	label_stats.text = text
+
 	xp_bar.max_value = player["xp_to_next"]
 	xp_bar.value = player["xp"]
 
-
+# ─────────────────────────────────────────
+# USAR CONSUMIBLE
+# ─────────────────────────────────────────
 func _on_button_use_pressed() -> void:
 
 	if selected_item.is_empty():
@@ -230,23 +267,34 @@ func _on_button_use_pressed() -> void:
 
 	var player = GameManager.get_player_data()
 
-	# ❤️ HP llena
+	# muerto
+	if player["hp"] <= 0:
+		label_detail.text = "💀 No puedes usar objetos muerto"
+		return
+
+	# hp llena
 	if player["hp"] >= player["max_hp"]:
-		label_detail.text = "HP ya está al máximo"
+		label_detail.text = "❤️ HP ya está al máximo"
 		return
 
 	var heal_amount = selected_item.get("heal", 0)
+
+	var old_hp = player["hp"]
 
 	player["hp"] = min(
 		player["hp"] + heal_amount,
 		player["max_hp"]
 	)
 
+	var real_heal = player["hp"] - old_hp
+
+	AudioManager.play_sfx("heal")
+
 	GameManager.remove_item(selected_item)
 
 	label_detail.text = (
-		"❤️ Recuperaste %d HP"
-		% heal_amount
+		"❤️ Recuperaste %d HP\n✨ Item consumido"
+		% real_heal
 	)
 
 	selected_item = {}
@@ -257,6 +305,9 @@ func _on_button_use_pressed() -> void:
 
 	GameManager._save_game()
 
+# ─────────────────────────────────────────
+# UI BOTÓN USE
+# ─────────────────────────────────────────
 func _update_use_button() -> void:
 	button_use.visible = (
 		not selected_item.is_empty()
