@@ -189,7 +189,6 @@ func _on_button_attack_pressed() -> void:
 		add_log("💥 CRÍTICO! " + str(result["damage"]))
 	else:
 		AudioManager.play_sfx("hit")
-		add_log("Golpeaste por " + str(result["damage"]))
 		
 
 	_update_ui()
@@ -211,8 +210,6 @@ func _on_button_attack_pressed() -> void:
 	if result["is_crit"]:
 		await _flash(player_container, Color.YELLOW)
 		add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
-	else:
-		add_log("Enemigo golpea por " + str(result["damage"]))
 
 	_update_ui()
 
@@ -262,10 +259,6 @@ func _on_button_defend_pressed() -> void:
 
 	if result["is_crit"]:
 		add_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
-	else:
-		add_log("Enemigo golpea por " + str(result["damage"]))
-		if player.is_defending:
-			add_log("🛡️ Parte del daño fue bloqueado")
 
 	_update_ui()
 
