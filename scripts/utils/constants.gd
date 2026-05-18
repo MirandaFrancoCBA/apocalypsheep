@@ -82,7 +82,28 @@ const RARITY_ICONS := {
 	"rare": "🔵",
 	"epic": "🟣"
 }
+# ─────────────────────────────────────────
+# STATUS EFFECTS
+# ─────────────────────────────────────────
+const EFFECT_CHANCES = {
+	"bleed": 35,
+	"poison": 25,
+	"burn": 20,
+	"stun": 10
+}
 
+const EFFECT_DURATIONS = {
+	"bleed": 3,
+	"poison": 4,
+	"burn": 2,
+	"stun": 1
+}
+
+const EFFECT_DAMAGE = {
+	"bleed": 4,
+	"poison": 3,
+	"burn": 6
+}
 # ─────────────────────────────────────────
 # LOOT
 # ─────────────────────────────────────────

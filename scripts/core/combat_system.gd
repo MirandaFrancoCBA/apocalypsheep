@@ -90,19 +90,16 @@ func apply_effects(target) -> Array[String]:
 		match effect["type"]:
 
 			"bleed":
-				target.hp -= effect["value"]
+				target.take_damage(effect["value"])
 				logs.append("🩸 Sangrado -" + str(effect["value"]))
 
 			"poison":
-				target.hp -= effect["value"]
+				target.take_damage(effect["value"])
 				logs.append("☠️ Veneno -" + str(effect["value"]))
 
 			"burn":
-				target.hp -= effect["value"]
+				target.take_damage(effect["value"])
 				logs.append("🔥 Quemadura -" + str(effect["value"]))
-
-			"stun":
-				logs.append("💫 Aturdido")
 
 		effect["duration"] -= 1
 
@@ -116,26 +113,57 @@ func apply_effects(target) -> Array[String]:
 # ─────────────────────────────────────────
 # EFECTOS DE ARMAS
 # ─────────────────────────────────────────
-func _apply_weapon_effect(weapon: Dictionary, target) -> void:
+func _apply_weapon_effect(
+	weapon: Dictionary,
+	target
+) -> void:
 
 	var effect_type = weapon.get("effect", null)
+
 	if effect_type == null:
+		return
+
+	var chance = Constants.EFFECT_CHANCES.get(
+		effect_type,
+		0
+	)
+
+	if rng.randi_range(1, 100) > chance:
 		return
 
 	match effect_type:
 
 		"bleed":
-			_add_effect(target, "bleed", 3, 2)
+			_add_effect(
+				target,
+				"bleed",
+				Constants.EFFECT_DURATIONS["bleed"],
+				Constants.EFFECT_DAMAGE["bleed"]
+			)
 
 		"poison":
-			_add_effect(target, "poison", 4, 1)
+			_add_effect(
+				target,
+				"poison",
+				Constants.EFFECT_DURATIONS["poison"],
+				Constants.EFFECT_DAMAGE["poison"]
+			)
 
 		"burn":
-			_add_effect(target, "burn", 2, 3)
+			_add_effect(
+				target,
+				"burn",
+				Constants.EFFECT_DURATIONS["burn"],
+				Constants.EFFECT_DAMAGE["burn"]
+			)
 
 		"stun":
-			if rng.randi_range(1, 100) <= 25:
-				_add_effect(target, "stun", 1, 0)
+			_add_effect(
+				target,
+				"stun",
+				Constants.EFFECT_DURATIONS["stun"],
+				0
+			)
 
 # ─────────────────────────────────────────
 # ADD EFFECT (no stackea mal)
