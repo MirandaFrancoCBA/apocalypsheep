@@ -12,11 +12,13 @@ extends Control
 @export var player_hp_bar: ProgressBar
 @export var player_container: Control
 
-@export var label_result: Label
+@export var label_result: RichTextLabel
 @export var log_container: ScrollContainer
 
 @export var button_attack: Button
 @export var button_defend: Button
+@onready var history_button = $HistoryButton
+@onready var combat_history_panel = $CombatHistoryPanel
 
 @export var player_effects_container: HBoxContainer
 @export var enemy_effects_container: HBoxContainer
@@ -55,6 +57,7 @@ var combat_system := CombatSystem.new()
 # ─────────────────────────────────────────
 func _ready() -> void:
 	_validate_nodes()
+	combat_history_panel.visible = false
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
@@ -63,6 +66,7 @@ func _ready() -> void:
 	GameManager.level_up.connect(_on_level_up)
 	GameManager.player_data_changed.connect(_update_xp_ui)
 	GameManager.game_saved.connect(show_save_feedback)
+	history_button.pressed.connect(_on_history_button_pressed)
 
 func _on_level_up(
 	new_level: int,
@@ -273,6 +277,7 @@ func _on_button_defend_pressed() -> void:
 # LOG
 # ─────────────────────────────────────────
 func add_log(text: String) -> void:
+
 	var lines: Array = []
 
 	if not label_result.text.is_empty():
@@ -287,9 +292,9 @@ func add_log(text: String) -> void:
 
 	await get_tree().process_frame
 
-	var scrollbar = log_container.get_v_scroll_bar()
-	if scrollbar:
-		log_container.scroll_vertical = int(scrollbar.max_value)
+	label_result.scroll_to_line(
+		label_result.get_line_count()
+	)
 
 # ─────────────────────────────────────────
 # COMBATE
@@ -779,3 +784,5 @@ func _show_game_over() -> void:
 	popup.top_level = true
 	popup.z_index = 100
 	
+func _on_history_button_pressed():
+	combat_history_panel.visible = !combat_history_panel.visible
