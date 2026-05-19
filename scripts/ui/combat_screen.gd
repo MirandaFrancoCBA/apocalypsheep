@@ -13,12 +13,12 @@ extends Control
 @export var player_container: Control
 
 @export var label_result: RichTextLabel
-@export var log_container: ScrollContainer
 
 @export var button_attack: Button
 @export var button_defend: Button
-@onready var history_button = $HistoryButton
-@onready var combat_history_panel = $CombatHistoryPanel
+
+@onready var combat_history_panel = $"CombatHistoryPanel"
+@onready var history_button = $MarginContainer/VBoxContainer/HistoryButton
 
 @export var player_effects_container: HBoxContainer
 @export var enemy_effects_container: HBoxContainer
@@ -94,7 +94,7 @@ func _validate_nodes() -> void:
 	var nodes = [
 		label_enemy, label_enemy_hp, enemy_hp_bar, enemy_container,
 		label_player_hp, player_hp_bar, player_container,
-		label_result, log_container, button_attack, button_defend
+
 	]
 
 	for n in nodes:

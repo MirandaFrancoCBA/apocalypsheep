@@ -12,7 +12,7 @@ bg_color = Color(0.9904657, 0.18689609, 0.7883756, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_032jr"]
 bg_color = Color(0.20565334, 0.68708014, 0.6062001, 1)
 
-[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "death_overlay", "label_player_hp", "player_hp_bar", "player_container", "label_result", "log_container", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container", "label_weapon", "xp_bar", "label_xp", "label_saving")]
+[node name="CombatScreen" type="Control" unique_id=844330171 node_paths=PackedStringArray("label_enemy", "label_enemy_hp", "enemy_hp_bar", "enemy_container", "death_overlay", "label_player_hp", "player_hp_bar", "player_container", "label_result", "button_attack", "button_defend", "player_effects_container", "enemy_effects_container", "label_weapon", "xp_bar", "label_xp", "label_saving")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,8 +28,7 @@ death_overlay = NodePath("DeathOverlay")
 label_player_hp = NodePath("MarginContainer/VBoxContainer/PlayerContainer/LabelPlayerHP")
 player_hp_bar = NodePath("MarginContainer/VBoxContainer/PlayerContainer/PlayerHPBar")
 player_container = NodePath("MarginContainer/VBoxContainer/PlayerContainer")
-label_result = NodePath("")
-log_container = NodePath("MarginContainer/VBoxContainer/CombatLogContainer")
+label_result = NodePath("CombatHistoryPanel/MarginContainer/VBoxContainer/ScrollContainer/LabelResult")
 button_attack = NodePath("MarginContainer/VBoxContainer/ButtonAttack")
 button_defend = NodePath("MarginContainer/VBoxContainer/ButtonDefend")
 player_effects_container = NodePath("MarginContainer/VBoxContainer/PlayerContainer/PlayerEffects")
