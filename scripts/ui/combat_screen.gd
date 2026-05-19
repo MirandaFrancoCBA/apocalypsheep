@@ -40,7 +40,7 @@ const GameOverPopupScene = preload(
 # ─────────────────────────────────────────
 # CONFIG
 # ─────────────────────────────────────────
-const MAX_LOG_LINES := 8
+const MAX_LOG_LINES := 40
 
 # ─────────────────────────────────────────
 # DATA
@@ -177,6 +177,12 @@ func _on_button_attack_pressed() -> void:
 	# ataque jugador
 	await _combat_pause(0.15)
 	var result = combat_system.player_attack(player, enemy)
+	add_log(
+	"⚔️ Hacés " +
+	str(result["damage"]) +
+	" de daño"
+)
+	
 	_show_damage_number(
 	enemy_container,
 	result["damage"],
@@ -206,6 +212,11 @@ func _on_button_attack_pressed() -> void:
 	# ataque enemigo
 	await _combat_pause(0.25)
 	result = combat_system.enemy_attack(player, enemy)
+	add_log(
+	"💢 Recibís " +
+	str(result["damage"]) +
+	" de daño"
+)
 
 	await _flash(player_container, Color.RED)
 	await _shake(player_container)
@@ -369,10 +380,6 @@ func _end_combat(result: String) -> void:
 		loot
 	)
 
-	# LOG LIMPIO
-	add_log("🏆 Victoria")
-	add_log("👉 Tocar para continuar")
-
 	button_attack.disabled = true
 	button_defend.disabled = true
 
@@ -472,7 +479,27 @@ func _update_weapon_ui() -> void:
 # INPUT FINAL
 # ─────────────────────────────────────────
 func _input(event):
-	if waiting_for_input and event.is_pressed():
+
+	if not waiting_for_input:
+		return
+
+	# mobile
+	if event is InputEventScreenTouch and event.pressed:
+
+		if combat_history_panel.visible:
+			return
+
+		waiting_for_input = false
+		SceneManager.go_to_result()
+
+	# desktop
+	elif event is InputEventMouseButton \
+	and event.pressed \
+	and event.button_index == MOUSE_BUTTON_LEFT:
+
+		if combat_history_panel.visible:
+			return
+
 		waiting_for_input = false
 		SceneManager.go_to_result()
 
