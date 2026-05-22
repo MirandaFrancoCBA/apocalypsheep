@@ -58,6 +58,7 @@ var combat_system := CombatSystem.new()
 func _ready() -> void:
 	_validate_nodes()
 	combat_history_panel.visible = false
+	combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
@@ -812,4 +813,10 @@ func _show_game_over() -> void:
 	popup.z_index = 100
 	
 func _on_history_button_pressed():
+
 	combat_history_panel.visible = !combat_history_panel.visible
+
+	if combat_history_panel.visible:
+		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_STOP
+	else:
+		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE

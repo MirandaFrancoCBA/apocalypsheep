@@ -186,6 +186,7 @@ layout_mode = 2
 [node name="ScrollContainer" type="ScrollContainer" parent="CombatHistoryPanel/MarginContainer/VBoxContainer" unique_id=1396222317]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 0
 
 [node name="LabelResult" type="RichTextLabel" parent="CombatHistoryPanel/MarginContainer/VBoxContainer/ScrollContainer" unique_id=1451454371]
 layout_mode = 2
