@@ -57,17 +57,24 @@ var combat_system := CombatSystem.new()
 # READY
 # ─────────────────────────────────────────
 func _ready() -> void:
+
 	_validate_nodes()
+
 	combat_history_panel.visible = false
 	combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	continue_overlay.pressed.connect(_on_continue_pressed)
+
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
+
 	_setup_combat()
 
 	GameManager.level_up.connect(_on_level_up)
 	GameManager.player_data_changed.connect(_update_xp_ui)
 	GameManager.game_saved.connect(show_save_feedback)
+
 	history_button.pressed.connect(_on_history_button_pressed)
 
 func _on_level_up(
@@ -348,7 +355,6 @@ func _end_combat(result: String) -> void:
 	combat_finished = true
 	waiting_for_input = true
 	continue_overlay.visible = true
-	continue_overlay.pressed.connect(_on_continue_pressed)
 
 	GameManager.set_combat_result(result)
 
