@@ -19,6 +19,7 @@ extends Control
 
 @onready var combat_history_panel = $"CombatHistoryPanel"
 @onready var history_button = $MarginContainer/VBoxContainer/HistoryButton
+@onready var continue_overlay = $ContinueOverlay
 
 @export var player_effects_container: HBoxContainer
 @export var enemy_effects_container: HBoxContainer
@@ -346,6 +347,8 @@ func _generate_enemy() -> Enemy:
 func _end_combat(result: String) -> void:
 	combat_finished = true
 	waiting_for_input = true
+	continue_overlay.visible = true
+	continue_overlay.pressed.connect(_on_continue_pressed)
 
 	GameManager.set_combat_result(result)
 
@@ -479,30 +482,6 @@ func _update_weapon_ui() -> void:
 # ─────────────────────────────────────────
 # INPUT FINAL
 # ─────────────────────────────────────────
-func _input(event):
-
-	if not waiting_for_input:
-		return
-
-	# mobile
-	if event is InputEventScreenTouch and event.pressed:
-
-		if combat_history_panel.visible:
-			return
-
-		waiting_for_input = false
-		SceneManager.go_to_result()
-
-	# desktop
-	elif event is InputEventMouseButton \
-	and event.pressed \
-	and event.button_index == MOUSE_BUTTON_LEFT:
-
-		if combat_history_panel.visible:
-			return
-
-		waiting_for_input = false
-		SceneManager.go_to_result()
 
 # ─────────────────────────────────────────
 # FX
@@ -820,3 +799,16 @@ func _on_history_button_pressed():
 		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	else:
 		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		
+		# extra seguridad
+		combat_history_panel.release_focus()
+
+func _on_continue_pressed():
+
+	if combat_history_panel.visible:
+		return
+
+	continue_overlay.visible = false
+	waiting_for_input = false
+
+	SceneManager.go_to_result()
