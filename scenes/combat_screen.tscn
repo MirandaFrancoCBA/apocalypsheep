@@ -160,19 +160,10 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.6, 0, 0, 1)
 
-[node name="CombatHistoryPanel" type="PanelContainer" parent="." unique_id=982409870]
+[node name="CombatHistoryPanel" type="PanelContainer" parent="."]
+visible = false
+mouse_filter = 2
 custom_minimum_size = Vector2(180, 180)
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -40.0
-offset_top = -40.0
-grow_horizontal = 0
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxTexture_icss1")
 
 [node name="MarginContainer" type="MarginContainer" parent="CombatHistoryPanel" unique_id=252415803]
 layout_mode = 2
@@ -195,18 +186,6 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_font_sizes/bold_italics_font_size = 8
 
-[node name="ContinueOverlay" type="Button" parent="." unique_id=2140550836]
-visible = false
-modulate = Color(1, 1, 1, 0.3)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "Continue
-"
-flat = true
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonAttack" to="." method="_on_button_attack_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonDefend" to="." method="_on_button_defend_pressed"]

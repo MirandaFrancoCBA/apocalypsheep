@@ -19,7 +19,6 @@ extends Control
 
 @onready var combat_history_panel = $"CombatHistoryPanel"
 @onready var history_button = $MarginContainer/VBoxContainer/HistoryButton
-@onready var continue_overlay = $ContinueOverlay
 
 @export var player_effects_container: HBoxContainer
 @export var enemy_effects_container: HBoxContainer
@@ -50,7 +49,6 @@ var player: Player
 var enemy: Enemy
 var combat_finished := false
 var waiting_for_input := false
-var can_continue := false
 var combat_system := CombatSystem.new()
 
 # ─────────────────────────────────────────
@@ -60,10 +58,11 @@ func _ready() -> void:
 
 	_validate_nodes()
 
+	# Historial oculto
 	combat_history_panel.visible = false
 	combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
-	continue_overlay.pressed.connect(_on_continue_pressed)
+	# Overlay oculto
 
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
@@ -352,17 +351,24 @@ func _generate_enemy() -> Enemy:
 	return Enemy.new()
 
 func _end_combat(result: String) -> void:
+
 	combat_finished = true
-	waiting_for_input = true
-	continue_overlay.visible = true
 
 	GameManager.set_combat_result(result)
 
+	button_attack.disabled = true
+	button_defend.disabled = true
+
 	if result == "defeat":
+
 		GameManager.kill_player()
+
 		await _death_feedback()
+
 		_show_game_over()
+
 		AudioManager.play_sfx("game_over")
+
 		return
 
 	var xp_gained := 0
@@ -370,36 +376,28 @@ func _end_combat(result: String) -> void:
 
 	if result == "victory":
 
-		# XP
 		xp_gained = enemy.xp
 		GameManager.add_xp(xp_gained)
 
-		# LOOT
 		if _roll_drop():
+
 			loot = _generate_loot()
 
 			if loot.size() > 0:
 				GameManager.add_item_to_inventory(loot)
 				AudioManager.play_sfx("loot")
 
-	# ✅ MOSTRAR POPUP
 	await _combat_pause(0.35)
+
 	_show_combat_result_popup(
 		result,
 		xp_gained,
 		loot
 	)
 
-	button_attack.disabled = true
-	button_defend.disabled = true
-
 	GameManager._save_game()
 
-
-
-	# ─────────────────────────
-	# POPUP RESULTADO
-	# ─────────────────────────
+	# ⚠️ ACTIVAR CONTINUE DESPUÉS DEL POPUP
 func _show_combat_result_popup(
 	result: String,
 	xp: int,
@@ -413,15 +411,16 @@ func _show_combat_result_popup(
 	popup.top_level = true
 	popup.z_index = 100
 
+	popup.continue_pressed.connect(
+		func():
+			SceneManager.go_to_result()
+	)
+
 	popup.show_result(
 		xp,
 		loot
 	)
 
-	# ─────────────────────────
-	# LOG MINIMALISTA
-	# (solo info importante realtime)
-	# ─────────────────────────
 	if result == "victory":
 		add_log("🏆 Victoria")
 	else:
@@ -429,15 +428,9 @@ func _show_combat_result_popup(
 
 	add_log("👉 Tocar para continuar")
 
-	# ─────────────────────────
-	# UI
-	# ─────────────────────────
 	button_attack.disabled = true
 	button_defend.disabled = true
 
-	# ─────────────────────────
-	# SAVE
-	# ─────────────────────────
 	GameManager._save_game()
 
 # ─────────────────────────────────────────
@@ -789,6 +782,7 @@ func _show_loot_popup(item: Dictionary) -> void:
 		print("[LootPopup] Métodos disponibles: ", popup.get_method_list().map(func(m): return m["name"]))
 
 
+
 func _show_game_over() -> void:
 	var popup = GameOverPopupScene.instantiate()
 
@@ -809,12 +803,11 @@ func _on_history_button_pressed():
 		# extra seguridad
 		combat_history_panel.release_focus()
 
-func _on_continue_pressed():
 
-	if combat_history_panel.visible:
-		return
+	SceneManager.go_to_result()
 
-	continue_overlay.visible = false
-	waiting_for_input = false
+func _on_combat_popup_continue():
+
+	print("SIGNAL RECIBIDA")
 
 	SceneManager.go_to_result()
