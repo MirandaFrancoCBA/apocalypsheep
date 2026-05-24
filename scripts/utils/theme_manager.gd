@@ -75,7 +75,7 @@ const RADIUS_SM      := 3
 # ─────────────────────────────────────────
 # FACTORY — StyleBoxFlat
 # ─────────────────────────────────────────
-static func make_panel_style(
+func make_panel_style(
 	bg: Color,
 	border: Color = C_BORDER,
 	border_width: int = 1,
@@ -98,7 +98,7 @@ static func make_panel_style(
 	s.content_margin_bottom = MARGIN_PANEL
 	return s
 
-static func make_button_style(
+func make_button_style(
 	bg: Color,
 	border: Color,
 	border_width: int = 1
@@ -120,7 +120,7 @@ static func make_button_style(
 	s.content_margin_bottom = PADDING_BUTTON
 	return s
 
-static func make_bar_fill(color: Color) -> StyleBoxFlat:
+func make_bar_fill(color: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = color
 	s.corner_radius_top_left     = RADIUS_SM
@@ -129,7 +129,7 @@ static func make_bar_fill(color: Color) -> StyleBoxFlat:
 	s.corner_radius_bottom_right = RADIUS_SM
 	return s
 
-static func make_bar_bg() -> StyleBoxFlat:
+func make_bar_bg() -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = Color(0.10, 0.08, 0.07)
 	s.border_color        = C_BORDER
@@ -148,7 +148,7 @@ static func make_bar_bg() -> StyleBoxFlat:
 # ─────────────────────────────────────────
 
 # Botón primario (Atacar, Jugar, Continuar)
-static func apply_button_primary(btn: Button) -> void:
+func apply_button_primary(btn: Button) -> void:
 	btn.add_theme_stylebox_override("normal",   make_button_style(C_RED,      C_RED_BRIGHT, 2))
 	btn.add_theme_stylebox_override("hover",    make_button_style(C_RED_BRIGHT, C_AMBER,    2))
 	btn.add_theme_stylebox_override("pressed",  make_button_style(C_RED_DIM,  C_RED,        2))
@@ -160,7 +160,7 @@ static func apply_button_primary(btn: Button) -> void:
 	btn.add_theme_font_size_override("font_size", FONT_BODY)
 
 # Botón secundario (Defender, Volver, opciones)
-static func apply_button_secondary(btn: Button) -> void:
+func apply_button_secondary(btn: Button) -> void:
 	btn.add_theme_stylebox_override("normal",   make_button_style(C_SURFACE_2, C_BORDER,    1))
 	btn.add_theme_stylebox_override("hover",    make_button_style(C_SURFACE_2, C_AMBER_DIM, 2))
 	btn.add_theme_stylebox_override("pressed",  make_button_style(C_SURFACE,   C_AMBER,     2))
@@ -172,7 +172,7 @@ static func apply_button_secondary(btn: Button) -> void:
 	btn.add_theme_font_size_override("font_size", FONT_BODY)
 
 # Botón danger (Nueva Partida, Eliminar)
-static func apply_button_danger(btn: Button) -> void:
+func apply_button_danger(btn: Button) -> void:
 	btn.add_theme_stylebox_override("normal",   make_button_style(C_SURFACE,   C_RED_DIM,   1))
 	btn.add_theme_stylebox_override("hover",    make_button_style(C_RED_DIM,   C_RED_BRIGHT,2))
 	btn.add_theme_stylebox_override("pressed",  make_button_style(C_RED,       C_RED_BRIGHT,2))
@@ -184,35 +184,35 @@ static func apply_button_danger(btn: Button) -> void:
 	btn.add_theme_font_size_override("font_size", FONT_BODY)
 
 # Panel genérico oscuro
-static func apply_panel_dark(panel: PanelContainer) -> void:
+func apply_panel_dark(panel: PanelContainer) -> void:
 	panel.add_theme_stylebox_override("panel", make_panel_style(C_SURFACE, C_BORDER, 1))
 
 # Panel elevado (popups, dialogs)
-static func apply_panel_elevated(panel: PanelContainer) -> void:
+func apply_panel_elevated(panel: PanelContainer) -> void:
 	panel.add_theme_stylebox_override("panel", make_panel_style(C_SURFACE_2, C_AMBER_DIM, 2))
 
 # Label título
-static func apply_label_title(label: Label) -> void:
+func apply_label_title(label: Label) -> void:
 	label.add_theme_color_override("font_color", C_TEXT_BRIGHT)
 	label.add_theme_font_size_override("font_size", FONT_TITLE)
 
 # Label subtítulo
-static func apply_label_subtitle(label: Label) -> void:
+func apply_label_subtitle(label: Label) -> void:
 	label.add_theme_color_override("font_color", C_TEXT)
 	label.add_theme_font_size_override("font_size", FONT_SUBTITLE)
 
 # Label cuerpo
-static func apply_label_body(label: Label) -> void:
+func apply_label_body(label: Label) -> void:
 	label.add_theme_color_override("font_color", C_TEXT)
 	label.add_theme_font_size_override("font_size", FONT_BODY)
 
 # Label dimmed / secundario
-static func apply_label_dim(label: Label) -> void:
+func apply_label_dim(label: Label) -> void:
 	label.add_theme_color_override("font_color", C_TEXT_DIM)
 	label.add_theme_font_size_override("font_size", FONT_SMALL)
 
 # HP bar — type: "player" | "enemy" | "xp"
-static func apply_progress_bar(bar: ProgressBar, type: String = "player") -> void:
+func apply_progress_bar(bar: ProgressBar, type: String = "player") -> void:
 	bar.add_theme_stylebox_override("background", make_bar_bg())
 	bar.show_percentage = false
 	match type:
@@ -226,7 +226,7 @@ static func apply_progress_bar(bar: ProgressBar, type: String = "player") -> voi
 			bar.add_theme_stylebox_override("fill", make_bar_fill(C_TEXT_DIM))
 
 # Color de rareza para labels/botones
-static func get_rarity_color(rarity: String) -> Color:
+func get_rarity_color(rarity: String) -> Color:
 	match rarity.to_lower():
 		"rare":  return C_RARE
 		"epic":  return C_EPIC
@@ -236,7 +236,7 @@ static func get_rarity_color(rarity: String) -> Color:
 # APLICADOR DE FONDO DE ESCENA
 # Llama en _ready() de cada escena con get_tree().current_scene o self
 # ─────────────────────────────────────────
-static func apply_scene_background(control: Control) -> void:
+func apply_scene_background(control: Control) -> void:
 	control.add_theme_color_override("font_color", C_TEXT)
 	# ColorRect de fondo — si no existe, lo creamos
 	var bg_name := "__ApocBG__"
