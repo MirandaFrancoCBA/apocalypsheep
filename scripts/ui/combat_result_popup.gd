@@ -7,7 +7,9 @@ signal continue_pressed
 @onready var label_loot = $Panel/VBoxContainer/LabelLoot
 @onready var button_continue = $Panel/VBoxContainer/ButtonContinue
 
-
+func _ready():
+	if not button_continue.pressed.is_connected(_on_button_continue_pressed):
+		button_continue.pressed.connect(_on_button_continue_pressed)
 func show_result(
 	xp: int,
 	loot: Dictionary

@@ -360,15 +360,10 @@ func _end_combat(result: String) -> void:
 	button_defend.disabled = true
 
 	if result == "defeat":
-
 		GameManager.kill_player()
-
 		await _death_feedback()
-
 		_show_game_over()
-
 		AudioManager.play_sfx("game_over")
-
 		return
 
 	var xp_gained := 0
@@ -380,7 +375,6 @@ func _end_combat(result: String) -> void:
 		GameManager.add_xp(xp_gained)
 
 		if _roll_drop():
-
 			loot = _generate_loot()
 
 			if loot.size() > 0:
@@ -396,8 +390,6 @@ func _end_combat(result: String) -> void:
 	)
 
 	GameManager._save_game()
-
-	# ⚠️ ACTIVAR CONTINUE DESPUÉS DEL POPUP
 func _show_combat_result_popup(
 	result: String,
 	xp: int,
@@ -408,18 +400,13 @@ func _show_combat_result_popup(
 
 	add_child(popup)
 
-	popup.top_level = true
-	popup.z_index = 100
+	popup.top_level = false
+	popup.z_index = 1000
 
-	popup.continue_pressed.connect(
-		func():
-			SceneManager.go_to_result()
-	)
+	popup.show_result(xp, loot)
 
-	popup.show_result(
-		xp,
-		loot
-	)
+	popup.continue_pressed.connect(_on_popup_continue)
+	popup.mouse_filter = Control.MOUSE_FILTER_STOP
 
 	if result == "victory":
 		add_log("🏆 Victoria")
@@ -791,23 +778,22 @@ func _show_game_over() -> void:
 	popup.top_level = true
 	popup.z_index = 100
 	
-func _on_history_button_pressed():
-
+func _on_history_button_pressed() -> void:
 	combat_history_panel.visible = !combat_history_panel.visible
-
+	
 	if combat_history_panel.visible:
 		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	else:
 		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		
-		# extra seguridad
 		combat_history_panel.release_focus()
-
-
-	SceneManager.go_to_result()
+	# ¡ELIMINÁ SceneManager.go_to_result() DE ACÁ!
 
 func _on_combat_popup_continue():
 
 	print("SIGNAL RECIBIDA")
+
+	SceneManager.go_to_result()
+
+func _on_popup_continue() -> void:
 
 	SceneManager.go_to_result()
