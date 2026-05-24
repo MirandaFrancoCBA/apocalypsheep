@@ -23,10 +23,10 @@ extends Control
 @export var label_xp: Label
 @export var label_saving: Label
 
-const LevelUpPopup         = preload("res://scenes/level_up_popup.tscn")
-const DamageNumberScene    = preload("res://scenes/ui/damage_number.tscn")
+const LevelUpPopup           = preload("res://scenes/level_up_popup.tscn")
+const DamageNumberScene      = preload("res://scenes/ui/damage_number.tscn")
 const CombatResultPopupScene = preload("res://scenes/ui/combat_result_popup.tscn")
-const GameOverPopupScene   = preload("res://scenes/ui/game_over_popup.tscn")
+const GameOverPopupScene     = preload("res://scenes/ui/game_over_popup.tscn")
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -38,40 +38,78 @@ const MAX_LOG_LINES := 40
 # ─────────────────────────────────────────
 var player: Player
 var enemy: Enemy
-
-# US-COMBAT-010: flag único de control de estado
-var combat_finished    := false
-var _input_locked      := false   # bloqueo durante animaciones
-var _popup_open        := false   # evita popups superpuestos
-var _active_tweens: Array = []    # registro de tweens para limpiarlos
-
-var combat_system := CombatSystem.new()
+var combat_finished  := false
+var _input_locked    := false
+var _popup_open      := false
+var _active_tweens: Array = []
+var combat_system    := CombatSystem.new()
 
 # ─────────────────────────────────────────
 # READY
 # ─────────────────────────────────────────
 func _ready() -> void:
 	_validate_nodes()
-	combat_history_panel.visible = false
+	combat_history_panel.visible      = false
 	combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
 
+	_apply_theme()
 	_setup_combat()
+
 	GameManager.level_up.connect(_on_level_up)
 	GameManager.player_data_changed.connect(_update_xp_ui)
 	GameManager.game_saved.connect(show_save_feedback)
 	history_button.pressed.connect(_on_history_button_pressed)
 
-func _on_level_up(new_level: int, hp_gain: int, damage_gain: int) -> void:
-	# US-COMBAT-002: level up va al log de combate, NO al log principal
-	add_combat_log("🎉 LEVEL UP! Nivel " + str(new_level))
-	AudioManager.play_sfx("levelup")
-	var popup = LevelUpPopup.instantiate()
-	add_child(popup)
-	popup.show_level_up(new_level, hp_gain, damage_gain)
+# ─────────────────────────────────────────
+# TEMA — US-UI-001, US-UI-002, US-UI-008
+# ─────────────────────────────────────────
+func _apply_theme() -> void:
+	ThemeManager.apply_scene_background(self)
+
+	# Barras
+	ThemeManager.apply_progress_bar(player_hp_bar, "player")
+	ThemeManager.apply_progress_bar(enemy_hp_bar,  "enemy")
+	ThemeManager.apply_progress_bar(xp_bar,        "xp")
+	player_hp_bar.custom_minimum_size = Vector2(0, 18)
+	enemy_hp_bar.custom_minimum_size  = Vector2(0, 18)
+	xp_bar.custom_minimum_size        = Vector2(0, 10)
+
+	# Labels
+	ThemeManager.apply_label_title(label_enemy)
+	label_enemy.add_theme_color_override("font_color", ThemeManager.C_RED_BRIGHT)
+
+	ThemeManager.apply_label_body(label_enemy_hp)
+	ThemeManager.apply_label_body(label_player_hp)
+	ThemeManager.apply_label_dim(label_xp)
+	ThemeManager.apply_label_dim(label_weapon)
+
+	# Label saving
+	if label_saving:
+		label_saving.add_theme_color_override("font_color", ThemeManager.C_AMBER)
+		label_saving.add_theme_font_size_override("font_size", ThemeManager.FONT_SMALL)
+
+	# Botones de combate
+	ThemeManager.apply_button_primary(button_attack)
+	button_attack.custom_minimum_size = Vector2(0, 72)
+
+	ThemeManager.apply_button_secondary(button_defend)
+	button_defend.custom_minimum_size = Vector2(0, 72)
+
+	# Botón historial
+	ThemeManager.apply_button_secondary(history_button)
+	history_button.custom_minimum_size = Vector2(0, 44)
+
+	# Panel historial
+	if combat_history_panel is PanelContainer:
+		ThemeManager.apply_panel_dark(combat_history_panel)
+
+	# Log
+	label_result.add_theme_color_override("default_color", ThemeManager.C_TEXT_DIM)
+	label_result.add_theme_font_size_override("normal_font_size", ThemeManager.FONT_SMALL)
 
 # ─────────────────────────────────────────
 # VALIDACIÓN
@@ -96,17 +134,14 @@ func _setup_combat() -> void:
 	player_hp_bar.min_value = 0
 	player_hp_bar.max_value = player.max_hp
 	player_hp_bar.value     = player.hp
+	enemy_hp_bar.min_value  = 0
+	enemy_hp_bar.max_value  = enemy.max_hp
+	enemy_hp_bar.value      = enemy.hp
 
-	enemy_hp_bar.min_value = 0
-	enemy_hp_bar.max_value = enemy.max_hp
-	enemy_hp_bar.value     = enemy.hp
-
-	label_enemy.text  = "Enemigo: " + enemy.name
+	label_enemy.text  = enemy.name
 	label_result.text = ""
 
-	# US-COMBAT-002: el log solo muestra eventos de acción
 	add_combat_log("⚔️ Combate contra " + enemy.name)
-
 	_update_ui()
 	_update_weapon_ui()
 	_update_xp_ui()
@@ -119,8 +154,8 @@ func _update_ui() -> void:
 	player.hp = max(player.hp, 0)
 	enemy.hp  = max(enemy.hp, 0)
 	GameManager.update_player_hp(player.hp)
-	label_player_hp.text = "HP: " + str(player.hp)
-	label_enemy_hp.text  = "HP: " + str(enemy.hp)
+	label_player_hp.text = "HP  %d / %d" % [player.hp, player.max_hp]
+	label_enemy_hp.text  = "HP  %d / %d" % [enemy.hp,  enemy.max_hp]
 	player_hp_bar.value  = player.hp
 	enemy_hp_bar.value   = enemy.hp
 	_update_effects_ui()
@@ -128,23 +163,22 @@ func _update_ui() -> void:
 
 func _update_xp_ui() -> void:
 	var data = GameManager.get_player_data()
-	xp_bar.max_value = data["xp_to_next"]
-	xp_bar.value     = data["xp"]
-	label_xp.text    = "XP: %d / %d" % [data["xp"], data["xp_to_next"]]
+	xp_bar.max_value  = data["xp_to_next"]
+	xp_bar.value      = data["xp"]
+	label_xp.text     = "XP  %d / %d   Lv %d" % [data["xp"], data["xp_to_next"], data["level"]]
 
 # ─────────────────────────────────────────
-# BLOQUEO DE INPUT — US-COMBAT-010
+# INPUT LOCK — US-COMBAT-010
 # ─────────────────────────────────────────
 func _lock_input() -> void:
-	_input_locked = true
+	_input_locked         = true
 	button_attack.disabled = true
 	button_defend.disabled = true
 
 func _unlock_input() -> void:
-	# Solo desbloquea si el combate sigue activo y no hay popup abierto
 	if combat_finished or _popup_open:
 		return
-	_input_locked = false
+	_input_locked         = false
 	button_attack.disabled = false
 	button_defend.disabled = false
 
@@ -152,29 +186,21 @@ func _unlock_input() -> void:
 # ATAQUE
 # ─────────────────────────────────────────
 func _on_button_attack_pressed() -> void:
-	# US-COMBAT-010: guardia doble — flag + estado
 	if combat_finished or _input_locked or GameManager.is_player_dead():
 		return
-
 	_lock_input()
 
-	# Efectos de turno
 	var logs = combat_system.apply_effects(player)
-	for l in logs:
-		add_combat_log(l)
+	for l in logs: add_combat_log(l)
 	logs = combat_system.apply_effects(enemy)
-	for l in logs:
-		add_combat_log(l)
+	for l in logs: add_combat_log(l)
 	_update_ui()
 
-	# Ataque jugador
 	await _combat_pause(0.15)
 	var result = combat_system.player_attack(player, enemy)
-
-	# US-COMBAT-002: log solo muestra daño, críticos y efectos — NO resultado final
-	add_combat_log("⚔️ Hacés " + str(result["damage"]) + " de daño")
-
+	add_combat_log("⚔️ " + str(result["damage"]) + " de daño")
 	_show_damage_number(enemy_container, result["damage"], result["is_crit"])
+
 	await _combat_pause(0.08)
 	await _flash(enemy_container, Color.RED)
 	await _shake(enemy_container)
@@ -183,33 +209,29 @@ func _on_button_attack_pressed() -> void:
 	if result["is_crit"]:
 		AudioManager.play_sfx("crit")
 		await _flash(enemy_container, Color.YELLOW)
-		add_combat_log("💥 CRÍTICO! " + str(result["damage"]))
+		add_combat_log("💥 CRÍTICO  " + str(result["damage"]))
 	else:
 		AudioManager.play_sfx("hit")
 
 	_update_ui()
-
 	if enemy.hp <= 0:
 		await _end_combat("victory")
 		return
 
 	await get_tree().create_timer(0.6).timeout
-
-	# Ataque enemigo
 	await _combat_pause(0.25)
-	result = combat_system.enemy_attack(player, enemy)
-	add_combat_log("💢 Recibís " + str(result["damage"]) + " de daño")
 
+	result = combat_system.enemy_attack(player, enemy)
+	add_combat_log("💢 Recibís " + str(result["damage"]))
 	await _flash(player_container, Color.RED)
 	await _shake(player_container)
 	await _combat_pause(0.12)
 
 	if result["is_crit"]:
 		await _flash(player_container, Color.YELLOW)
-		add_combat_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
+		add_combat_log("⚠️ CRÍTICO enemigo  " + str(result["damage"]))
 
 	_update_ui()
-
 	if player.hp <= 0:
 		await _end_combat("defeat")
 		return
@@ -222,31 +244,29 @@ func _on_button_attack_pressed() -> void:
 func _on_button_defend_pressed() -> void:
 	if combat_finished or _input_locked or GameManager.is_player_dead():
 		return
-
 	_lock_input()
 
 	player.start_defense()
-	_show_status_text(player_container, "🛡 DEFEND", Color.CYAN)
-	await _flash(player_container, Color.CYAN)
+	_show_status_text(player_container, "🛡 DEFEND", ThemeManager.C_DEFENSE)
+	await _flash(player_container, ThemeManager.C_DEFENSE)
 
 	player_container.modulate = Color(0.7, 0.9, 1.0)
 	await get_tree().create_timer(0.15).timeout
 	player_container.modulate = Color.WHITE
 
 	await _combat_pause(0.15)
-	add_combat_log("🛡 Te preparás para defender")
+	add_combat_log("🛡 Defendiendo")
 	await get_tree().create_timer(0.5).timeout
 
 	var result = combat_system.enemy_attack(player, enemy)
 	_show_damage_number(player_container, result["damage"], result["is_crit"])
-	await _flash(player_container, Color.BLUE)
+	await _flash(player_container, ThemeManager.C_DEFENSE)
 	await _shake(player_container)
 
 	if result["is_crit"]:
-		add_combat_log("⚠️ CRÍTICO enemigo! " + str(result["damage"]))
+		add_combat_log("⚠️ CRÍTICO enemigo  " + str(result["damage"]))
 
 	_update_ui()
-
 	if player.hp <= 0:
 		await _end_combat("defeat")
 		return
@@ -254,9 +274,7 @@ func _on_button_defend_pressed() -> void:
 	_unlock_input()
 
 # ─────────────────────────────────────────
-# LOG — US-COMBAT-002
-# Solo muestra: daño, críticos, efectos, acciones
-# NO muestra: loot, XP ganada, resultado final
+# LOG — US-COMBAT-002: solo daño, críticos, efectos
 # ─────────────────────────────────────────
 func add_combat_log(text: String) -> void:
 	var lines: Array = []
@@ -269,7 +287,6 @@ func add_combat_log(text: String) -> void:
 	await get_tree().process_frame
 	label_result.scroll_to_line(label_result.get_line_count())
 
-# Alias para compatibilidad (el código viejo usaba add_log)
 func add_log(text: String) -> void:
 	add_combat_log(text)
 
@@ -277,12 +294,10 @@ func add_log(text: String) -> void:
 # FIN DE COMBATE
 # ─────────────────────────────────────────
 func _end_combat(result: String) -> void:
-	# US-COMBAT-010: evitar que se llame dos veces
 	if combat_finished:
 		return
 	combat_finished = true
 	_lock_input()
-
 	GameManager.set_combat_result(result)
 
 	if result == "defeat":
@@ -292,10 +307,8 @@ func _end_combat(result: String) -> void:
 		AudioManager.play_sfx("game_over")
 		return
 
-	# Victoria
 	var xp_gained := enemy.xp
 	var loot      := {}
-
 	GameManager.add_xp(xp_gained)
 
 	if _roll_drop():
@@ -306,25 +319,21 @@ func _end_combat(result: String) -> void:
 
 	await _combat_pause(0.35)
 
-	# US-COMBAT-010: evitar popup superpuesto
 	if _popup_open:
 		return
 	_popup_open = true
-
 	_show_combat_result_popup(result, xp_gained, loot)
 	GameManager._save_game()
 
 # ─────────────────────────────────────────
-# POPUP DE RESULTADO — US-COMBAT-001
+# POPUP RESULTADO — US-COMBAT-001
 # ─────────────────────────────────────────
 func _show_combat_result_popup(result: String, xp: int, loot: Dictionary) -> void:
 	var popup = CombatResultPopupScene.instantiate()
 	add_child(popup)
-	popup.top_level   = false
-	popup.z_index     = 1000
+	popup.top_level    = false
+	popup.z_index      = 1000
 	popup.mouse_filter = Control.MOUSE_FILTER_STOP
-
-	# US-COMBAT-001: pasamos resultado completo al popup
 	popup.show_result(result, xp, loot)
 	popup.continue_pressed.connect(_on_popup_continue)
 
@@ -345,7 +354,17 @@ func _show_game_over() -> void:
 	popup.z_index   = 100
 
 # ─────────────────────────────────────────
-# UI EFECTOS
+# LEVEL UP
+# ─────────────────────────────────────────
+func _on_level_up(new_level: int, hp_gain: int, damage_gain: int) -> void:
+	add_combat_log("🎉 LEVEL UP! Nivel " + str(new_level))
+	AudioManager.play_sfx("levelup")
+	var popup = LevelUpPopup.instantiate()
+	add_child(popup)
+	popup.show_level_up(new_level, hp_gain, damage_gain)
+
+# ─────────────────────────────────────────
+# EFECTOS UI
 # ─────────────────────────────────────────
 func _update_effects_ui() -> void:
 	_draw_effects(player.effects, player_effects_container)
@@ -355,10 +374,11 @@ func _draw_effects(effects: Array, container: HBoxContainer) -> void:
 	for child in container.get_children():
 		child.queue_free()
 	for effect in effects:
-		var label = Label.new()
-		var icon  = _effect_icon(effect["type"])
-		label.text = icon if effect["type"] == "stun" else icon + " x" + str(effect["duration"])
-		label.add_theme_font_size_override("font_size", 16)
+		var label  = Label.new()
+		var icon   = _effect_icon(effect["type"])
+		label.text = icon if effect["type"] == "stun" else icon + "x" + str(effect["duration"])
+		label.add_theme_font_size_override("font_size", ThemeManager.FONT_SMALL)
+		label.add_theme_color_override("font_color", _effect_color(effect["type"]))
 		container.add_child(label)
 
 func _effect_icon(type: String) -> String:
@@ -369,49 +389,54 @@ func _effect_icon(type: String) -> String:
 		"stun":   return "💫"
 		_:        return "❓"
 
+func _effect_color(type: String) -> Color:
+	match type:
+		"bleed":  return ThemeManager.C_BLEED
+		"poison": return ThemeManager.C_POISON
+		"burn":   return ThemeManager.C_BURN
+		_:        return ThemeManager.C_TEXT_DIM
+
 # ─────────────────────────────────────────
-# UI ARMA
+# ARMA UI
 # ─────────────────────────────────────────
 func _update_weapon_ui() -> void:
 	var weapon = player.equipped_weapon
 	if weapon == null or weapon.is_empty():
-		label_weapon.text = "Arma: Sin arma"
+		label_weapon.text = "Sin arma equipada"
 	else:
-		label_weapon.text = "Arma: " + weapon.get("name", "???")
 		var effect = weapon.get("effect", "")
+		label_weapon.text = weapon.get("name", "???")
 		if effect != "":
-			label_weapon.text += " (" + _effect_icon(effect) + ")"
+			label_weapon.text += "  " + _effect_icon(effect)
 
 # ─────────────────────────────────────────
 # FX — US-COMBAT-010: tweens trackeados
 # ─────────────────────────────────────────
 func _flash(node: Control, color: Color) -> void:
+	if not is_instance_valid(node): return
 	var original = node.modulate
 	node.modulate = color
 	await get_tree().create_timer(0.1).timeout
-	# Verificar que el nodo sigue vivo antes de restaurar
 	if is_instance_valid(node):
 		node.modulate = original
 
 func _death_feedback() -> void:
-	if death_overlay == null:
-		return
-	death_overlay.visible  = true
+	if death_overlay == null: return
+	death_overlay.visible    = true
 	death_overlay.modulate.a = 0.0
+	death_overlay.color      = ThemeManager.C_RED
 	var tween = create_tween()
 	_active_tweens.append(tween)
 	tween.tween_property(death_overlay, "modulate:a", 0.65, 0.5)
 	await tween.finished
 
 func _shake(node: Control) -> void:
-	if not is_instance_valid(node):
-		return
+	if not is_instance_valid(node): return
 	var original_pos = node.position
 	for i in range(5):
 		node.position.x += float(randi_range(-5, 5))
 		node.position.y += float(randi_range(-5, 5))
 		await get_tree().create_timer(0.02).timeout
-	# US-COMBAT-010: restaurar posición aunque se haya cortado
 	if is_instance_valid(node):
 		node.position = original_pos
 
@@ -419,8 +444,7 @@ func _combat_pause(duration: float) -> void:
 	await get_tree().create_timer(duration).timeout
 
 func _enemy_intro_animation() -> void:
-	if enemy_container == null:
-		return
+	if enemy_container == null: return
 	var original_position := enemy_container.position
 	enemy_container.modulate.a = 0.0
 	enemy_container.scale      = Vector2(0.85, 0.85)
@@ -428,98 +452,27 @@ func _enemy_intro_animation() -> void:
 	var tween = create_tween()
 	_active_tweens.append(tween)
 	tween.set_parallel(true)
-	tween.tween_property(enemy_container, "modulate:a", 1.0, 0.35)
-	tween.tween_property(enemy_container, "scale", Vector2.ONE, 0.35)
-	tween.tween_property(enemy_container, "position", original_position, 0.35)
+	tween.tween_property(enemy_container, "modulate:a", 1.0,        0.35)
+	tween.tween_property(enemy_container, "scale",      Vector2.ONE, 0.35)
+	tween.tween_property(enemy_container, "position",   original_position, 0.35)
 	await tween.finished
 
-# US-COMBAT-010: limpiar tweens colgados al salir de la escena
 func _exit_tree() -> void:
 	for t in _active_tweens:
-		if t and t.is_valid():
-			t.kill()
+		if t and t.is_valid(): t.kill()
 	_active_tweens.clear()
-
-# ─────────────────────────────────────────
-# LOOT
-# ─────────────────────────────────────────
-func _generate_loot() -> Dictionary:
-	var file = FileAccess.open("res://data/items.json", FileAccess.READ)
-	if file == null:
-		return {}
-	var data = JSON.parse_string(file.get_as_text())
-	if data == null or data.is_empty():
-		return {}
-	var rarity = _roll_rarity()
-	var filtered_items: Array = []
-	for item in data:
-		if item.get("rarity", "common") == rarity:
-			filtered_items.append(item)
-	if filtered_items.is_empty():
-		filtered_items = data
-	return filtered_items.pick_random()
-
-func _roll_rarity() -> String:
-	var total_weight := 0
-	for w in Constants.RARITY_WEIGHTS.values():
-		total_weight += w
-	var roll       = randi_range(1, total_weight)
-	var cumulative = 0
-	for rarity in Constants.RARITY_WEIGHTS.keys():
-		cumulative += Constants.RARITY_WEIGHTS[rarity]
-		if roll <= cumulative:
-			return rarity
-	return "common"
-
-func _roll_drop() -> bool:
-	return randi_range(1, 100) <= Constants.LOOT_DROP_CHANCE
-
-# ─────────────────────────────────────────
-# ENEMY GENERATION & SCALING
-# ─────────────────────────────────────────
-func _generate_enemy() -> Enemy:
-	var zone       = GameManager.get_selected_zone()
-	var enemies_ids = zone.get("enemies", [])
-	if enemies_ids.is_empty():
-		push_error("Zona sin enemigos")
-		return Enemy.new()
-	var random_id = enemies_ids.pick_random()
-	var file = FileAccess.open("res://data/enemies.json", FileAccess.READ)
-	if file == null:
-		push_error("No se pudo abrir enemies.json")
-		return Enemy.new()
-	var data = JSON.parse_string(file.get_as_text())
-	for e in data:
-		if e.get("id", "") == random_id:
-			var new_enemy = Enemy.from_dict(e)
-			if new_enemy == null:
-				push_error("Enemy.from_dict devolvió null")
-				return Enemy.new()
-			_apply_enemy_scaling(new_enemy)
-			return new_enemy
-	push_error("Enemy ID no encontrado: " + str(random_id))
-	return Enemy.new()
-
-func _apply_enemy_scaling(target_enemy: Enemy) -> void:
-	var zone        = GameManager.get_selected_zone()
-	var level_range = zone.get("level_range", [1, 1])
-	var final_level = randi_range(level_range[0], level_range[1])
-	target_enemy.max_hp += final_level * Constants.ENEMY_HP_PER_LEVEL
-	target_enemy.hp      = target_enemy.max_hp
-	target_enemy.damage += final_level * Constants.ENEMY_DAMAGE_PER_LEVEL
-	target_enemy.xp     += final_level * Constants.XP_PER_ENEMY_LEVEL
-	print("[ENEMY]", target_enemy.name, "LV:", final_level,
-		"HP:", target_enemy.hp, "DMG:", target_enemy.damage, "XP:", target_enemy.xp)
 
 # ─────────────────────────────────────────
 # DAMAGE NUMBERS
 # ─────────────────────────────────────────
 func _show_damage_number(target_node: Control, damage: int, is_crit: bool) -> void:
 	var label := Label.new()
-	label.text         = "💥 " + str(damage) if is_crit else str(damage)
+	label.text = "💥 " + str(damage) if is_crit else str(damage)
 	label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 32 if is_crit else 24)
+	label.add_theme_color_override("font_color",
+		ThemeManager.C_CRIT if is_crit else ThemeManager.C_TEXT_BRIGHT)
 	target_node.add_child(label)
 
 	await get_tree().process_frame
@@ -538,41 +491,36 @@ func _show_damage_number(target_node: Control, damage: int, is_crit: bool) -> vo
 	_active_tweens.append(tween)
 	tween.set_parallel(true)
 	tween.tween_property(label, "position:y", label.position.y - 80, 1.2)
-	tween.tween_property(label, "modulate:a", 0.0, 1.2)
+	tween.tween_property(label, "modulate:a", 0.0,                   1.2)
 	tween.tween_property(label, "scale", Vector2(scale_factor + 0.3, scale_factor + 0.3), 1.2)
 	await tween.finished
-	if is_instance_valid(label):
-		label.queue_free()
+	if is_instance_valid(label): label.queue_free()
 
 func _show_status_text(target_node: Control, text: String, color: Color) -> void:
 	var label := Label.new()
-	label.text    = text
+	label.text     = text
 	label.modulate = color
-	label.add_theme_font_size_override("font_size", 20)
+	label.add_theme_font_size_override("font_size", ThemeManager.FONT_BODY)
 	target_node.add_child(label)
-
 	await get_tree().process_frame
 	label.position = Vector2(
 		(target_node.size.x - label.size.x) / 2.0,
 		target_node.size.y * 0.25
 	)
-
 	var tween = create_tween()
 	_active_tweens.append(tween)
 	tween.set_parallel(true)
 	tween.tween_property(label, "position:y", label.position.y - 40, 0.8)
-	tween.tween_property(label, "modulate:a", 0.0, 0.8)
+	tween.tween_property(label, "modulate:a", 0.0,                   0.8)
 	await tween.finished
-	if is_instance_valid(label):
-		label.queue_free()
+	if is_instance_valid(label): label.queue_free()
 
 # ─────────────────────────────────────────
 # SAVE FEEDBACK
 # ─────────────────────────────────────────
 func show_save_feedback() -> void:
-	if label_saving == null:
-		return
-	label_saving.visible   = true
+	if label_saving == null: return
+	label_saving.visible    = true
 	label_saving.modulate.a = 0.0
 	var tween = create_tween()
 	_active_tweens.append(tween)
@@ -580,23 +528,78 @@ func show_save_feedback() -> void:
 	tween.tween_interval(0.8)
 	tween.tween_property(label_saving, "modulate:a", 0.0, 0.4)
 	await tween.finished
-	if is_instance_valid(label_saving):
-		label_saving.visible = false
+	if is_instance_valid(label_saving): label_saving.visible = false
 
 # ─────────────────────────────────────────
 # HISTORIAL
 # ─────────────────────────────────────────
 func _on_history_button_pressed() -> void:
 	combat_history_panel.visible = !combat_history_panel.visible
-	if combat_history_panel.visible:
-		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	else:
-		combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	combat_history_panel.mouse_filter = \
+		Control.MOUSE_FILTER_STOP if combat_history_panel.visible \
+		else Control.MOUSE_FILTER_IGNORE
+	if not combat_history_panel.visible:
 		combat_history_panel.release_focus()
 
 # ─────────────────────────────────────────
-# LOOT POPUP (legacy — mantenido por si se usa)
+# GENERACIÓN & SCALING
 # ─────────────────────────────────────────
+func _generate_enemy() -> Enemy:
+	var zone        = GameManager.get_selected_zone()
+	var enemies_ids = zone.get("enemies", [])
+	if enemies_ids.is_empty():
+		push_error("Zona sin enemigos")
+		return Enemy.new()
+	var random_id = enemies_ids.pick_random()
+	var file = FileAccess.open("res://data/enemies.json", FileAccess.READ)
+	if file == null:
+		push_error("No se pudo abrir enemies.json")
+		return Enemy.new()
+	var data = JSON.parse_string(file.get_as_text())
+	for e in data:
+		if e.get("id", "") == random_id:
+			var new_enemy = Enemy.from_dict(e)
+			if new_enemy == null: return Enemy.new()
+			_apply_enemy_scaling(new_enemy)
+			return new_enemy
+	push_error("Enemy ID no encontrado: " + str(random_id))
+	return Enemy.new()
+
+func _apply_enemy_scaling(target_enemy: Enemy) -> void:
+	var zone        = GameManager.get_selected_zone()
+	var level_range = zone.get("level_range", [1, 1])
+	var final_level = randi_range(level_range[0], level_range[1])
+	target_enemy.max_hp += final_level * Constants.ENEMY_HP_PER_LEVEL
+	target_enemy.hp      = target_enemy.max_hp
+	target_enemy.damage += final_level * Constants.ENEMY_DAMAGE_PER_LEVEL
+	target_enemy.xp     += final_level * Constants.XP_PER_ENEMY_LEVEL
+
+func _generate_loot() -> Dictionary:
+	var file = FileAccess.open("res://data/items.json", FileAccess.READ)
+	if file == null: return {}
+	var data = JSON.parse_string(file.get_as_text())
+	if data == null or data.is_empty(): return {}
+	var rarity         = _roll_rarity()
+	var filtered_items: Array = []
+	for item in data:
+		if item.get("rarity", "common") == rarity:
+			filtered_items.append(item)
+	if filtered_items.is_empty(): filtered_items = data
+	return filtered_items.pick_random()
+
+func _roll_rarity() -> String:
+	var total_weight := 0
+	for w in Constants.RARITY_WEIGHTS.values(): total_weight += w
+	var roll       = randi_range(1, total_weight)
+	var cumulative = 0
+	for rarity in Constants.RARITY_WEIGHTS.keys():
+		cumulative += Constants.RARITY_WEIGHTS[rarity]
+		if roll <= cumulative: return rarity
+	return "common"
+
+func _roll_drop() -> bool:
+	return randi_range(1, 100) <= Constants.LOOT_DROP_CHANCE
+
 func _show_loot_popup(item: Dictionary) -> void:
 	var scene = load("res://scenes/ui/loot_popup.tscn")
 	var popup = scene.instantiate()
