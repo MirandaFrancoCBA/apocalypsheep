@@ -1,54 +1,53 @@
 # scripts/managers/audio_manager.gd
 # ─────────────────────────────────────────
-# AUDIO MANAGER — Godot 4 / GDScript
-# US-AUDIO-011 — manager centralizado con lazy cache
+# AUDIO MANAGER — versión final
+# US-AUDIO-011 — manager centralizado
+# US-AUDIO-012 — prioridad y limpieza de sonidos
 #
-# ⚠️  POR QUÉ NO SUENA LA MÚSICA — FIX INCLUIDO:
-#
-#   En Godot 4, AudioStreamOggVorbis NO tiene una propiedad .loop
-#   que se pueda setear en runtime desde GDScript.
-#   El loop hay que activarlo ANTES de importar, en el panel
-#   de Import del editor:
-#
-#     1. Seleccioná el archivo .ogg en el FileSystem
-#     2. Panel Import → tildá "Loop"
-#     3. Click "Reimport"
-#
-#   Si querés evitar todo eso, convertí la música a .wav con loop
-#   seteado directamente — funciona sin configuración extra.
-#
-#   Este archivo incluye un fallback manual: si el OGG no tiene
-#   loop configurado, _on_music_finished() lo reinicia solo.
-#
-# Rutas esperadas:
-#   res://audio/sfx/hit.wav
-#   res://audio/sfx/crit.wav
-#   res://audio/sfx/defend.wav
-#   res://audio/sfx/loot.wav
-#   res://audio/sfx/loot_epic.wav
-#   res://audio/sfx/levelup.wav
-#   res://audio/sfx/game_over.wav
-#   res://audio/sfx/heal.wav
-#   res://audio/sfx/click.wav
-#   res://audio/sfx/confirm.wav
-#   res://audio/sfx/bleed.wav
-#   res://audio/sfx/poison.wav
-#   res://audio/sfx/burn.wav
-#   res://audio/sfx/stun.wav
-#   res://audio/music/combat.ogg   ← loop activado en Import
-#   res://audio/music/menu.ogg     ← loop activado en Import
+# NOVEDADES vs versión anterior:
+#   - Límite de instancias SFX simultáneas (anti-saturación)
+#   - Cooldown por SFX (evita que el mismo sonido se pise a sí mismo)
+#   - Efectos de estado con volumen reducido (no tapan el combate)
 # ─────────────────────────────────────────
 extends Node
 
-# ─────────────────────────────────────────
-# ESTADO INTERNO
-# ─────────────────────────────────────────
-var _cache: Dictionary = {}
+var _cache: Dictionary           = {}
 var _music_player: AudioStreamPlayer = null
-var _current_music: String = ""
+var _current_music: String       = ""
+
+# US-AUDIO-012 — control de instancias activas
+var _active_sfx:       Array     = []   # lista de AudioStreamPlayer activos
+const MAX_SFX_SIMULTANEOUS := 6         # máximo global de SFX a la vez
+
+# Cooldown por sfx_key — evita que el mismo sonido suene
+# dos veces en < N segundos (diccionario: key → tiempo_epoch)
+var _sfx_last_played: Dictionary = {}
+const SFX_COOLDOWNS: Dictionary  = {
+	# Efectos de estado: se aplican por turno, pueden sonar muy seguido
+	"bleed":  0.3,
+	"poison": 0.3,
+	"burn":   0.3,
+	"stun":   0.3,
+	# Hit/crit pueden sonar dos veces muy rápido en combos
+	"hit":    0.05,
+	"crit":   0.05,
+	# UI: sin cooldown efectivo
+	"click":  0.08,
+}
+
+# Volúmenes relativos por categoría — US-AUDIO-012
+# Los efectos de estado suenan más suave para no tapar el combate
+const SFX_VOLUME_MULTIPLIERS: Dictionary = {
+	"bleed":  0.55,
+	"poison": 0.55,
+	"burn":   0.60,
+	"stun":   0.65,
+	"click":  0.70,
+	"confirm":0.75,
+}
 
 # ─────────────────────────────────────────
-# VOLUMEN — US-AUDIO-010
+# VOLUMEN
 # ─────────────────────────────────────────
 var master_volume: float = 1.0
 var music_volume:  float = 0.7
@@ -76,34 +75,55 @@ const SFX_PATHS: Dictionary = {
 }
 
 const MUSIC_PATHS: Dictionary = {
-	"combat": "res://audio/music/combat.ogg",
+	"combat": "res://audio/music/combate.ogg",
 	"menu":   "res://audio/music/menu.ogg",
 }
 
 # ─────────────────────────────────────────
 # API — SFX
 # ─────────────────────────────────────────
-func play_sfx(sfx_name: String) -> void:
+func play_sfx(sfx_key: String) -> void:
 	if muted:
 		return
-	var stream = _load_resource(sfx_name, SFX_PATHS)
+
+	# US-AUDIO-012 — cooldown: evitar solapamiento del mismo SFX
+	if _sfx_last_played.has(sfx_key):
+		var cooldown = SFX_COOLDOWNS.get(sfx_key, 0.0)
+		if Time.get_ticks_msec() - _sfx_last_played[sfx_key] < cooldown * 1000:
+			return
+
+	# US-AUDIO-012 — límite global de SFX simultáneos
+	_clean_finished_sfx()
+	if _active_sfx.size() >= MAX_SFX_SIMULTANEOUS:
+		# Eliminar el más viejo para hacer lugar
+		var oldest = _active_sfx.pop_front()
+		if is_instance_valid(oldest):
+			oldest.stop()
+			oldest.queue_free()
+
+	var stream = _load_resource(sfx_key, SFX_PATHS)
 	if stream == null:
 		return
-	var player := AudioStreamPlayer.new()
+
+	var vol_mult = SFX_VOLUME_MULTIPLIERS.get(sfx_key, 1.0)
+	var player   = AudioStreamPlayer.new()
 	add_child(player)
 	player.stream    = stream
-	player.volume_db = linear_to_db(master_volume * sfx_volume)
+	player.volume_db = linear_to_db(master_volume * sfx_volume * vol_mult)
 	player.play()
-	player.finished.connect(player.queue_free)
+	player.finished.connect(func():
+		_active_sfx.erase(player)
+		player.queue_free()
+	)
+	_active_sfx.append(player)
+	_sfx_last_played[sfx_key] = Time.get_ticks_msec()
 
-## Loot con distinción por rareza — US-AUDIO-005
+func _clean_finished_sfx() -> void:
+	_active_sfx = _active_sfx.filter(func(p): return is_instance_valid(p) and p.playing)
+
 func play_loot_sfx(rarity: String) -> void:
-	if rarity.to_lower() == "epic":
-		play_sfx("loot_epic")
-	else:
-		play_sfx("loot")
+	play_sfx("loot_epic" if rarity.to_lower() == "epic" else "loot")
 
-## SFX de efecto de estado — US-AUDIO-004
 func play_effect_sfx(effect_type: String) -> void:
 	match effect_type.to_lower():
 		"bleed":  play_sfx("bleed")
@@ -112,57 +132,41 @@ func play_effect_sfx(effect_type: String) -> void:
 		"stun":   play_sfx("stun")
 
 # ─────────────────────────────────────────
-# API — MÚSICA — US-AUDIO-007 / 008
+# API — MÚSICA
 # ─────────────────────────────────────────
-
-## Reproduce música. Si ya está sonando la misma pista, no hace nada.
-## IMPORTANTE: el loop se configura en el panel Import del editor Godot,
-## NO en runtime. Ver cabecera del archivo.
 func play_music(track_name: String) -> void:
 	if _current_music == track_name:
 		if _music_player != null and _music_player.playing:
 			return
-
 	_stop_music_immediate()
-
 	var stream = _load_resource(track_name, MUSIC_PATHS)
 	if stream == null:
-		push_warning("[AudioManager] No se encontró la pista: " + track_name
-			+ "\nVerificá que el archivo exista en res://audio/music/")
+		push_warning("[AudioManager] Pista no encontrada: " + track_name)
 		return
-
-	_music_player = AudioStreamPlayer.new()
+	_music_player          = AudioStreamPlayer.new()
 	add_child(_music_player)
 	_music_player.stream    = stream
 	_music_player.volume_db = linear_to_db(master_volume * music_volume)
-
-	# NO seteamos stream.loop acá — es readonly en Godot 4.
-	# Activarlo desde el editor: FileSystem → Import → Loop → Reimport
-
 	_music_player.play()
-	_current_music = track_name
-
-	# Fallback manual por si el OGG no tiene loop en el Import
+	_current_music          = track_name
 	_music_player.finished.connect(_on_music_finished)
 
 func _on_music_finished() -> void:
-	# Si el OGG no tiene loop activado en Import, lo repetimos acá
 	if _music_player != null and not _current_music.is_empty():
 		_music_player.play()
 
-## Fade out suave + detiene la música.
 func stop_music(fade_time: float = 0.5) -> void:
 	if _music_player == null or not _music_player.playing:
 		_stop_music_immediate()
 		return
-	var player_ref = _music_player
+	var ref   = _music_player
 	var tween = create_tween()
-	tween.tween_property(player_ref, "volume_db", -80.0, fade_time)
+	tween.tween_property(ref, "volume_db", -80.0, fade_time)
 	await tween.finished
-	if is_instance_valid(player_ref):
-		player_ref.stop()
-		player_ref.queue_free()
-	if _music_player == player_ref:
+	if is_instance_valid(ref):
+		ref.stop()
+		ref.queue_free()
+	if _music_player == ref:
 		_music_player  = null
 		_current_music = ""
 
@@ -174,7 +178,7 @@ func _stop_music_immediate() -> void:
 	_current_music = ""
 
 # ─────────────────────────────────────────
-# VOLUMEN — US-AUDIO-010
+# VOLUMEN
 # ─────────────────────────────────────────
 func set_master_volume(value: float) -> void:
 	master_volume = clamp(value, 0.0, 1.0)
@@ -192,7 +196,6 @@ func set_muted(value: bool) -> void:
 	if _music_player != null:
 		_music_player.volume_db = -80.0 if muted else linear_to_db(master_volume * music_volume)
 
-## Alias legacy
 func set_volume(value: float) -> void:
 	set_master_volume(value)
 
@@ -201,27 +204,21 @@ func _apply_music_volume() -> void:
 		_music_player.volume_db = linear_to_db(master_volume * music_volume)
 
 # ─────────────────────────────────────────
-# CARGA LAZY CON CACHE — US-AUDIO-011
+# CARGA LAZY CON CACHE
 # ─────────────────────────────────────────
 func _load_resource(sfx_key: String, paths: Dictionary) -> AudioStream:
 	var cache_key: String = "%s_%d" % [sfx_key, paths.hash()]
-
 	if _cache.has(cache_key):
 		return _cache[cache_key]
-
 	if not paths.has(sfx_key):
-		push_warning("[AudioManager] Nombre desconocido: '%s'" % sfx_key)
+		push_warning("[AudioManager] Key desconocida: '%s'" % sfx_key)
 		return null
-
 	var path: String = paths[sfx_key]
-
 	if not ResourceLoader.exists(path):
-		return null  # Silencioso — normal si el archivo no existe todavía
-
+		return null
 	var stream = load(path) as AudioStream
 	if stream == null:
-		push_warning("[AudioManager] Falló la carga: %s" % path)
+		push_warning("[AudioManager] Falló carga: %s" % path)
 		return null
-
 	_cache[cache_key] = stream
 	return stream
