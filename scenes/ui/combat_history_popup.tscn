@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://cmyj6tivadn2w"]
+
+[ext_resource type="Script" uid="uid://cgislibfyxkfd" path="res://scripts/ui/combat_history_popup.gd" id="1_jt3rv"]
+
+[node name="CombatHistoryPopup" type="Control" unique_id=1925496911]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jt3rv")
+
+[node name="BgDim" type="ColorRect" parent="." unique_id=1829597861]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1699134631]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=778517371]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=2140599498]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LabelHeader" type="Label" parent="Panel/Margin/VBox" unique_id=1908760452]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/Margin/VBox" unique_id=1926694873]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LabelLog" type="RichTextLabel" parent="Panel/Margin/VBox/ScrollContainer" unique_id=1875803857]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ButtonClose" type="Button" parent="Panel/Margin/VBox" unique_id=1437841530]
+layout_mode = 2

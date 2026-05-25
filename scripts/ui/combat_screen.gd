@@ -30,14 +30,13 @@ extends Control
 @export var xp_bar:                   ProgressBar
 @export var label_xp:                 Label
 @export var label_saving:             Label
-
-@onready var combat_history_panel = $"CombatHistoryPanel"
 @onready var history_button       = $MarginContainer/VBoxContainer/HistoryButton
 
 const LevelUpPopup          = preload("res://scenes/level_up_popup.tscn")
 const DamageNumberScene     = preload("res://scenes/ui/damage_number.tscn")
 const CombatResultPopupScene= preload("res://scenes/ui/combat_result_popup.tscn")
 const GameOverPopupScene    = preload("res://scenes/ui/game_over_popup.tscn")
+const CombatHistoryPopupScene = preload("res://scenes/ui/combat_history_popup.tscn")	
 
 # ─────────────────────────────────────────
 # CONFIG
@@ -60,9 +59,6 @@ var combat_system   := CombatSystem.new()
 # ─────────────────────────────────────────
 func _ready() -> void:
 	_validate_nodes()
-	combat_history_panel.visible      = false
-	combat_history_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
@@ -112,9 +108,6 @@ func _apply_theme() -> void:
 	# Historial — botón con indicador de estado
 	ThemeManager.apply_button_secondary(history_button)
 	history_button.custom_minimum_size = Vector2(0, 44)
-
-	if combat_history_panel is PanelContainer:
-		ThemeManager.apply_panel_dark(combat_history_panel)
 
 	label_result.add_theme_color_override("default_color",   ThemeManager.C_TEXT_DIM)
 	label_result.add_theme_font_size_override("normal_font_size", ThemeManager.FONT_SMALL)
@@ -574,21 +567,12 @@ func show_save_feedback() -> void:
 # HISTORIAL — US-UI-013 con estado visual del botón
 # ─────────────────────────────────────────
 func _on_history_button_pressed() -> void:
-	AudioManager.play_sfx("click")   # ← US-AUDIO-009
-	var is_open = !combat_history_panel.visible
-	combat_history_panel.visible = is_open
-	combat_history_panel.mouse_filter = \
-		Control.MOUSE_FILTER_STOP if is_open else Control.MOUSE_FILTER_IGNORE
-
-	# Feedback visual del estado — botón muestra si está abierto
-	history_button.text = "📜 ✓" if is_open else "📜"
-	if is_open:
-		ThemeManager.apply_button_primary(history_button)
-	else:
-		ThemeManager.apply_button_secondary(history_button)
-
-	if not is_open:
-		combat_history_panel.release_focus()
+	AudioManager.play_sfx("click")
+	var popup = CombatHistoryPopupScene.instantiate()
+	add_child(popup)
+	popup.top_level = true
+	popup.z_index   = 500
+	popup.set_log(label_result.text)
 
 # ─────────────────────────────────────────
 # GENERACIÓN
