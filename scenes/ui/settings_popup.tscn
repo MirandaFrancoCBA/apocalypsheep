@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://cof1by4tv7hup"]
+
+[ext_resource type="Script" uid="uid://kcvq3s6xpatr" path="res://scripts/ui/settings_popup.gd" id="1_cnhj7"]
+
+[node name="SettingsPopup" type="Control" unique_id=1794342665]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_cnhj7")
+
+[node name="BgDim" type="ColorRect" parent="." unique_id=102857922]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1947145929]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -210.0
+offset_right = 200.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=1142348960]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=278592396]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LabelTitle" type="Label" parent="Panel/Margin/VBox" unique_id=1469276146]
+layout_mode = 2
+text = "⚙️ Ajustes de audio"
+horizontal_alignment = 1
+
+[node name="RowMaster" type="HBoxContainer" parent="Panel/Margin/VBox" unique_id=1122893188]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LabelMaster" type="Label" parent="Panel/Margin/VBox/RowMaster" unique_id=858100896]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔊 Master"
+
+[node name="SliderMaster" type="HSlider" parent="Panel/Margin/VBox/RowMaster" unique_id=457980796]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 100.0
+
+[node name="LabelMasterVal" type="Label" parent="Panel/Margin/VBox/RowMaster" unique_id=625329642]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="RowMusic" type="HBoxContainer" parent="Panel/Margin/VBox" unique_id=846759784]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LabelMusic" type="Label" parent="Panel/Margin/VBox/RowMusic" unique_id=30119188]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🎵 Música"
+
+[node name="SliderMusic" type="HSlider" parent="Panel/Margin/VBox/RowMusic" unique_id=1185160725]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 70.0
+
+[node name="LabelMusicVal" type="Label" parent="Panel/Margin/VBox/RowMusic" unique_id=1499474352]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "70%"
+horizontal_alignment = 2
+
+[node name="RowSFX" type="HBoxContainer" parent="Panel/Margin/VBox" unique_id=1489124276]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LabelSFX" type="Label" parent="Panel/Margin/VBox/RowSFX" unique_id=1792334632]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "💥 Efectos"
+
+[node name="SliderSFX" type="HSlider" parent="Panel/Margin/VBox/RowSFX" unique_id=2121319962]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LabelSFXVal" type="Label" parent="Panel/Margin/VBox/RowSFX" unique_id=696415868]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="ButtonMute" type="Button" parent="Panel/Margin/VBox" unique_id=370384520]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "🔊 Silenciar todo"
+
+[node name="ButtonClose" type="Button" parent="Panel/Margin/VBox" unique_id=830604538]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+text = "✔ Cerrar"
+
+[connection signal="value_changed" from="Panel/Margin/VBox/RowMaster/SliderMaster" to="." method="_on_master_changed"]
+[connection signal="value_changed" from="Panel/Margin/VBox/RowMusic/SliderMusic" to="." method="_on_music_changed"]
+[connection signal="pressed" from="Panel/Margin/VBox/ButtonMute" to="." method="_on_mute_pressed"]
+[connection signal="pressed" from="Panel/Margin/VBox/ButtonClose" to="." method="_on_close_pressed"]
+[connection signal="value_changed" from="Panel/Margin/VBox/RowSFX/SliderSFX" to="." method="_on_sfx_changed"]
