@@ -46,7 +46,7 @@ func _apply_theme() -> void:
 			ThemeManager.make_panel_style(ThemeManager.C_SURFACE_2, ThemeManager.C_AMBER_DIM, 2, ThemeManager.RADIUS)
 		)
 	ThemeManager.apply_label_title(label_header)
-	label_header.text = "📜 Historial de combate"
+	label_header.text = "📜 Historial de combate!"
 
 	label_log.add_theme_color_override("default_color",        ThemeManager.C_TEXT_DIM)
 	label_log.add_theme_font_size_override("normal_font_size", ThemeManager.FONT_SMALL)
