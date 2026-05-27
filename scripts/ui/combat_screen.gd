@@ -208,8 +208,18 @@ func _on_button_attack_pressed() -> void:
 	await _combat_pause(0.15)
 
 	var result = combat_system.player_attack(player, enemy)
-	add_combat_log("⚔️ " + str(result["damage"]) + " de daño")
-	_show_damage_number(enemy_container, result["damage"], result["is_crit"])
+
+	if result["skipped"]:
+		add_combat_log("💫 Estás aturdido")
+		await _combat_pause(0.35)
+	else:
+		add_combat_log("⚔️ " + str(result["damage"]) + " de daño")
+
+	_show_damage_number(
+		enemy_container,
+		result["damage"],
+		result["is_crit"]
+	)
 
 	await _combat_pause(0.08)
 	await _flash(enemy_container, Color.RED)
@@ -257,28 +267,68 @@ func _on_button_attack_pressed() -> void:
 func _on_button_defend_pressed() -> void:
 	if combat_finished or _input_locked or GameManager.is_player_dead():
 		return
+
 	_lock_input()
 
 	player.start_defense()
-	AudioManager.play_sfx("defend")  # ← US-AUDIO-003
+	AudioManager.play_sfx("defend")
 
-	_show_status_text(player_container, "🛡 DEFEND", ThemeManager.C_DEFENSE)
-	await _flash(player_container, ThemeManager.C_DEFENSE)
+	_show_status_text(
+		player_container,
+		"🛡 DEFEND",
+		ThemeManager.C_DEFENSE
+	)
+
+	await _flash(
+		player_container,
+		ThemeManager.C_DEFENSE
+	)
+
 	player_container.modulate = Color(0.7, 0.9, 1.0)
+
 	await get_tree().create_timer(0.15).timeout
+
 	player_container.modulate = Color.WHITE
 
 	await _combat_pause(0.15)
+
 	add_combat_log("🛡 Defendiendo")
+
 	await get_tree().create_timer(0.5).timeout
 
 	var result = combat_system.enemy_attack(player, enemy)
-	_show_damage_number(player_container, result["damage"], result["is_crit"])
-	await _flash(player_container, ThemeManager.C_DEFENSE)
-	await _shake(player_container)
 
-	if result["is_crit"]:
-		add_combat_log("⚠️ CRÍTICO enemigo " + str(result["damage"]))
+	if result["skipped"]:
+
+		add_combat_log("💫 El enemigo está aturdido")
+
+		await _combat_pause(0.35)
+
+	else:
+
+		add_combat_log(
+			"💢 Recibís " + str(result["damage"])
+		)
+
+		_show_damage_number(
+			player_container,
+			result["damage"],
+			result["is_crit"]
+		)
+
+		await _flash(player_container, Color.RED)
+
+		await _shake(player_container)
+
+		await _combat_pause(0.12)
+
+		if result["is_crit"]:
+
+			await _flash(player_container, Color.YELLOW)
+
+			add_combat_log(
+				"⚠️ CRÍTICO enemigo " + str(result["damage"])
+			)
 
 	_update_ui()
 
@@ -464,14 +514,33 @@ func _death_feedback() -> void:
 	await tween.finished
 
 func _shake(node: Control) -> void:
-	if not is_instance_valid(node): return
-	var original_pos = node.position
-	for i in range(5):
-		node.position.x += float(randi_range(-5, 5))
-		node.position.y += float(randi_range(-5, 5))
-		await get_tree().create_timer(0.02).timeout
-	if is_instance_valid(node):
-		node.position = original_pos
+	if not is_instance_valid(node):
+		return
+
+	var original_pos := node.position
+
+	var tween := create_tween()
+	_active_tweens.append(tween)
+
+	for i in range(4):
+		tween.tween_property(
+			node,
+			"position",
+			original_pos + Vector2(
+				randi_range(-6, 6),
+				randi_range(-6, 6)
+			),
+			0.03
+		)
+
+	tween.tween_property(
+		node,
+		"position",
+		original_pos,
+		0.04
+	)
+
+	await tween.finished
 
 func _combat_pause(duration: float) -> void:
 	await get_tree().create_timer(duration).timeout
