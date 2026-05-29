@@ -16,7 +16,7 @@ func _ready() -> void:
 func _apply_theme() -> void:
 	ThemeManager.apply_scene_background(self)
 	ThemeManager.apply_label_title(label_title)
-	label_title.text = "[ SELECCIONAR ZONA ]"
+	label_title.text = "[ SELECCIONAR ZONAS ]"
 	ThemeManager.apply_button_secondary(button_back)
 
 # ─────────────────────────────────────────
