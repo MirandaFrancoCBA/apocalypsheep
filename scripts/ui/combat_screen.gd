@@ -244,6 +244,20 @@ func _on_button_attack_pressed() -> void:
 
 	result = combat_system.enemy_attack(player, enemy)
 	add_combat_log("💢 Recibís " + str(result["damage"]))
+
+	match result.get("effect", ""):
+
+		"bleed":
+			add_combat_log("🩸 Te provoca sangrado")
+
+		"poison":
+			add_combat_log("☠️ Te envenena")
+
+		"burn":
+			add_combat_log("🔥 Te incendia")
+
+		"stun":
+			add_combat_log("💫 Te aturde")
 	_show_damage_number(player_container, result["damage"], result["is_crit"])
 	await _flash(player_container, Color.RED)
 	await _shake(player_container)
