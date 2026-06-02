@@ -10,7 +10,7 @@
       "id": "rifle_00",
       "name": "Rifle Antiguo del Sol",
       "type": "weapon",
-      "damage": 100,
+      "damage": 15,
       "rarity": "epic"
     },
     {
@@ -37,6 +37,13 @@
       "description": "Recupera gran cantidad de HP."
     },
     {
+      "id": "bandage",
+      "name": "Vendaje Militar",
+      "type": "consumable",
+      "heal": 50,
+      "rarity": "common"
+    },
+    {
         "id": "rusty_pistol",
         "name": "Pistola Oxidada Agujereadora",
         "type": "weapon",
@@ -56,7 +63,7 @@
         "id": "flamethrower",
         "name": "Lanzallamas",
         "type": "weapon",
-        "damage": 4,
+        "damage": 8,
         "effect": "burn",
         "rarity": "epic"
     },
@@ -64,7 +71,7 @@
         "id": "shock_gun",
         "name": "Arma de Descarga",
         "type": "weapon",
-        "damage": 2,
+        "damage": 3,
         "effect": "stun",
         "rarity": "rare"
     }

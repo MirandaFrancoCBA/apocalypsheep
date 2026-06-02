@@ -65,10 +65,13 @@ func enemy_attack(player: Player, enemy: Enemy) -> Dictionary:
 
 	player.take_damage(damage)
 
+	_apply_enemy_effect(enemy, player)
+
 	return {
-		"damage": damage,
-		"is_crit": is_crit,
-		"skipped": false
+	"damage": damage,
+	"is_crit": is_crit,
+	"skipped": false,
+	"effect": enemy.effect
 	}
 
 # ─────────────────────────────────────────
@@ -165,6 +168,52 @@ func _apply_weapon_effect(
 				0
 			)
 
+func _apply_enemy_effect(enemy: Enemy, player: Player) -> void:
+
+	if enemy.effect.is_empty():
+		return
+
+	var chance = Constants.EFFECT_CHANCES.get(
+		enemy.effect,
+		0
+	)
+
+	if rng.randi_range(1, 100) > chance:
+		return
+
+	match enemy.effect:
+
+		"bleed":
+			_add_effect(
+				player,
+				"bleed",
+				Constants.EFFECT_DURATIONS["bleed"],
+				Constants.EFFECT_DAMAGE["bleed"]
+			)
+
+		"poison":
+			_add_effect(
+				player,
+				"poison",
+				Constants.EFFECT_DURATIONS["poison"],
+				Constants.EFFECT_DAMAGE["poison"]
+			)
+
+		"burn":
+			_add_effect(
+				player,
+				"burn",
+				Constants.EFFECT_DURATIONS["burn"],
+				Constants.EFFECT_DAMAGE["burn"]
+			)
+
+		"stun":
+			_add_effect(
+				player,
+				"stun",
+				Constants.EFFECT_DURATIONS["stun"],
+				0
+			)
 # ─────────────────────────────────────────
 # ADD EFFECT (no stackea mal)
 # ─────────────────────────────────────────
