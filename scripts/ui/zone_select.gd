@@ -50,38 +50,51 @@ func create_zone_buttons(zones: Array) -> void:
 	var player_level = GameManager.get_player_data().get("level", 1)
 
 	for zone in zones:
-		var btn         = Button.new()
+
+		var btn = Button.new()
+
 		var level_range = zone.get("level_range", [1, 1])
-		var zone_min    = level_range[0]
-		var zone_max    = level_range[1]
+		var zone_min = level_range[0]
+		var zone_max = level_range[1]
 
-		# Indicador de dificultad relativa al nivel del jugador
+		var icon = zone.get("icon", "📍")
+		var description = zone.get("description", "")
+
 		var difficulty_tag := ""
-		if player_level < zone_min:
-			difficulty_tag = "  ⚠ PELIGROSO"
-		elif player_level > zone_max + 2:
-			difficulty_tag = "  ✓ FÁCIL"
 
-		btn.text = "%s   Lv %d–%d%s" % [
+		if player_level < zone_min:
+			difficulty_tag = "\n⚠ PELIGROSO"
+
+		elif player_level > zone_max + 2:
+			difficulty_tag = "\n✓ FÁCIL"
+
+		btn.text = "%s %s\n%s\nLv %d-%d%s" % [
+			icon,
 			zone.get("name", "Zona"),
+			description,
 			zone_min,
 			zone_max,
 			difficulty_tag
 		]
-		btn.custom_minimum_size = Vector2(0, 64)
 
-		# Estilo según dificultad
+		btn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+
+		btn.custom_minimum_size = Vector2(0, 120)
+
 		if player_level < zone_min:
 			ThemeManager.apply_button_danger(btn)
+
 		elif player_level > zone_max + 2:
 			ThemeManager.apply_button_secondary(btn)
+
 		else:
 			ThemeManager.apply_button_primary(btn)
 
 		btn.pressed.connect(func(): _on_zone_selected(zone))
+
 		zones_container.add_child(btn)
 
-	# Separador visual antes del botón back
 	var spacer = Control.new()
 	spacer.custom_minimum_size = Vector2(0, ThemeManager.SEPARATION_LG)
 	zones_container.add_child(spacer)
