@@ -100,9 +100,9 @@ const EFFECT_DURATIONS = {
 }
 
 const EFFECT_DAMAGE = {
-	"bleed": 4,
-	"poison": 3,
-	"burn": 6
+	"bleed": 2,
+	"poison": 2,
+	"burn": 3
 }
 # ─────────────────────────────────────────
 # LOOT
