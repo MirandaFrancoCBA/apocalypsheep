@@ -4,7 +4,8 @@
     "name": "Saqueador",
     "hp": 20,
     "damage": 5,
-    "xp": 18
+    "xp": 18,
+    "effect": ""
   },
   {
     "id": "mutant_rat",
@@ -19,7 +20,8 @@
     "name": "Robot defectuoso",
     "hp": 30,
     "damage": 6,
-    "xp": 28
+    "xp": 28,
+    "effect": "stun"
   },
   {
     "id": "infected_scientist",
@@ -42,7 +44,8 @@
     "name": "Bestia del pantano",
     "hp": 42,
     "damage": 9,
-    "xp": 46
+    "xp": 46,
+    "effect": "bleed"
   },
   {
     "id": "elite_soldier",
@@ -50,7 +53,7 @@
     "hp": 55,
     "damage": 11,
     "xp": 60,
-    "effect": "stun"
+    "effect": ""
   },
   {
     "id": "turret",
