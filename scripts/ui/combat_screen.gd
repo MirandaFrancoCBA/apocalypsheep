@@ -140,10 +140,17 @@ func _setup_combat() -> void:
 	enemy_hp_bar.max_value = enemy.max_hp
 	enemy_hp_bar.value     = enemy.hp
 
-	label_enemy.text  = enemy.name
+	label_enemy.text  = enemy.name + _get_enemy_trait(enemy)
 	label_result.text = ""
 
-	add_combat_log("⚔️ Combate contra " + enemy.name)
+	add_combat_log(
+	"⚔️ Combate contra " + enemy.name
+		)
+
+	if enemy.effect != "":
+			add_combat_log(
+			"⚠️ Puede causar " + _effect_name(enemy.effect)
+	)
 	_update_ui()
 	_update_weapon_ui()
 	_update_xp_ui()
@@ -492,7 +499,43 @@ func _effect_color(type: String) -> Color:
 		"poison": return ThemeManager.C_POISON
 		"burn":   return ThemeManager.C_BURN
 		_:        return ThemeManager.C_TEXT_DIM
+func _get_enemy_trait(target_enemy: Enemy) -> String:
 
+	match target_enemy.effect:
+
+		"bleed":
+			return " 🩸"
+
+		"poison":
+			return " ☠️"
+
+		"burn":
+			return " 🔥"
+
+		"stun":
+			return " 💫"
+
+		_:
+			return ""
+
+func _effect_name(effect: String) -> String:
+
+	match effect:
+
+		"bleed":
+			return "Sangrado"
+
+		"poison":
+			return "Veneno"
+
+		"burn":
+			return "Quemadura"
+
+		"stun":
+			return "Aturdimiento"
+
+		_:
+			return effect
 # ─────────────────────────────────────────
 # ARMA UI
 # ─────────────────────────────────────────
