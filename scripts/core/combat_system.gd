@@ -3,8 +3,7 @@ class_name CombatSystem
 
 var rng = RandomNumberGenerator.new()
 
-const CRIT_CHANCE := 20
-const CRIT_MULTIPLIER := 2.0
+
 
 func _init():
 	rng.randomize()
@@ -25,7 +24,7 @@ func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 
 	var is_crit := _is_critical()
 	if is_crit:
-		damage = int(damage * CRIT_MULTIPLIER)
+		damage = int(damage * Constants.CRIT_MULTIPLIER)
 
 	# 🛡️ aplicar defensa del enemigo
 	damage = _apply_defense(enemy, damage)
@@ -58,7 +57,7 @@ func enemy_attack(player: Player, enemy: Enemy) -> Dictionary:
 
 	var is_crit := _is_critical()
 	if is_crit:
-		damage = int(damage * CRIT_MULTIPLIER)
+		damage = int(damage * Constants.CRIT_MULTIPLIER)
 
 	# 🛡️ aplicar defensa del jugador
 	damage = _apply_defense(player, damage)
@@ -236,8 +235,8 @@ func _add_effect(target, type: String, duration: int, value: int) -> void:
 func _apply_defense(target, damage: int) -> int:
 
 	if target.is_defending:
-		damage = int(damage * 0.5)
-		target.is_defending = false  # se consume
+		damage = int(damage * Constants.DEFENSE_MULTIPLIER)
+		target.is_defending = false
 
 	return max(damage, 0)
 
@@ -245,11 +244,15 @@ func _apply_defense(target, damage: int) -> int:
 # UTILS
 # ─────────────────────────────────────────
 func _calculate_damage(base: int) -> int:
-	var variation := int(base * 0.2)
-	return max(base + rng.randi_range(-variation, variation), 1)
+	var multiplier := rng.randf_range(
+		Constants.DAMAGE_VARIATION_MIN,
+		Constants.DAMAGE_VARIATION_MAX
+	)
+
+	return max(int(round(base * multiplier)), 1)
 
 func _is_critical() -> bool:
-	return rng.randi_range(1, 100) <= CRIT_CHANCE
+	return rng.randf() <= Constants.CRIT_CHANCE
 
 func _is_stunned(entity) -> bool:
 	for e in entity.effects:

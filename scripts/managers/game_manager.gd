@@ -210,7 +210,10 @@ func reset_game() -> void:
 # NIVEL
 # ─────────────────────────────────────────
 func calculate_xp_to_next(level: int) -> int:
-	return int(50 * pow(level, 1.5))
+	return int(
+		Constants.XP_BASE
+		* pow(level, Constants.XP_EXPONENT)
+	)
 
 func _level_up() -> void:
 

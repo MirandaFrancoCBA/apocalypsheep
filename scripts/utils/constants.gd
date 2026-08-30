@@ -60,7 +60,6 @@ const BLEED_DAMAGE := 3
 const POISON_DAMAGE := 4
 const BURN_DAMAGE := 5
 
-const STUN_CHANCE := 0.15
 
 # ─────────────────────────────────────────
 # LOOT — rarezas
