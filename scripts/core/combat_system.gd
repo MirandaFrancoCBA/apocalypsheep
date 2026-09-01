@@ -13,7 +13,7 @@ func _init():
 # ─────────────────────────────────────────
 func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 
-	if _is_stunned(player):
+	if _consume_stun(player):
 		return {
 			"damage": 0,
 			"is_crit": false,
@@ -46,7 +46,7 @@ func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 # ─────────────────────────────────────────
 func enemy_attack(player: Player, enemy: Enemy) -> Dictionary:
 
-	if _is_stunned(enemy):
+	if _consume_stun(enemy):
 		return {
 			"damage": 0,
 			"is_crit": false,
@@ -76,8 +76,18 @@ func enemy_attack(player: Player, enemy: Enemy) -> Dictionary:
 # ─────────────────────────────────────────
 # DEFENDER (clave para tu botón nuevo)
 # ─────────────────────────────────────────
-func defend(entity) -> void:
-	entity.is_defending = true
+func defend(player: Player) -> Dictionary:
+
+	if _consume_stun(player):
+		return {
+			"skipped": true
+		}
+
+	player.start_defense()
+
+	return {
+		"skipped": false
+	}
 
 # ─────────────────────────────────────────
 # EFECTOS POR TURNO
@@ -88,6 +98,12 @@ func apply_effects(target) -> Array[String]:
 	var new_effects: Array[Dictionary] = []
 
 	for effect in target.effects:
+
+		# El stun no se consume aquí.
+		# Se consume cuando la entidad intenta realizar su acción.
+		if effect["type"] == "stun":
+			new_effects.append(effect)
+			continue
 
 		match effect["type"]:
 
@@ -254,8 +270,24 @@ func _calculate_damage(base: int) -> int:
 func _is_critical() -> bool:
 	return rng.randf() <= Constants.CRIT_CHANCE
 
-func _is_stunned(entity) -> bool:
-	for e in entity.effects:
-		if e["type"] == "stun":
-			return true
-	return false
+func _consume_stun(entity) -> bool:
+
+	var new_effects: Array[Dictionary] = []
+	var stunned := false
+
+	for effect in entity.effects:
+
+		if effect["type"] == "stun" and not stunned:
+			stunned = true
+			effect["duration"] -= 1
+
+			if effect["duration"] > 0:
+				new_effects.append(effect)
+
+			continue
+
+		new_effects.append(effect)
+
+	entity.effects = new_effects
+
+	return stunned

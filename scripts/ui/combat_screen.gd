@@ -191,54 +191,80 @@ func _unlock_input() -> void:
 	button_attack.disabled = false
 	button_defend.disabled = false
 
+#------------
+# helper
+#___________________________
+
+func _process_turn_start_effects() -> bool:
+	var logs = combat_system.apply_effects(player)
+
+	for log_text in logs:
+		add_combat_log(log_text)
+		_play_effect_log_sfx(log_text)
+
+	logs = combat_system.apply_effects(enemy)
+
+	for log_text in logs:
+		add_combat_log(log_text)
+		_play_effect_log_sfx(log_text)
+
+	_update_ui()
+	await _combat_pause(0.15)
+
+	if player.hp <= 0:
+		await _end_combat("defeat")
+		return false
+
+	if enemy.hp <= 0:
+		await _end_combat("victory")
+		return false
+
+	return true
+
 # ─────────────────────────────────────────
 # ATAQUE — US-AUDIO-001 / 002
 # ─────────────────────────────────────────
 func _on_button_attack_pressed() -> void:
 	if combat_finished or _input_locked or GameManager.is_player_dead():
 		return
+
 	_lock_input()
 
-	# Efectos de estado turno inicio
-	var logs = combat_system.apply_effects(player)
-	for l in logs:
-		add_combat_log(l)
-		# US-AUDIO-004 — reproducir SFX del efecto que se aplicó
-		_play_effect_log_sfx(l)
+	var can_continue := await _process_turn_start_effects()
 
-	logs = combat_system.apply_effects(enemy)
-	for l in logs:
-		add_combat_log(l)
-		_play_effect_log_sfx(l)
-
-	_update_ui()
-	await _combat_pause(0.15)
+	if not can_continue:
+		return
 
 	var result = combat_system.player_attack(player, enemy)
 
 	if result["skipped"]:
 		add_combat_log("💫 Estás aturdido")
 		await _combat_pause(0.35)
+
 	else:
 		add_combat_log("⚔️ " + str(result["damage"]) + " de daño")
 
-	_show_damage_number(
-		enemy_container,
-		result["damage"],
-		result["is_crit"]
-	)
+		_show_damage_number(
+			enemy_container,
+			result["damage"],
+			result["is_crit"]
+		)
 
-	await _combat_pause(0.08)
-	await _flash(enemy_container, Color.RED)
-	await _shake(enemy_container)
-	await _combat_pause(0.12)
+		await _combat_pause(0.08)
+		await _flash(enemy_container, Color.RED)
+		await _shake(enemy_container)
+		await _combat_pause(0.12)
 
-	if result["is_crit"]:
-		AudioManager.play_sfx("crit")
-		await _flash(enemy_container, Color.YELLOW)
-		add_combat_log("💥 CRÍTICO " + str(result["damage"]))
-	else:
-		AudioManager.play_sfx("hit")
+		if result["is_crit"]:
+			AudioManager.play_sfx("crit")
+			await _flash(enemy_container, Color.YELLOW)
+
+			add_combat_log(
+				"💥 CRÍTICO " + str(result["damage"])
+			)
+
+		else:
+			AudioManager.play_sfx("hit")
 
 	_update_ui()
 
@@ -250,29 +276,45 @@ func _on_button_attack_pressed() -> void:
 	await _combat_pause(0.25)
 
 	result = combat_system.enemy_attack(player, enemy)
-	add_combat_log("💢 Recibís " + str(result["damage"]))
 
-	match result.get("effect", ""):
+	if result["skipped"]:
+		add_combat_log("💫 El enemigo está aturdido")
+		await _combat_pause(0.35)
 
-		"bleed":
-			add_combat_log("🩸 Te provoca sangrado")
+	else:
+		add_combat_log(
+			"💢 Recibís " + str(result["damage"])
+		)
 
-		"poison":
-			add_combat_log("☠️ Te envenena")
+		match result.get("effect", ""):
+			"bleed":
+				add_combat_log("🩸 Te provoca sangrado")
 
-		"burn":
-			add_combat_log("🔥 Te incendia")
+			"poison":
+				add_combat_log("☠️ Te envenena")
 
-		"stun":
-			add_combat_log("💫 Te aturde")
-	_show_damage_number(player_container, result["damage"], result["is_crit"])
-	await _flash(player_container, Color.RED)
-	await _shake(player_container)
-	await _combat_pause(0.12)
+			"burn":
+				add_combat_log("🔥 Te incendia")
 
-	if result["is_crit"]:
-		await _flash(player_container, Color.YELLOW)
-		add_combat_log("⚠️ CRÍTICO enemigo " + str(result["damage"]))
+			"stun":
+				add_combat_log("💫 Te aturde")
+
+		_show_damage_number(
+			player_container,
+			result["damage"],
+			result["is_crit"]
+		)
+
+		await _flash(player_container, Color.RED)
+		await _shake(player_container)
+		await _combat_pause(0.12)
+
+		if result["is_crit"]:
+			await _flash(player_container, Color.YELLOW)
+
+			add_combat_log(
+				"⚠️ CRÍTICO enemigo " + str(result["damage"])
+			)
 
 	_update_ui()
 
@@ -291,42 +333,50 @@ func _on_button_defend_pressed() -> void:
 
 	_lock_input()
 
-	player.start_defense()
-	AudioManager.play_sfx("defend")
+	var can_continue := await _process_turn_start_effects()
 
-	_show_status_text(
-		player_container,
-		"🛡 DEFEND",
-		ThemeManager.C_DEFENSE
-	)
+	if not can_continue:
+		return
 
-	await _flash(
-		player_container,
-		ThemeManager.C_DEFENSE
-	)
+	var defense_result = combat_system.defend(player)
 
-	player_container.modulate = Color(0.7, 0.9, 1.0)
+	if defense_result["skipped"]:
+		add_combat_log("💫 Estás aturdido")
+		await _combat_pause(0.35)
 
-	await get_tree().create_timer(0.15).timeout
+	else:
+		AudioManager.play_sfx("defend")
 
-	player_container.modulate = Color.WHITE
+		_show_status_text(
+			player_container,
+			"🛡 DEFEND",
+			ThemeManager.C_DEFENSE
+		)
 
-	await _combat_pause(0.15)
+		await _flash(
+			player_container,
+			ThemeManager.C_DEFENSE
+		)
 
-	add_combat_log("🛡 Defendiendo")
+		player_container.modulate = Color(0.7, 0.9, 1.0)
 
-	await get_tree().create_timer(0.5).timeout
+		await get_tree().create_timer(0.15).timeout
+
+		player_container.modulate = Color.WHITE
+
+		await _combat_pause(0.15)
+
+		add_combat_log("🛡 Defendiendo")
+
+		await get_tree().create_timer(0.5).timeout
 
 	var result = combat_system.enemy_attack(player, enemy)
 
 	if result["skipped"]:
-
 		add_combat_log("💫 El enemigo está aturdido")
-
 		await _combat_pause(0.35)
 
 	else:
-
 		add_combat_log(
 			"💢 Recibís " + str(result["damage"])
 		)
@@ -338,13 +388,10 @@ func _on_button_defend_pressed() -> void:
 		)
 
 		await _flash(player_container, Color.RED)
-
 		await _shake(player_container)
-
 		await _combat_pause(0.12)
 
 		if result["is_crit"]:
-
 			await _flash(player_container, Color.YELLOW)
 
 			add_combat_log(
@@ -358,7 +405,6 @@ func _on_button_defend_pressed() -> void:
 		return
 
 	_unlock_input()
-
 # ─────────────────────────────────────────
 # HELPER — SFX de efectos por texto de log — US-AUDIO-004
 # ─────────────────────────────────────────
