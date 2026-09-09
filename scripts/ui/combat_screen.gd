@@ -160,8 +160,6 @@ func _setup_combat() -> void:
 # UI UPDATE
 # ─────────────────────────────────────────
 func _update_ui() -> void:
-	player.hp = max(player.hp, 0)
-	enemy.hp  = max(enemy.hp,  0)
 	GameManager.update_player_hp(player.hp)
 	label_player_hp.text = "HP %d / %d" % [player.hp, player.max_hp]
 	label_enemy_hp.text  = "HP %d / %d" % [enemy.hp, enemy.max_hp]

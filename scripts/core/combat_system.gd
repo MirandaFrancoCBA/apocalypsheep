@@ -29,7 +29,7 @@ func player_attack(player: Player, enemy: Enemy) -> Dictionary:
 	# 🛡️ aplicar defensa del enemigo
 	damage = _apply_defense(enemy, damage)
 
-	enemy.hp -= damage
+	enemy.take_damage(damage)
 
 	# 🔫 efecto del arma
 	if player.equipped_weapon != null:
