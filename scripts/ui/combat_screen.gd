@@ -455,33 +455,47 @@ func _end_combat(result: String) -> void:
 
 	var xp_gained := enemy.xp
 	var loot      := {}
+	var loot_added := false
 	GameManager.add_xp(xp_gained)
 
 	if _roll_drop():
 		loot = _generate_loot()
 		if loot.size() > 0:
-			GameManager.add_item_to_inventory(loot)
-			# US-AUDIO-005 — distinción por rareza
-			AudioManager.play_loot_sfx(loot.get("rarity", "common"))
+			loot_added = GameManager.add_item_to_inventory(loot)
+
+			if loot_added:
+				AudioManager.play_loot_sfx(
+					loot.get("rarity", "common")
+				)
 
 	await _combat_pause(0.35)
 
 	if _popup_open:
 		return
 	_popup_open = true
-	_show_combat_result_popup(result, xp_gained, loot)
+	_show_combat_result_popup(
+		result,
+		xp_gained,
+		loot,
+		loot_added
+	)
 	GameManager._save_game()
 
 # ─────────────────────────────────────────
 # POPUP RESULTADO
 # ─────────────────────────────────────────
-func _show_combat_result_popup(result: String, xp: int, loot: Dictionary) -> void:
+func _show_combat_result_popup(
+	result: String,
+	xp: int,
+	loot: Dictionary,
+	loot_added: bool
+) -> void:
 	var popup = CombatResultPopupScene.instantiate()
 	add_child(popup)
 	popup.top_level   = false
 	popup.z_index     = 1000
 	popup.mouse_filter = Control.MOUSE_FILTER_STOP
-	popup.show_result(result, xp, loot)
+	popup.show_result(result, xp, loot, loot_added)
 	popup.continue_pressed.connect(_on_popup_continue)
 
 func _on_popup_continue() -> void:
