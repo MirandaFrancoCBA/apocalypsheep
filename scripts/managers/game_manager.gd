@@ -118,11 +118,24 @@ func update_player_hp(new_hp: int) -> void:
 	emit_signal("player_data_changed")
 
 func add_xp(amount: int) -> void:
-	player_data["xp"] += amount
+	player_data["xp"] = maxi(
+		int(player_data["xp"]) + amount,
+		0
+	)
 
-	while player_data["xp"] >= player_data["xp_to_next"]:
-		player_data["xp"] -= player_data["xp_to_next"]
+	var xp_to_next: int = maxi(
+		int(player_data["xp_to_next"]),
+		1
+	)
+
+	while player_data["xp"] >= xp_to_next:
+		player_data["xp"] -= xp_to_next
 		_level_up()
+
+		xp_to_next = maxi(
+			int(player_data["xp_to_next"]),
+			1
+		)
 
 	_save_game()
 	emit_signal("player_data_changed")
