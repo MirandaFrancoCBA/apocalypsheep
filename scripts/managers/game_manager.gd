@@ -263,33 +263,55 @@ func _load_game() -> void:
 	var data = SaveSystem.load_game()
 
 	if data.is_empty():
-		print("[GameManager] Nueva partida")
+		print("[GameManager] Save inválido o inexistente — iniciando partida nueva")
+		reset_game()
 		return
 
 	var loaded_player = data.get("player_data", {})
-	
 
-# merge seguro
-	for key in player_data.keys():
+	if typeof(loaded_player) != TYPE_DICTIONARY:
+		push_error("[GameManager] player_data inválido — usando defaults")
+		reset_game()
+		return
+
+	var defaults := create_default_player_data()
+	player_data = defaults.duplicate(true)
+
+	for key in defaults.keys():
 		if loaded_player.has(key):
 			player_data[key] = loaded_player[key]
 
 	print("[GameManager] Datos cargados:", player_data)
 
 	player_data["hp"] = clamp(
-	player_data["hp"],
-	0,
-	player_data["max_hp"])
+		int(player_data["hp"]),
+		0,
+		int(player_data["max_hp"])
+	)
 
-	player_data["xp"] = max(player_data["xp"], 0)
-	player_data["level"] = max(player_data["level"], 1)
+	player_data["xp"] = maxi(
+		int(player_data["xp"]),
+		0
+	)
+
+	player_data["level"] = maxi(
+		int(player_data["level"]),
+		1
+	)
 
 	if typeof(player_data["inventory"]) != TYPE_ARRAY:
+		push_warning("[GameManager] Inventario inválido — usando default")
 		player_data["inventory"] = []
-	
+
 	if typeof(player_data["equipped_weapon"]) != TYPE_DICTIONARY:
+		push_warning("[GameManager] Equipamiento inválido — usando default")
 		player_data["equipped_weapon"] = {}
-	
+
+	selected_zone = data.get("selected_zone", {})
+
+	if typeof(selected_zone) != TYPE_DICTIONARY:
+		push_warning("[GameManager] selected_zone inválido — usando default")
+		selected_zone = {}
 
 	emit_signal("player_data_changed")
 
