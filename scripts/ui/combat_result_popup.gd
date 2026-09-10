@@ -46,7 +46,12 @@ func _apply_theme() -> void:
 	ThemeManager.apply_button_primary(button_continue)
 	button_continue.custom_minimum_size = Vector2(0, 56)
 
-func show_result(result: String, xp: int, loot: Dictionary) -> void:
+func show_result(
+	result: String,
+	xp: int,
+	loot: Dictionary,
+	loot_added: bool = false
+) -> void:
 	if result == "victory":
 		label_title.text = "⚔️ VICTORIA"
 		label_title.add_theme_color_override("font_color", ThemeManager.C_GREEN)
@@ -65,13 +70,35 @@ func show_result(result: String, xp: int, loot: Dictionary) -> void:
 
 	if loot.is_empty():
 		label_loot.text = "Sin loot esta vez"
-		label_loot.add_theme_color_override("font_color", ThemeManager.C_TEXT_DIM)
+		label_loot.add_theme_color_override(
+			"font_color",
+			ThemeManager.C_TEXT_DIM
+		)
+
+	elif not loot_added:
+		var item_name := str(loot.get("name", "Item"))
+		label_loot.text = "Inventario lleno — %s no recogido" % item_name
+		label_loot.add_theme_color_override(
+			"font_color",
+			ThemeManager.C_RED_BRIGHT
+		)
+		label_loot.add_theme_font_size_override(
+			"font_size",
+			ThemeManager.FONT_BODY
+		)
+
 	else:
 		var rarity = loot.get("rarity", "common").to_lower()
 		var icon   = Constants.RARITY_ICONS.get(rarity, "⚪")
 		label_loot.text = icon + " " + loot.get("name", "Item")
-		label_loot.add_theme_color_override("font_color",    ThemeManager.get_rarity_color(rarity))
-		label_loot.add_theme_font_size_override("font_size", ThemeManager.FONT_BODY)
+		label_loot.add_theme_color_override(
+			"font_color",
+			ThemeManager.get_rarity_color(rarity)
+		)
+		label_loot.add_theme_font_size_override(
+			"font_size",
+			ThemeManager.FONT_BODY
+		)
 
 	# Animación de entrada
 	scale      = Vector2(0.85, 0.85)
