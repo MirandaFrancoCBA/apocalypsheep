@@ -51,6 +51,7 @@ var enemy:             Enemy
 var combat_finished := false
 var _input_locked   := false
 var _popup_open     := false
+var _history_popup_open := false
 var _active_tweens: Array = []
 var combat_system   := CombatSystem.new()
 
@@ -751,12 +752,23 @@ func show_save_feedback() -> void:
 # HISTORIAL — US-UI-013 con estado visual del botón
 # ─────────────────────────────────────────
 func _on_history_button_pressed() -> void:
+	if _history_popup_open:
+		return
+
+	_history_popup_open = true
+
 	AudioManager.play_sfx("click")
+
 	var popup = CombatHistoryPopupScene.instantiate()
 	add_child(popup)
+
 	popup.top_level = true
-	popup.z_index   = 500
+	popup.z_index = 500
 	popup.set_log(label_result.text)
+
+	popup.tree_exited.connect(
+		func(): _history_popup_open = false
+	)
 
 # ─────────────────────────────────────────
 # GENERACIÓN
