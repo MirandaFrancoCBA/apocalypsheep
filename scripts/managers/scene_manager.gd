@@ -15,6 +15,10 @@ func go_to(scene_path: String) -> void:
 		push_error("[SceneManager] Ruta de escena vacía")
 		return
 
+	if not ResourceLoader.exists(scene_path):
+		push_error("[SceneManager] Escena inexistente: " + scene_path)
+		return
+
 	print("[SceneManager] Navegando a: ", scene_path)
 
 	# ─────────────────────────
