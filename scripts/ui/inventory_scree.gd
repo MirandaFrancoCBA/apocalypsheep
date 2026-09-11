@@ -312,10 +312,32 @@ func _update_stats() -> void:
 func _on_button_use_pressed() -> void:
 	if selected_item.is_empty():
 		return
+
 	if not selected_item.has("heal"):
 		return
 
 	var player = GameManager.get_player_data()
+	var inventory: Array = player.get("inventory", [])
+
+	if selected_item not in inventory:
+		label_detail.text = "Objeto inválido o ya no disponible"
+		label_detail.add_theme_color_override(
+			"font_color",
+			ThemeManager.C_RED_BRIGHT
+		)
+		selected_item = {}
+		_update_use_button()
+		return
+
+	var heal_amount: int = int(selected_item.get("heal", 0))
+
+	if heal_amount <= 0:
+		label_detail.text = "Consumible inválido"
+		label_detail.add_theme_color_override(
+			"font_color",
+			ThemeManager.C_RED_BRIGHT
+		)
+		return
 	if player["hp"] <= 0:
 		label_detail.text = "💀 No puedes usar objetos muerto"
 		label_detail.add_theme_color_override("font_color", ThemeManager.C_RED_BRIGHT)
@@ -325,7 +347,6 @@ func _on_button_use_pressed() -> void:
 		label_detail.add_theme_color_override("font_color", ThemeManager.C_AMBER)
 		return
 
-	var heal_amount = selected_item.get("heal", 0)
 	var old_hp      = player["hp"]
 	player["hp"]    = min(player["hp"] + heal_amount, player["max_hp"])
 	var real_heal   = player["hp"] - old_hp
