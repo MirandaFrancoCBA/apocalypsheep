@@ -22,15 +22,19 @@ var _items:   Array = []
 var _zones:   Array = []
 
 # ─────────────────────────────────────────
-# READY — precarga todo al iniciar
+# READY — precarga y valida todo al iniciar
 # ─────────────────────────────────────────
 func _ready() -> void:
-	_enemies = _load_json(PATH_ENEMIES)
-	_items   = _load_json(PATH_ITEMS)
-	_zones   = _load_json(PATH_ZONES)
+	_enemies = _load_json(PATH_ENEMIES, "enemy")
+	_items = _load_json(PATH_ITEMS, "item")
+	_zones = _load_json(PATH_ZONES, "zone")
+
 	print("[DataManager] Cargado — enemies:%d  items:%d  zones:%d" % [
-		_enemies.size(), _items.size(), _zones.size()
+		_enemies.size(),
+		_items.size(),
+		_zones.size()
 	])
+
 
 # ─────────────────────────────────────────
 # GETTERS — devuelven copia para evitar
@@ -85,16 +89,181 @@ func get_enemies_for_zone(zone: Dictionary) -> Array:
 # ─────────────────────────────────────────
 # INTERNO
 # ─────────────────────────────────────────
-func _load_json(path: String) -> Array:
+func _load_json(path: String, data_type: String) -> Array:
 	if not FileAccess.file_exists(path):
 		push_error("[DataManager] Archivo no encontrado: " + path)
 		return []
-	var file = FileAccess.open(path, FileAccess.READ)
+
+	var file := FileAccess.open(path, FileAccess.READ)
+
 	if file == null:
 		push_error("[DataManager] No se pudo abrir: " + path)
 		return []
+
 	var parsed = JSON.parse_string(file.get_as_text())
+
 	if typeof(parsed) != TYPE_ARRAY:
 		push_error("[DataManager] JSON inválido en: " + path)
 		return []
-	return parsed
+
+	var valid_entries: Array = []
+
+	for index in range(parsed.size()):
+		var entry = parsed[index]
+
+		if typeof(entry) != TYPE_DICTIONARY:
+			push_warning(
+				"[DataManager] Entrada inválida en %s, índice %d: se esperaba Dictionary"
+				% [path, index]
+			)
+			continue
+
+		var is_valid := false
+
+		match data_type:
+			"enemy":
+				is_valid = _is_valid_enemy(entry)
+
+			"item":
+				is_valid = _is_valid_item(entry)
+
+			"zone":
+				is_valid = _is_valid_zone(entry)
+
+			_:
+				push_error(
+					"[DataManager] Tipo de datos desconocido: " + data_type
+				)
+				return []
+
+		if is_valid:
+			valid_entries.append(entry)
+		else:
+			var entry_id: String = str(entry.get("id", "<sin id>"))
+
+			push_warning(
+				"[DataManager] %s inválido descartado en %s, índice %d, id: %s"
+				% [data_type, path, index, entry_id]
+			)
+
+	return valid_entries
+
+
+func _is_valid_enemy(enemy: Dictionary) -> bool:
+	if not _has_valid_string(enemy, "id"):
+		return false
+
+	if not _has_valid_string(enemy, "name"):
+		return false
+
+	if not _is_positive_number(enemy.get("hp")):
+		return false
+
+	if not _is_non_negative_number(enemy.get("damage")):
+		return false
+
+	if not _is_non_negative_number(enemy.get("xp")):
+		return false
+
+	if typeof(enemy.get("effect", "")) != TYPE_STRING:
+		return false
+
+	return true
+
+
+func _is_valid_item(item: Dictionary) -> bool:
+	if not _has_valid_string(item, "id"):
+		return false
+
+	if not _has_valid_string(item, "name"):
+		return false
+
+	if not _has_valid_string(item, "type"):
+		return false
+
+	if not _has_valid_string(item, "rarity"):
+		return false
+
+	var item_type: String = item["type"]
+
+	match item_type:
+		"weapon":
+			if not _is_non_negative_number(item.get("damage")):
+				return false
+
+			if typeof(item.get("effect", "")) != TYPE_STRING:
+				return false
+
+		"consumable":
+			if not _is_positive_number(item.get("heal")):
+				return false
+
+		_:
+			return false
+
+	return true
+
+
+func _is_valid_zone(zone: Dictionary) -> bool:
+	if not _has_valid_string(zone, "id"):
+		return false
+
+	if not _has_valid_string(zone, "name"):
+		return false
+
+	var enemies = zone.get("enemies")
+
+	if typeof(enemies) != TYPE_ARRAY or enemies.is_empty():
+		return false
+
+	for enemy_id in enemies:
+		if typeof(enemy_id) != TYPE_STRING:
+			return false
+
+		if enemy_id.strip_edges().is_empty():
+			return false
+
+	var level_range = zone.get("level_range")
+
+	if typeof(level_range) != TYPE_ARRAY:
+		return false
+
+	if level_range.size() != 2:
+		return false
+
+	if not _is_positive_number(level_range[0]):
+		return false
+
+	if not _is_positive_number(level_range[1]):
+		return false
+
+	if float(level_range[0]) > float(level_range[1]):
+		return false
+
+	return true
+
+
+func _has_valid_string(data: Dictionary, key: String) -> bool:
+	if not data.has(key):
+		return false
+
+	var value = data[key]
+
+	if typeof(value) != TYPE_STRING:
+		return false
+
+	return not value.strip_edges().is_empty()
+
+
+func _is_positive_number(value: Variant) -> bool:
+	if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
+		return false
+
+	return float(value) > 0.0
+
+
+func _is_non_negative_number(value: Variant) -> bool:
+	if typeof(value) != TYPE_INT and typeof(value) != TYPE_FLOAT:
+		return false
+
+	return float(value) >= 0.0
