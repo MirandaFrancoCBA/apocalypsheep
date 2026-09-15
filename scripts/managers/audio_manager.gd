@@ -222,3 +222,23 @@ func _load_resource(sfx_key: String, paths: Dictionary) -> AudioStream:
 		return null
 	_cache[cache_key] = stream
 	return stream
+
+# ─────────────────────────────────────────
+# LIMPIEZA AL CERRAR
+# ─────────────────────────────────────────
+func _exit_tree() -> void:
+	if _music_player != null and is_instance_valid(_music_player):
+		_music_player.stop()
+		_music_player.stream = null
+
+	for player in _active_sfx:
+		if is_instance_valid(player):
+			player.stop()
+			player.stream = null
+
+	_active_sfx.clear()
+	_cache.clear()
+	_sfx_last_played.clear()
+
+	_music_player = null
+	_current_music = ""
