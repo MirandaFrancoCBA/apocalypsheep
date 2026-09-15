@@ -165,6 +165,7 @@ func stop_music(fade_time: float = 0.5) -> void:
 	await tween.finished
 	if is_instance_valid(ref):
 		ref.stop()
+		ref.stream = null
 		ref.queue_free()
 	if _music_player == ref:
 		_music_player  = null
@@ -173,6 +174,7 @@ func stop_music(fade_time: float = 0.5) -> void:
 func _stop_music_immediate() -> void:
 	if _music_player != null:
 		_music_player.stop()
+		_music_player.stream = null
 		_music_player.queue_free()
 		_music_player  = null
 	_current_music = ""
@@ -227,14 +229,20 @@ func _load_resource(sfx_key: String, paths: Dictionary) -> AudioStream:
 # LIMPIEZA AL CERRAR
 # ─────────────────────────────────────────
 func _exit_tree() -> void:
+	# queue_free() no garantiza que los AudioStreamPlayer lleguen a
+	# NOTIFICATION_PREDELETE antes del cleanup global del motor. Durante el
+	# shutdown los liberamos de forma inmediata para que Godot detenga y
+	# descarte sus playbacks mientras AudioServer todavía está disponible.
 	if _music_player != null and is_instance_valid(_music_player):
 		_music_player.stop()
 		_music_player.stream = null
+		_music_player.free()
 
 	for player in _active_sfx:
 		if is_instance_valid(player):
 			player.stop()
 			player.stream = null
+			player.free()
 
 	_active_sfx.clear()
 	_cache.clear()
