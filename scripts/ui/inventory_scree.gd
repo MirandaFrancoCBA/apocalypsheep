@@ -32,7 +32,6 @@ func _ready() -> void:
 	]
 
 	GameManager.player_data_changed.connect(_update_stats)
-	print("[Inventory] Cargando inventario")
 	_load_inventory()
 	_update_equipped_label()
 	_update_unequip_button()
@@ -46,14 +45,12 @@ func _ready() -> void:
 func _apply_theme() -> void:
 	ThemeManager.apply_scene_background(self)
 
-	# Título
 	if label_title:
 		label_title.add_theme_color_override("font_color", ThemeManager.C_TEXT_BRIGHT)
 		label_title.add_theme_font_size_override("font_size", ThemeManager.FONT_TITLE)
 		label_title.text = "📦 INVENTARIO"
 		label_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	# Stats — panel elevado
 	if label_stats:
 		var style = ThemeManager.make_panel_style(
 			ThemeManager.C_SURFACE_2,
@@ -64,16 +61,13 @@ func _apply_theme() -> void:
 		label_stats.add_theme_stylebox_override("normal", style)
 		ThemeManager.apply_label_body(label_stats)
 
-	# XP bar
 	if xp_bar:
 		ThemeManager.apply_progress_bar(xp_bar, "xp")
 		xp_bar.custom_minimum_size = Vector2(0, 12)
 
-	# Arma equipada
 	if label_equipped:
 		ThemeManager.apply_label_dim(label_equipped)
 
-	# Detalle — panel sutil
 	if label_detail:
 		var style_detail = ThemeManager.make_panel_style(
 			ThemeManager.C_SURFACE,
@@ -85,33 +79,22 @@ func _apply_theme() -> void:
 		label_detail.add_theme_color_override("font_color", ThemeManager.C_TEXT)
 		label_detail.add_theme_font_size_override("font_size", ThemeManager.FONT_BODY)
 
-	# Botones de acción
 	ThemeManager.apply_button_primary(button_equip)
 	button_equip.custom_minimum_size   = Vector2(0, 52)
-
 	ThemeManager.apply_button_secondary(button_unequip)
 	button_unequip.custom_minimum_size = Vector2(0, 52)
-
 	ThemeManager.apply_button_secondary(button_use)
 	button_use.custom_minimum_size     = Vector2(0, 52)
-
 	ThemeManager.apply_button_danger(button_delete)
 	button_delete.custom_minimum_size  = Vector2(0, 52)
-
 	ThemeManager.apply_button_secondary(button_back)
 	button_back.custom_minimum_size    = Vector2(0, 48)
 
-# ─────────────────────────────────────────
-# ANIMACIÓN DE ENTRADA
-# ─────────────────────────────────────────
 func _animate_entrance() -> void:
 	modulate.a = 0.0
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 1.0, 0.25)
 
-# ─────────────────────────────────────────
-# LOAD
-# ─────────────────────────────────────────
 func _load_inventory() -> void:
 	var player    = GameManager.get_player_data()
 	var inventory = player["inventory"]
@@ -128,20 +111,14 @@ func _show_empty() -> void:
 	label.add_theme_font_size_override("font_size", ThemeManager.FONT_BODY)
 	items_container.add_child(label)
 
-# ─────────────────────────────────────────
-# LISTA DE ITEMS — US-UI-005 / 006
-# ─────────────────────────────────────────
 func _create_items(items: Array) -> void:
 	for item in items:
 		var button = Button.new()
 		var rarity = item.get("rarity", "common").to_lower()
 		var is_equipped = (item == GameManager.get_equipped_weapon())
-
-		# Estilo base del botón
 		var bg_color = ThemeManager.C_SURFACE_2
 		var border_color = ThemeManager.get_rarity_color(rarity)
 		var border_width = 2 if is_equipped else 1
-
 		var style_normal  = ThemeManager.make_button_style(bg_color, border_color, border_width)
 		var style_hover   = ThemeManager.make_button_style(ThemeManager.C_SURFACE, border_color, 2)
 		var style_pressed = ThemeManager.make_button_style(ThemeManager.C_SURFACE, border_color, 2)
@@ -165,9 +142,6 @@ func _create_items(items: Array) -> void:
 		)
 		items_container.add_child(button)
 
-# ─────────────────────────────────────────
-# FORMATO ITEMS
-# ─────────────────────────────────────────
 func _format_item(item: Dictionary) -> String:
 	var rarity = item.get("rarity", "common").to_lower()
 	var icon   = Constants.RARITY_ICONS.get(rarity, "⚪")
@@ -189,18 +163,11 @@ func _effect_to_text(effect: String) -> String:
 		"stun":    return "💫"
 		_:         return effect
 
-# ─────────────────────────────────────────
-# SELECCIÓN
-# ─────────────────────────────────────────
 func _on_item_selected(item: Dictionary) -> void:
 	selected_item = item
-	print("[Inventory] Item seleccionado:", item)
 	_show_item_detail(item)
 	_update_use_button()
 
-# ─────────────────────────────────────────
-# DETALLE ITEM — US-UI-005
-# ─────────────────────────────────────────
 func _show_item_detail(item: Dictionary) -> void:
 	var rarity = item.get("rarity", "common").to_lower()
 	var icon   = Constants.RARITY_ICONS.get(rarity, "⚪")
@@ -221,9 +188,6 @@ func _show_item_detail(item: Dictionary) -> void:
 	label_detail.text = text
 	label_detail.add_theme_color_override("font_color", color)
 
-# ─────────────────────────────────────────
-# BOTONES — US-AUDIO-009
-# ─────────────────────────────────────────
 func _on_button_back_pressed() -> void:
 	AudioManager.play_sfx("click")
 	SceneManager.go_to_zone_select()
@@ -259,9 +223,6 @@ func _on_confirm_delete_dialog_confirmed() -> void:
 	label_detail.text = "Item eliminado"
 	label_detail.add_theme_color_override("font_color", ThemeManager.C_TEXT_DIM)
 
-# ─────────────────────────────────────────
-# HELPERS
-# ─────────────────────────────────────────
 func _clear_items() -> void:
 	for child in items_container.get_children():
 		child.queue_free()
@@ -290,8 +251,7 @@ func _update_equipped_label() -> void:
 
 func _update_stats() -> void:
 	var player = GameManager.get_player_data()
-
-	var weapon       = GameManager.get_equipped_weapon()
+	var weapon = GameManager.get_equipped_weapon()
 	var total_damage = player["damage"]
 	if weapon != null:
 		total_damage += weapon.get("damage", 0)
@@ -306,9 +266,6 @@ func _update_stats() -> void:
 	xp_bar.max_value = player["xp_to_next"]
 	xp_bar.value     = player["xp"]
 
-# ─────────────────────────────────────────
-# USAR CONSUMIBLE — US-AUDIO-009
-# ─────────────────────────────────────────
 func _on_button_use_pressed() -> void:
 	if selected_item.is_empty():
 		return
@@ -320,11 +277,9 @@ func _on_button_use_pressed() -> void:
 	var inventory: Array = player.get("inventory", [])
 
 	if selected_item not in inventory:
+		push_warning("[InventoryScreen] Uso bloqueado: item seleccionado ya no está en inventario")
 		label_detail.text = "Objeto inválido o ya no disponible"
-		label_detail.add_theme_color_override(
-			"font_color",
-			ThemeManager.C_RED_BRIGHT
-		)
+		label_detail.add_theme_color_override("font_color", ThemeManager.C_RED_BRIGHT)
 		selected_item = {}
 		_update_use_button()
 		return
@@ -332,11 +287,11 @@ func _on_button_use_pressed() -> void:
 	var heal_amount: int = int(selected_item.get("heal", 0))
 
 	if heal_amount <= 0:
+		push_warning("[InventoryScreen] Consumible inválido: heal=%d item=%s" % [
+			heal_amount, selected_item.get("name", "desconocido")
+		])
 		label_detail.text = "Consumible inválido"
-		label_detail.add_theme_color_override(
-			"font_color",
-			ThemeManager.C_RED_BRIGHT
-		)
+		label_detail.add_theme_color_override("font_color", ThemeManager.C_RED_BRIGHT)
 		return
 	if player["hp"] <= 0:
 		label_detail.text = "💀 No puedes usar objetos muerto"
@@ -363,9 +318,6 @@ func _on_button_use_pressed() -> void:
 	_update_use_button()
 	GameManager._save_game()
 
-# ─────────────────────────────────────────
-# UI BOTÓN USE
-# ─────────────────────────────────────────
 func _update_use_button() -> void:
 	button_use.visible = (
 		not selected_item.is_empty()
