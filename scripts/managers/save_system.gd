@@ -15,8 +15,6 @@ func save_game(data: Dictionary) -> void:
 	var json = JSON.stringify(data, "\t")
 	file.store_string(json)
 
-	print("[SaveSystem] Juego guardado")
-
 # ─────────────────────────────────────────
 # LOAD
 # ─────────────────────────────────────────
