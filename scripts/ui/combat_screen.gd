@@ -59,7 +59,12 @@ var combat_system   := CombatSystem.new()
 # READY
 # ─────────────────────────────────────────
 func _ready() -> void:
-	_validate_nodes()
+	if not _validate_nodes():
+		push_error("[CombatScreen] Inicialización cancelada por referencias nulas")
+		set_process(false)
+		set_process_input(false)
+		return
+
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
@@ -116,15 +121,34 @@ func _apply_theme() -> void:
 # ─────────────────────────────────────────
 # VALIDACIÓN
 # ─────────────────────────────────────────
-func _validate_nodes() -> void:
-	var nodes = [
-		label_enemy, label_enemy_hp, enemy_hp_bar, enemy_container,
-		label_player_hp, player_hp_bar, player_container,
-	]
-	for n in nodes:
-		if n == null:
-			push_error("[CombatScreen] Nodo no asignado en inspector")
-			return
+func _validate_nodes() -> bool:
+	var required_nodes = {
+		"label_enemy": label_enemy,
+		"label_enemy_hp": label_enemy_hp,
+		"enemy_hp_bar": enemy_hp_bar,
+		"enemy_container": enemy_container,
+		"label_player_hp": label_player_hp,
+		"player_hp_bar": player_hp_bar,
+		"player_container": player_container,
+		"label_result": label_result,
+		"button_attack": button_attack,
+		"button_defend": button_defend,
+		"player_effects_container": player_effects_container,
+		"enemy_effects_container": enemy_effects_container,
+		"label_weapon": label_weapon,
+		"xp_bar": xp_bar,
+		"label_xp": label_xp,
+		"history_button": history_button,
+	}
+
+	for node_name in required_nodes:
+		if not is_instance_valid(required_nodes[node_name]):
+			push_error(
+				"[CombatScreen] Referencia requerida inválida: %s" % node_name
+			)
+			return false
+
+	return true
 
 # ─────────────────────────────────────────
 # SETUP
