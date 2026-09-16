@@ -10,6 +10,11 @@ class_name GameOverPopup
 @onready var inner_panel  = $ColorRect/Panel
 
 func _ready() -> void:
+	if not _validate_nodes():
+		push_error("[GameOverPopup] Inicialización cancelada por referencias nulas")
+		queue_free()
+		return
+
 	_apply_responsive_layout()
 	_apply_theme()
 	var player = GameManager.get_player_data()
@@ -22,6 +27,24 @@ func _ready() -> void:
 	tween.tween_property(self, "scale",      Vector2.ONE, 0.4).set_trans(Tween.TRANS_BACK)
 	button_retry.pressed.connect(_on_retry_pressed)
 	button_menu.pressed.connect(_on_menu_pressed)
+
+func _validate_nodes() -> bool:
+	var required_nodes = {
+		"label_stats": label_stats,
+		"button_retry": button_retry,
+		"button_menu": button_menu,
+		"label_title": label_title,
+		"inner_panel": inner_panel,
+	}
+
+	for node_name in required_nodes:
+		if not is_instance_valid(required_nodes[node_name]):
+			push_error(
+				"[GameOverPopup] Referencia requerida inválida: %s" % node_name
+			)
+			return false
+
+	return true
 
 func _apply_responsive_layout() -> void:
 	await get_tree().process_frame
