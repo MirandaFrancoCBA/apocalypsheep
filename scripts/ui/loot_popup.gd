@@ -6,10 +6,8 @@ class_name LootPopup
 
 
 func show_loot(item: Dictionary) -> void:
-	print("[LootPopup] show_loot ejecutado con:", item)
-
 	if label_name == null:
-		push_error("[LootPopup] label_name no está asignado en el inspector")
+		push_error("[LootPopup] No se puede mostrar loot: falta LabelItem")
 		return
 
 	if item.is_empty():
