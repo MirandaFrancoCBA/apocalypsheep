@@ -13,10 +13,33 @@ signal continue_pressed
 @onready var panel          = $Panel
 
 func _ready() -> void:
+	if not _validate_nodes():
+		push_error("[CombatResultPopup] Inicialización cancelada por referencias nulas")
+		queue_free()
+		return
+
 	_apply_responsive_layout()
 	_apply_theme()
 	if not button_continue.pressed.is_connected(_on_button_continue_pressed):
 		button_continue.pressed.connect(_on_button_continue_pressed)
+
+func _validate_nodes() -> bool:
+	var required_nodes = {
+		"label_title": label_title,
+		"label_xp": label_xp,
+		"label_loot": label_loot,
+		"button_continue": button_continue,
+		"panel": panel,
+	}
+
+	for node_name in required_nodes:
+		if not is_instance_valid(required_nodes[node_name]):
+			push_error(
+				"[CombatResultPopup] Referencia requerida inválida: %s" % node_name
+			)
+			return false
+
+	return true
 
 # ─────────────────────────────────────────
 # RESPONSIVE — US-UI-009
@@ -52,6 +75,10 @@ func show_result(
 	loot: Dictionary,
 	loot_added: bool = false
 ) -> void:
+	if not _validate_nodes():
+		push_error("[CombatResultPopup] No se puede mostrar el resultado: referencias inválidas")
+		return
+
 	if result == "victory":
 		label_title.text = "⚔️ VICTORIA"
 		label_title.add_theme_color_override("font_color", ThemeManager.C_GREEN)

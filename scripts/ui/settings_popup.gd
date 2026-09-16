@@ -24,10 +24,38 @@ signal closed
 @onready var button_close     = $Panel/Margin/VBox/ButtonClose
 
 func _ready() -> void:
+	if not _validate_nodes():
+		push_error("[SettingsPopup] Inicialización cancelada por referencias nulas")
+		queue_free()
+		return
+
 	_apply_theme()
 	_load_values()
 	_connect_signals()
 	_animate_in()
+
+func _validate_nodes() -> bool:
+	var required_nodes = {
+		"panel": panel,
+		"label_title": label_title,
+		"slider_master": slider_master,
+		"label_master_val": label_master_val,
+		"slider_music": slider_music,
+		"label_music_val": label_music_val,
+		"slider_sfx": slider_sfx,
+		"label_sfx_val": label_sfx_val,
+		"button_mute": button_mute,
+		"button_close": button_close,
+	}
+
+	for node_name in required_nodes:
+		if not is_instance_valid(required_nodes[node_name]):
+			push_error(
+				"[SettingsPopup] Referencia requerida inválida: %s" % node_name
+			)
+			return false
+
+	return true
 
 # ─────────────────────────────────────────
 # TEMA

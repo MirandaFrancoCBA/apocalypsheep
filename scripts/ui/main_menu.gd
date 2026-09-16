@@ -73,8 +73,16 @@ func _on_button_inventory_pressed() -> void:
 
 func _on_button_settings_pressed() -> void:
 	AudioManager.play_sfx("click")
-	var SettingsPopupScene = load("res://scenes/ui/settings_popup.tscn")
-	var popup = SettingsPopupScene.instantiate()
+	var settings_popup_scene = load("res://scenes/ui/settings_popup.tscn") as PackedScene
+	if settings_popup_scene == null:
+		push_error("[MainMenu] No se pudo cargar settings_popup.tscn")
+		return
+
+	var popup = settings_popup_scene.instantiate()
+	if popup == null:
+		push_error("[MainMenu] No se pudo instanciar settings_popup.tscn")
+		return
+
 	add_child(popup)
 	popup.top_level = true
 	popup.z_index   = 100

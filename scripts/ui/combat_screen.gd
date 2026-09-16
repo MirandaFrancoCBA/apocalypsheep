@@ -59,7 +59,12 @@ var combat_system   := CombatSystem.new()
 # READY
 # ─────────────────────────────────────────
 func _ready() -> void:
-	_validate_nodes()
+	if not _validate_nodes():
+		push_error("[CombatScreen] Inicialización cancelada por referencias nulas")
+		set_process(false)
+		set_process_input(false)
+		return
+
 	if GameManager.is_player_dead():
 		SceneManager.go_to_main_menu()
 		return
@@ -116,15 +121,34 @@ func _apply_theme() -> void:
 # ─────────────────────────────────────────
 # VALIDACIÓN
 # ─────────────────────────────────────────
-func _validate_nodes() -> void:
-	var nodes = [
-		label_enemy, label_enemy_hp, enemy_hp_bar, enemy_container,
-		label_player_hp, player_hp_bar, player_container,
-	]
-	for n in nodes:
-		if n == null:
-			push_error("[CombatScreen] Nodo no asignado en inspector")
-			return
+func _validate_nodes() -> bool:
+	var required_nodes = {
+		"label_enemy": label_enemy,
+		"label_enemy_hp": label_enemy_hp,
+		"enemy_hp_bar": enemy_hp_bar,
+		"enemy_container": enemy_container,
+		"label_player_hp": label_player_hp,
+		"player_hp_bar": player_hp_bar,
+		"player_container": player_container,
+		"label_result": label_result,
+		"button_attack": button_attack,
+		"button_defend": button_defend,
+		"player_effects_container": player_effects_container,
+		"enemy_effects_container": enemy_effects_container,
+		"label_weapon": label_weapon,
+		"xp_bar": xp_bar,
+		"label_xp": label_xp,
+		"history_button": history_button,
+	}
+
+	for node_name in required_nodes:
+		if not is_instance_valid(required_nodes[node_name]):
+			push_error(
+				"[CombatScreen] Referencia requerida inválida: %s" % node_name
+			)
+			return false
+
+	return true
 
 # ─────────────────────────────────────────
 # SETUP
@@ -492,6 +516,11 @@ func _show_combat_result_popup(
 	loot_added: bool
 ) -> void:
 	var popup = CombatResultPopupScene.instantiate()
+	if not is_instance_valid(popup):
+		push_error("[CombatScreen] No se pudo instanciar CombatResultPopup")
+		_popup_open = false
+		return
+
 	add_child(popup)
 	popup.top_level   = false
 	popup.z_index     = 1000
@@ -510,9 +539,20 @@ func _on_popup_continue() -> void:
 func _show_game_over() -> void:
 	if _popup_open:
 		return
-	_popup_open = true
+
 	var popup = GameOverPopupScene.instantiate()
-	get_tree().current_scene.add_child(popup)
+	if not is_instance_valid(popup):
+		push_error("[CombatScreen] No se pudo instanciar GameOverPopup")
+		return
+
+	var current_scene := get_tree().current_scene
+	if not is_instance_valid(current_scene):
+		push_error("[CombatScreen] No hay current_scene para mostrar GameOverPopup")
+		popup.queue_free()
+		return
+
+	_popup_open = true
+	current_scene.add_child(popup)
 	popup.top_level = true
 	popup.z_index   = 100
 
@@ -523,6 +563,10 @@ func _on_level_up(new_level: int, hp_gain: int, damage_gain: int) -> void:
 	add_combat_log("🎉 LEVEL UP! Nivel " + str(new_level))
 	AudioManager.play_sfx("levelup")
 	var popup = LevelUpPopup.instantiate()
+	if not is_instance_valid(popup):
+		push_error("[CombatScreen] No se pudo instanciar LevelUpPopup")
+		return
+
 	add_child(popup)
 	popup.show_level_up(new_level, hp_gain, damage_gain)
 
@@ -755,11 +799,14 @@ func _on_history_button_pressed() -> void:
 	if _history_popup_open:
 		return
 
-	_history_popup_open = true
-
 	AudioManager.play_sfx("click")
 
 	var popup = CombatHistoryPopupScene.instantiate()
+	if not is_instance_valid(popup):
+		push_error("[CombatScreen] No se pudo instanciar CombatHistoryPopup")
+		return
+
+	_history_popup_open = true
 	add_child(popup)
 
 	popup.top_level = true
@@ -834,9 +881,23 @@ func _roll_drop() -> bool:
 	return randi_range(1, 100) <= Constants.LOOT_DROP_CHANCE
 
 func _show_loot_popup(item: Dictionary) -> void:
-	var scene  = load("res://scenes/ui/loot_popup.tscn")
-	var popup  = scene.instantiate()
-	get_tree().current_scene.add_child(popup)
+	var scene = load("res://scenes/ui/loot_popup.tscn") as PackedScene
+	if scene == null:
+		push_error("[CombatScreen] No se pudo cargar loot_popup.tscn")
+		return
+
+	var popup = scene.instantiate()
+	if not is_instance_valid(popup):
+		push_error("[CombatScreen] No se pudo instanciar LootPopup")
+		return
+
+	var current_scene := get_tree().current_scene
+	if not is_instance_valid(current_scene):
+		push_error("[CombatScreen] No hay current_scene para mostrar LootPopup")
+		popup.queue_free()
+		return
+
+	current_scene.add_child(popup)
 	popup.z_index = 10
 	if popup.has_method("show_loot"):
 		popup.show_loot(item)

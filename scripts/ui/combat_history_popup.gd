@@ -21,12 +21,36 @@ class_name CombatHistoryPopup
 @onready var bg_dim       = $BgDim
 
 func _ready() -> void:
+	if not _validate_nodes():
+		push_error("[CombatHistoryPopup] Inicialización cancelada por referencias nulas")
+		queue_free()
+		return
+
 	_apply_responsive_layout()
 	_apply_theme()
 	button_close.pressed.connect(_on_close)
 	# Cerrar también al tocar el fondo oscuro
 	bg_dim.gui_input.connect(_on_bg_input)
 	_animate_in()
+
+func _validate_nodes() -> bool:
+	var required_nodes = {
+		"panel": panel,
+		"label_header": label_header,
+		"scroll": scroll,
+		"label_log": label_log,
+		"button_close": button_close,
+		"bg_dim": bg_dim,
+	}
+
+	for node_name in required_nodes:
+		if not is_instance_valid(required_nodes[node_name]):
+			push_error(
+				"[CombatHistoryPopup] Referencia requerida inválida: %s" % node_name
+			)
+			return false
+
+	return true
 
 func _apply_responsive_layout() -> void:
 	await get_tree().process_frame
@@ -57,6 +81,10 @@ func _apply_theme() -> void:
 
 ## Recibe el texto del log acumulado del combate
 func set_log(log_text: String) -> void:
+	if not is_instance_valid(label_log) or not is_instance_valid(scroll):
+		push_error("[CombatHistoryPopup] No se puede cargar el historial: referencias inválidas")
+		return
+
 	label_log.text = log_text
 	await get_tree().process_frame
 	# Scroll al final automáticamente
