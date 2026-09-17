@@ -28,7 +28,7 @@ var game_started: bool = false
 
 
 func _ready() -> void:
-	print("[GameManager] Iniciado correctamente")
+	print("[GameManager] Iniciado")
 	_load_game()
 
 # ─────────────────────────────────────────
@@ -37,7 +37,7 @@ func _ready() -> void:
 func set_selected_zone(zone: Dictionary) -> void:
 	selected_zone = zone
 	emit_signal("zone_selected", zone)
-	print("[GameManager] Zona seleccionada:", zone.get("name", "desconocida"))
+	print("[GameManager] Zona seleccionada: %s" % zone.get("name", "desconocida"))
 
 func get_selected_zone() -> Dictionary:
 	return selected_zone
@@ -56,11 +56,11 @@ func get_combat_result() -> String:
 # ─────────────────────────────────────────
 func equip_item(item: Dictionary) -> void:
 	if item.get("type") != "weapon":
-		print("[Inventory] No es un arma")
+		push_warning("[GameManager] No se puede equipar item: type=%s" % item.get("type", "desconocido"))
 		return
 
 	player_data["equipped_weapon"] = item
-	print("[Inventory] Arma equipada:", item.get("name", ""))
+	print("[GameManager] Arma equipada: %s" % item.get("name", "desconocida"))
 	emit_signal("player_data_changed")
 	_save_game()
 
@@ -68,13 +68,9 @@ func unequip_item() -> void:
 	var weapon = player_data.get("equipped_weapon", {})
 
 	if weapon.is_empty():
-		print("[Inventory] No hay arma equipada")
 		return
 
-	print("[Inventory] Arma desequipada:", weapon.get("name", ""))
-	
-
-	# 🔥 nunca null
+	print("[GameManager] Arma desequipada: %s" % weapon.get("name", "desconocida"))
 	player_data["equipped_weapon"] = {}
 	_save_game()
 	emit_signal("player_data_changed")
@@ -98,20 +94,15 @@ func is_player_dead() -> bool:
 
 func kill_player() -> void:
 	player_data["hp"] = 0
-
 	print("[GameManager] Jugador muerto")
-
 	_save_game()
 	emit_signal("player_data_changed")
 
 func revive_player(hp_amount: int = 1) -> void:
 	player_data["hp"] = max(hp_amount, 1)
-
-	print("[GameManager] Jugador revivido")
-
+	print("[GameManager] Jugador revivido: hp=%d" % player_data["hp"])
 	_save_game()
 	emit_signal("player_data_changed")
-
 
 func update_player_hp(new_hp: int) -> void:
 	player_data["hp"] = clamp(new_hp, 0, player_data["max_hp"])
@@ -139,23 +130,19 @@ func add_xp(amount: int) -> void:
 
 	_save_game()
 	emit_signal("player_data_changed")
-	
 
 func add_item_to_inventory(item: Dictionary) -> bool:
 	var inventory = player_data["inventory"]
 
 	if inventory.size() >= Constants.INVENTORY_MAX_SIZE:
-		print("[Inventory] Inventario lleno")
+		print("[GameManager] Inventario lleno: %d/%d" % [inventory.size(), Constants.INVENTORY_MAX_SIZE])
 		return false
 
 	inventory.append(item)
 	_save_game()
-
 	emit_signal("player_data_changed")
-	print("[GameManager] Item agregado:", item.get("name", "desconocido"))
-
+	print("[GameManager] Item agregado: %s" % item.get("name", "desconocido"))
 	return true
-
 
 # ─────────────────────────────────────────
 # INVENTARIO
@@ -168,57 +155,40 @@ func remove_item(item: Dictionary) -> void:
 
 		if player_data.get("equipped_weapon") == item:
 			player_data["equipped_weapon"] = {}
-			print("[Inventory] Item equipado eliminado → desequipado")
-
-		print("[Inventory] Item eliminado:", item.get("name", ""))
+			print("[GameManager] Item equipado eliminado y desequipado: %s" % item.get("name", "desconocido"))
+		else:
+			print("[GameManager] Item eliminado: %s" % item.get("name", "desconocido"))
 	else:
-		print("[Inventory] Item no encontrado")
+		push_warning("[GameManager] No se pudo eliminar item: no está en inventario")
 
-	_save_game() # 🔥
+	_save_game()
 	emit_signal("player_data_changed")
-	
-
 
 func create_default_player_data() -> Dictionary:
 	return {
 		"name": "Oveja",
-
 		"hp": Constants.PLAYER_DEFAULT_HP,
 		"max_hp": Constants.PLAYER_DEFAULT_HP,
-
 		"damage": Constants.PLAYER_DEFAULT_DAMAGE,
-
 		"level": Constants.PLAYER_DEFAULT_LEVEL,
 		"xp": Constants.PLAYER_DEFAULT_XP,
-
 		"equipped_weapon": {},
-
-		"xp_to_next": calculate_xp_to_next(
-			Constants.PLAYER_DEFAULT_LEVEL
-		),
-
+		"xp_to_next": calculate_xp_to_next(Constants.PLAYER_DEFAULT_LEVEL),
 		"inventory": []
 	}
+
 # ─────────────────────────────────────────
 # RESET
 # ─────────────────────────────────────────
-# Reinicia la run completa.
-# Futuro:
-# algunos datos podrán persistir
-# mediante KEEP_ON_DEATH.
 func reset_game() -> void:
 	player_data = create_default_player_data()
-
 	selected_zone = {}
 	last_combat_result = ""
 	game_started = false
-
-
 	emit_signal("player_data_changed")
-	
 	print("[GameManager] Partida reseteada")
-
 	_save_game()
+
 # ─────────────────────────────────────────
 # NIVEL
 # ─────────────────────────────────────────
@@ -229,26 +199,15 @@ func calculate_xp_to_next(level: int) -> int:
 	)
 
 func _level_up() -> void:
-
 	var old_max_hp = player_data["max_hp"]
 	var old_damage = player_data["damage"]
-
 	player_data["level"] += 1
-
-	# 📈 scaling básico
 	player_data["max_hp"] += 10
 	player_data["damage"] += 2
-
 	player_data["hp"] = player_data["max_hp"]
-
-	# 📊 calcular gains
 	var hp_gain = player_data["max_hp"] - old_max_hp
 	var damage_gain = player_data["damage"] - old_damage
-
-	# 🔁 recalcular XP necesaria
-	player_data["xp_to_next"] = calculate_xp_to_next(
-		player_data["level"]
-	)
+	player_data["xp_to_next"] = calculate_xp_to_next(player_data["level"])
 
 	emit_signal(
 		"level_up",
@@ -257,20 +216,22 @@ func _level_up() -> void:
 		damage_gain
 	)
 
-	print("[LEVEL UP] Nivel:", player_data["level"])
+	print("[GameManager] Level up: nivel=%d hp_gain=%d damage_gain=%d" % [
+		player_data["level"], hp_gain, damage_gain
+	])
 
 func _load_game() -> void:
 	var data = SaveSystem.load_game()
 
 	if data.is_empty():
-		print("[GameManager] Save inválido o inexistente — iniciando partida nueva")
+		print("[GameManager] Save inexistente o inválido; usando partida nueva")
 		reset_game()
 		return
 
 	var loaded_player = data.get("player_data", {})
 
 	if typeof(loaded_player) != TYPE_DICTIONARY:
-		push_error("[GameManager] player_data inválido — usando defaults")
+		push_error("[GameManager] Save inválido: player_data no es Dictionary; usando defaults")
 		reset_game()
 		return
 
@@ -281,37 +242,37 @@ func _load_game() -> void:
 		if loaded_player.has(key):
 			player_data[key] = loaded_player[key]
 
-	print("[GameManager] Datos cargados:", player_data)
-
 	player_data["hp"] = clamp(
 		int(player_data["hp"]),
 		0,
 		int(player_data["max_hp"])
 	)
 
-	player_data["xp"] = maxi(
-		int(player_data["xp"]),
-		0
-	)
-
-	player_data["level"] = maxi(
-		int(player_data["level"]),
-		1
-	)
+	player_data["xp"] = maxi(int(player_data["xp"]), 0)
+	player_data["level"] = maxi(int(player_data["level"]), 1)
 
 	if typeof(player_data["inventory"]) != TYPE_ARRAY:
-		push_warning("[GameManager] Inventario inválido — usando default")
+		push_warning("[GameManager] Save inválido: inventory no es Array; usando []")
 		player_data["inventory"] = []
 
 	if typeof(player_data["equipped_weapon"]) != TYPE_DICTIONARY:
-		push_warning("[GameManager] Equipamiento inválido — usando default")
+		push_warning("[GameManager] Save inválido: equipped_weapon no es Dictionary; usando {}")
 		player_data["equipped_weapon"] = {}
 
 	selected_zone = data.get("selected_zone", {})
 
 	if typeof(selected_zone) != TYPE_DICTIONARY:
-		push_warning("[GameManager] selected_zone inválido — usando default")
+		push_warning("[GameManager] Save inválido: selected_zone no es Dictionary; usando {}")
 		selected_zone = {}
+
+	print("[GameManager] Partida cargada: nivel=%d hp=%d/%d xp=%d/%d inventario=%d" % [
+		player_data["level"],
+		player_data["hp"],
+		player_data["max_hp"],
+		player_data["xp"],
+		player_data["xp_to_next"],
+		player_data["inventory"].size()
+	])
 
 	emit_signal("player_data_changed")
 

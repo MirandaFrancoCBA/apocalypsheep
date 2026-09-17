@@ -13,7 +13,6 @@ extends Control
 @onready var label_subtitle   = $VBoxContainer/LabelSubtitle
 
 func _ready() -> void:
-	print("[MainMenu] Escena cargada")
 	_apply_theme()
 	_check_existing_save()
 	_animate_entrance()

@@ -1,52 +1,28 @@
 # scripts/managers/scene_manager.gd
 extends Node
 
-# ─────────────────────────────────────────
-# SEÑAL — avisamos cuando cambia la escena
-# ─────────────────────────────────────────
 signal scene_changed(scene_name)
 
-# ─────────────────────────────────────────
-# NAVEGACIÓN PRINCIPAL
-# ─────────────────────────────────────────
 func go_to(scene_path: String) -> void:
-
-	if scene_path == "":
-		push_error("[SceneManager] Ruta de escena vacía")
+	if scene_path.is_empty():
+		push_error("[SceneManager] Navegación cancelada: ruta de escena vacía")
 		return
 
 	if not ResourceLoader.exists(scene_path):
-		push_error("[SceneManager] Escena inexistente: " + scene_path)
+		push_error("[SceneManager] Navegación cancelada: escena inexistente path='%s'" % scene_path)
 		return
 
-	print("[SceneManager] Navegando a: ", scene_path)
-
-	# ─────────────────────────
-	# CAMBIO DIRECTO (SIN TRANSITIONS)
-	# ─────────────────────────
-	var error = get_tree().change_scene_to_file(scene_path)
+	print("[SceneManager] Navegando a: %s" % scene_path)
+	var error := get_tree().change_scene_to_file(scene_path)
 
 	if error != OK:
-		push_error(
-			"[SceneManager] Error al cambiar escena: "
-			+ scene_path
-		)
+		push_error("[SceneManager] Falló cambio de escena: path='%s' error=%d" % [scene_path, error])
 		return
 
-	# esperar frame
 	await get_tree().process_frame
+	var scene_name := scene_path.get_file().replace(".tscn", "")
+	emit_signal("scene_changed", scene_name)
 
-	# señal
-	var scene_name = scene_path.get_file().replace(".tscn", "")
-
-	emit_signal(
-		"scene_changed",
-		scene_name
-	)
-
-# ─────────────────────────────────────────
-# ATAJOS
-# ─────────────────────────────────────────
 func go_to_main_menu() -> void:
 	go_to(Constants.SCENE_MAIN_MENU)
 
