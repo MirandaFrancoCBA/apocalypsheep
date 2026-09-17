@@ -56,8 +56,15 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_ty45s")
 layout_mode = 2
 text = "Arma equipada: Ninguna"
 
-[node name="VBoxItems" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1535806740]
+[node name="ItemsScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 180)
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VBoxItems" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ItemsScroll" unique_id=1535806740]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="LabelDetail" type="Label" parent="MarginContainer/VBoxContainer" unique_id=727969253]
 clip_contents = true
@@ -81,8 +88,7 @@ text = "Desequipar"
 
 [node name="ButtonUse" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1873895744]
 layout_mode = 2
-text = "Usar
-"
+text = "Usar"
 
 [node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=293995187]
 layout_mode = 2
