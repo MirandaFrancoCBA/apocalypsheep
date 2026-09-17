@@ -1,12 +1,12 @@
 # scripts/ui/inventory_scree.gd
 # ─────────────────────────────────────────
 # INVENTORY SCREEN
-# US-UI-003, 004, 005, 007, 011 — ThemeManager completo
+# US-UI-003, 004, 005, 007, 009, 011 — ThemeManager / responsive layout
 # US-AUDIO-009 — feedback sonoro en botones
 # ─────────────────────────────────────────
 extends Control
 
-@onready var items_container    = $MarginContainer/VBoxContainer/VBoxItems
+@onready var items_container    = $MarginContainer/VBoxContainer/ItemsScroll/VBoxItems
 @onready var button_back        = $MarginContainer/VBoxContainer/ButtonBack
 @onready var label_detail       = $MarginContainer/VBoxContainer/LabelDetail
 @onready var button_equip       = $MarginContainer/VBoxContainer/ButtonEquip
@@ -39,9 +39,6 @@ func _ready() -> void:
 	_update_use_button()
 	_animate_entrance()
 
-# ─────────────────────────────────────────
-# TEMA — US-UI-003 / 004 / 007 / 011
-# ─────────────────────────────────────────
 func _apply_theme() -> void:
 	ThemeManager.apply_scene_background(self)
 
