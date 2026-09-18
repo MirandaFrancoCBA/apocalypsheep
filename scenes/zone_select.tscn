@@ -32,10 +32,17 @@ layout_mode = 2
 text = "Seleccionar Zona"
 horizontal_alignment = 1
 
-[node name="VBoxZones" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1621934966]
+[node name="ZonesScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VBoxZones" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ZonesScroll" unique_id=1621934966]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1315409959]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 text = "Volver al Menu"
 
