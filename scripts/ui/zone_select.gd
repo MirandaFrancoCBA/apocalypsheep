@@ -1,7 +1,7 @@
 # scripts/ui/zone_select.gd
 extends Control
 
-@onready var zones_container = $MarginContainer/VBoxContainer/VBoxZones
+@onready var zones_container = $MarginContainer/VBoxContainer/ZonesScroll/VBoxZones
 @onready var button_back     = $MarginContainer/VBoxContainer/ButtonBack
 @onready var label_title     = $MarginContainer/VBoxContainer/LabelTitle
 
