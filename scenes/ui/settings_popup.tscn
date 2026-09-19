@@ -37,9 +37,9 @@ grow_vertical = 2
 
 [node name="Margin" type="MarginContainer" parent="Panel" unique_id=1142348960]
 layout_mode = 2
-theme_override_constants/margin_left = 28
+theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 28
+theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 24
 
 [node name="VBox" type="VBoxContainer" parent="Panel/Margin" unique_id=278592396]
@@ -61,7 +61,7 @@ size_flags_horizontal = 3
 text = "🔊 Master"
 
 [node name="SliderMaster" type="HSlider" parent="Panel/Margin/VBox/RowMaster" unique_id=457980796]
-custom_minimum_size = Vector2(140, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 100.0
@@ -82,7 +82,7 @@ size_flags_horizontal = 3
 text = "🎵 Música"
 
 [node name="SliderMusic" type="HSlider" parent="Panel/Margin/VBox/RowMusic" unique_id=1185160725]
-custom_minimum_size = Vector2(140, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 70.0
@@ -103,7 +103,7 @@ size_flags_horizontal = 3
 text = "💥 Efectos"
 
 [node name="SliderSFX" type="HSlider" parent="Panel/Margin/VBox/RowSFX" unique_id=2121319962]
-custom_minimum_size = Vector2(140, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 
