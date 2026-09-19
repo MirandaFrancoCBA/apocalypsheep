@@ -32,7 +32,6 @@ func _ready() -> void:
 	_apply_responsive_layout()
 	_apply_theme()
 	_load_values()
-	_connect_signals()
 	_animate_in()
 
 func _validate_nodes() -> bool:
