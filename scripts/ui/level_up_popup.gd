@@ -2,6 +2,16 @@
 extends Control
 
 @onready var label = $CenterContainer/Panel/Label
+@onready var panel = $CenterContainer/Panel
+
+func _ready() -> void:
+	_apply_responsive_layout()
+
+func _apply_responsive_layout() -> void:
+	await get_tree().process_frame
+	var vp: Vector2 = get_viewport_rect().size
+	var width: float = minf(vp.x * 0.82, 360.0)
+	panel.custom_minimum_size = Vector2(width, 150.0)
 
 func show_level_up(level: int, hp_gain: int, damage_gain: int) -> void:
 	label.text = "LEVEL UP\nNivel %d\n+%d HP   +%d Daño" % [level, hp_gain, damage_gain]
@@ -9,7 +19,6 @@ func show_level_up(level: int, hp_gain: int, damage_gain: int) -> void:
 	label.add_theme_font_size_override("font_size", ThemeManager.FONT_SUBTITLE)
 
 	# Panel interior
-	var panel = $CenterContainer/Panel
 	if panel:
 		panel.add_theme_stylebox_override(
 			"panel",
