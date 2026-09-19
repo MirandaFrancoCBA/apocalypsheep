@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://qd2cwb0t70wb" path="res://scripts/ui/loot_popup.gd" id="1_x5r40"]
 
 [node name="LootPopup" type="Control" unique_id=1048732134]
-custom_minimum_size = Vector2(400, 200)
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -16,7 +15,6 @@ mouse_filter = 2
 script = ExtResource("1_x5r40")
 
 [node name="Panel" type="Panel" parent="." unique_id=606578056]
-custom_minimum_size = Vector2(320, 140)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
