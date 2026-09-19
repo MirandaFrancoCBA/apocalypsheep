@@ -64,9 +64,9 @@ func _validate_nodes() -> bool:
 # ─────────────────────────────────────────
 func _apply_responsive_layout() -> void:
 	await get_tree().process_frame
-	var vp := get_viewport_rect().size
-	var width := min(vp.x * 0.90, 400.0)
-	var height := min(vp.y * 0.70, 420.0)
+	var vp: Vector2 = get_viewport_rect().size
+	var width: float = minf(vp.x * 0.90, 400.0)
+	var height: float = minf(vp.y * 0.70, 420.0)
 
 	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.offset_left = -(width / 2.0)
