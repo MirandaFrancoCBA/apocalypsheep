@@ -29,6 +29,7 @@ func _ready() -> void:
 		queue_free()
 		return
 
+	_apply_responsive_layout()
 	_apply_theme()
 	_load_values()
 	_connect_signals()
@@ -56,6 +57,22 @@ func _validate_nodes() -> bool:
 			return false
 
 	return true
+
+# ─────────────────────────────────────────
+# RESPONSIVE — US-UI-009
+# Mantiene el panel dentro del viewport, especialmente en portrait estrecho.
+# ─────────────────────────────────────────
+func _apply_responsive_layout() -> void:
+	await get_tree().process_frame
+	var vp := get_viewport_rect().size
+	var width := min(vp.x * 0.90, 400.0)
+	var height := min(vp.y * 0.70, 420.0)
+
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.offset_left = -(width / 2.0)
+	panel.offset_top = -(height / 2.0)
+	panel.offset_right = width / 2.0
+	panel.offset_bottom = height / 2.0
 
 # ─────────────────────────────────────────
 # TEMA
