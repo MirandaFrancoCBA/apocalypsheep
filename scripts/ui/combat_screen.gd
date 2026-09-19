@@ -113,7 +113,7 @@ func _apply_theme() -> void:
 
 	# Historial — botón con indicador de estado
 	ThemeManager.apply_button_secondary(history_button)
-	history_button.custom_minimum_size = Vector2(0, 44)
+	history_button.custom_minimum_size = Vector2(0, 52)
 
 	label_result.add_theme_color_override("default_color",   ThemeManager.C_TEXT_DIM)
 	label_result.add_theme_font_size_override("normal_font_size", ThemeManager.FONT_SMALL)
