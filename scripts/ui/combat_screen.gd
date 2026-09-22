@@ -570,6 +570,8 @@ func _on_level_up(new_level: int, hp_gain: int, damage_gain: int) -> void:
 		return
 
 	add_child(popup)
+	popup.top_level = true
+	popup.z_index = 1100
 	popup.show_level_up(new_level, hp_gain, damage_gain)
 
 # ─────────────────────────────────────────
