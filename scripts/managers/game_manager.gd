@@ -24,6 +24,7 @@ var player_data: Dictionary = create_default_player_data()
 # ─────────────────────────────────────────
 var selected_zone: Dictionary = {}
 var last_combat_result: String = ""
+var last_combat_loot: Dictionary = {}
 var game_started: bool = false
 
 
@@ -50,6 +51,12 @@ func set_combat_result(result: String) -> void:
 
 func get_combat_result() -> String:
 	return last_combat_result
+
+func set_combat_loot(loot: Dictionary) -> void:
+	last_combat_loot = loot.duplicate(true)
+
+func get_combat_loot() -> Dictionary:
+	return last_combat_loot.duplicate(true)
 
 # ─────────────────────────────────────────
 # EQUIPO
@@ -184,6 +191,7 @@ func reset_game() -> void:
 	player_data = create_default_player_data()
 	selected_zone = {}
 	last_combat_result = ""
+	last_combat_loot = {}
 	game_started = false
 	emit_signal("player_data_changed")
 	print("[GameManager] Partida reseteada")

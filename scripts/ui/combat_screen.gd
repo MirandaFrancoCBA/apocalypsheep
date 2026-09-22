@@ -469,6 +469,7 @@ func _end_combat(result: String) -> void:
 	combat_finished = true
 	_lock_input()
 	GameManager.set_combat_result(result)
+	GameManager.set_combat_loot({})
 
 	if result == "defeat":
 		GameManager.kill_player()
@@ -489,6 +490,7 @@ func _end_combat(result: String) -> void:
 			loot_added = GameManager.add_item_to_inventory(loot)
 
 			if loot_added:
+				GameManager.set_combat_loot(loot)
 				AudioManager.play_loot_sfx(
 					loot.get("rarity", "common")
 				)

@@ -19,7 +19,7 @@ func _apply_theme() -> void:
 func _show_result() -> void:
 	var result    = GameManager.get_combat_result()
 	var player    = GameManager.get_player_data()
-	var inventory = player["inventory"]
+	var combat_loot = GameManager.get_combat_loot()
 
 	if result == "victory":
 		label_title.text = "VICTORIA"
@@ -32,11 +32,10 @@ func _show_result() -> void:
 		label_title.add_theme_color_override("font_color", ThemeManager.C_TEXT_DIM)
 
 	var lines := PackedStringArray()
-	if inventory.size() > 0:
-		var last_item = inventory[inventory.size() - 1]
-		var rarity    = last_item.get("rarity", "common")
-		var icon      = Constants.RARITY_ICONS.get(rarity, "⚪")
-		lines.append("Loot:   " + icon + "  " + last_item["name"])
+	if not combat_loot.is_empty():
+		var rarity = combat_loot.get("rarity", "common")
+		var icon = Constants.RARITY_ICONS.get(rarity, "⚪")
+		lines.append("Loot:   " + icon + "  " + combat_loot.get("name", "Item"))
 	lines.append("Nivel:  " + str(player["level"]))
 	lines.append("XP:     %d / %d" % [player["xp"], player["xp_to_next"]])
 
