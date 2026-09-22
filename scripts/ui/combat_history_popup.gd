@@ -73,7 +73,7 @@ func _apply_theme() -> void:
 	label_header.text = "📜 Historial de combate!"
 
 	label_log.add_theme_color_override("default_color",        ThemeManager.C_TEXT_DIM)
-	label_log.add_theme_font_size_override("normal_font_size", ThemeManager.FONT_SMALL)
+	label_log.add_theme_font_size_override("normal_font_size", ThemeManager.FONT_BODY)
 
 	ThemeManager.apply_button_secondary(button_close)
 	button_close.custom_minimum_size = Vector2(0, 52)
