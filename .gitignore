@@ -4,7 +4,6 @@
 
 # Archivos de compilación / exportación
 .export/
-.export_presets.cfg
 
 # Cache interna del editor
 .import/
