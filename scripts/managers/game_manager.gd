@@ -286,7 +286,8 @@ func _load_game() -> void:
 
 func _save_game() -> void:
 	var data = {
-		"player_data": player_data
+		"player_data": player_data,
+		"selected_zone": selected_zone
 	}
 
 	SaveSystem.save_game(data)
