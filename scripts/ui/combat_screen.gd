@@ -322,6 +322,8 @@ func _on_button_attack_pressed() -> void:
 			"stun":
 				add_combat_log("💫 Te aturde")
 
+		_play_enemy_attack_sfx(result)
+
 		_show_damage_number(
 			player_container,
 			result["damage"],
@@ -404,6 +406,8 @@ func _on_button_defend_pressed() -> void:
 			"💢 Recibís " + str(result["damage"])
 		)
 
+		_play_enemy_attack_sfx(result)
+
 		_show_damage_number(
 			player_container,
 			result["damage"],
@@ -428,6 +432,15 @@ func _on_button_defend_pressed() -> void:
 		return
 
 	_unlock_input()
+# ─────────────────────────────────────────
+# HELPER — SFX de ataque enemigo
+# ─────────────────────────────────────────
+func _play_enemy_attack_sfx(result: Dictionary) -> void:
+	AudioManager.play_sfx("crit" if result.get("is_crit", false) else "hit")
+	var effect := str(result.get("effect", ""))
+	if not effect.is_empty():
+		AudioManager.play_effect_sfx(effect)
+
 # ─────────────────────────────────────────
 # HELPER — SFX de efectos por texto de log — US-AUDIO-004
 # ─────────────────────────────────────────
