@@ -47,10 +47,10 @@ func _animate_entrance() -> void:
 	tween.parallel().tween_property(label_title, "scale", Vector2.ONE, 0.4).set_trans(Tween.TRANS_BACK)
 	tween.tween_property(label_subtitle, "modulate:a", 1.0, 0.3)
 	tween.tween_interval(0.05)
-	tween.tween_property(button_play,      "modulate:a", 1.0, 0.25)
-	tween.tween_property(button_inventory, "modulate:a", 1.0, 0.20)
-	tween.tween_property(button_settings,  "modulate:a", 1.0, 0.15)
-	tween.tween_property(button_new_game,  "modulate:a", 1.0, 0.15)
+	tween.tween_property(button_play, "modulate:a", 1.0, 0.20)
+	tween.parallel().tween_property(button_inventory, "modulate:a", 1.0, 0.20)
+	tween.parallel().tween_property(button_settings, "modulate:a", 1.0, 0.20)
+	tween.parallel().tween_property(button_new_game, "modulate:a", 1.0, 0.20)
 
 func _check_existing_save() -> void:
 	button_play.text = "▶ CONTINUAR" if SaveSystem.has_save() else "▶ JUGAR"
