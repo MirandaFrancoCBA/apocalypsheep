@@ -37,6 +37,7 @@ func _ready() -> void:
 # ─────────────────────────────────────────
 func set_selected_zone(zone: Dictionary) -> void:
 	selected_zone = zone
+	_save_game()
 	emit_signal("zone_selected", zone)
 	print("[GameManager] Zona seleccionada: %s" % zone.get("name", "desconocida"))
 
