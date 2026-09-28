@@ -58,7 +58,7 @@ func _check_existing_save() -> void:
 func _on_button_play_pressed() -> void:
 	AudioManager.play_sfx("confirm")
 	if SaveSystem.has_save():
-		SaveSystem.load_game()
+		GameManager._load_game()
 	else:
 		if not GameManager.game_started:
 			GameManager.reset_game()
