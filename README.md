@@ -193,6 +193,7 @@ apocalypsheep/
 ├── README.md
 ├── project.godot
 └── .editorconfig
+```
 
 # 🛠️ Tecnologías
 
@@ -208,7 +209,7 @@ apocalypsheep/
 ## 1️⃣ Clonar repositorio
 
 ```bash
-git clone https://github.com/yourusername/apocalypsheep.git
+git clone https://github.com/MirandaFrancoCBA/apocalypsheep.git
 cd apocalypsheep
 ```
 
@@ -216,7 +217,7 @@ cd apocalypsheep
 
 ## 2️⃣ Abrir proyecto
 
-Abrir el proyecto desde Godot Engine 4.x usando el archivo:
+Abrir el proyecto desde Godot Engine 4.6.2 usando el archivo:
 
 ```text
 project.godot
