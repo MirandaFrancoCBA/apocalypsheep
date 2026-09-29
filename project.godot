@@ -13,7 +13,9 @@ config_version=5
 config/name="Apocalypsheep"
 run/main_scene="uid://c4t2ujc72l3nf"
 config/features=PackedStringArray("4.6", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://assets/branding/icons/icon_512.png"
+boot_splash/image="res://assets/branding/splash/splash_portrait.png"
+boot_splash/bg_color=Color(0.06, 0.05, 0.04, 1)
 
 [autoload]
 
